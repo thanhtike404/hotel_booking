@@ -5,7 +5,15 @@ import {
   DollarSign 
 } from "lucide-react";
 import React from "react";
-import { Booking, RoomStatus } from "@/types/dashboard";
+import { dashboardData } from "@/data/dashboard";
+
+interface Booking {
+  id: number;
+  guestName: string;
+  roomType: string;
+  date: string;
+  status: string;
+}
 
 const recentBookings: Booking[] = [
   {
@@ -68,6 +76,8 @@ function StatsCard({ title, value, icon, trend }: CardProps) {
 }
 
 export default function DashboardPage() {
+  const { stats, recentBookings, roomStatus } = dashboardData;
+  
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-foreground">Dashboard Overview</h1>
@@ -76,27 +86,27 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard
           title="Total Bookings"
-          value="1,234"
+          value={stats.bookings.total.toLocaleString()}
           icon={Calendar}
-          trend={{ direction: 'up', value: '12.5%' }}
+          trend={stats.bookings.trend}
         />
         <StatsCard
           title="Total Guests"
-          value="5,678"
+          value={stats.guests.total.toLocaleString()}
           icon={Users}
-          trend={{ direction: 'up', value: '8.2%' }}
+          trend={stats.guests.trend}
         />
         <StatsCard
           title="Available Rooms"
-          value="45"
+          value={stats.rooms.available}
           icon={Hotel}
-          trend={{ direction: 'down', value: '3.1%' }}
+          trend={stats.rooms.trend}
         />
         <StatsCard
           title="Revenue"
-          value="$52,389"
+          value={`$${stats.revenue.total.toLocaleString()}`}
           icon={DollarSign}
-          trend={{ direction: 'up', value: '15.3%' }}
+          trend={stats.revenue.trend as { direction: 'up' | 'down'; value: string }}
         />
       </div>
 
