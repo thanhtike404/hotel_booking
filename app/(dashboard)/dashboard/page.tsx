@@ -4,8 +4,10 @@ import {
   Calendar, 
   DollarSign 
 } from "lucide-react";
+import React from "react";
+import { Booking, RoomStatus } from "@/types/dashboard";
 
-const recentBookings = [
+const recentBookings: Booking[] = [
   {
     id: 1,
     guestName: "John Doe",
@@ -29,24 +31,34 @@ const recentBookings = [
   }
 ];
 
-const roomStatus = [
+const roomStatus: RoomStatus[] = [
   { type: "Occupied", percentage: 75 },
   { type: "Available", percentage: 25 },
   { type: "Under Maintenance", percentage: 10 },
   { type: "Reserved", percentage: 45 }
 ];
 
-function StatsCard({ title, value, icon, trend }) {
-  const isPositive = trend.startsWith('+');
+interface CardProps {
+  title: string;
+  value: string | number;
+  icon: React.ElementType;
+  trend: {
+    direction: 'up' | 'down';
+    value: string;
+  };
+}
+
+function StatsCard({ title ,value, icon, trend }:CardProps) {
+  const isPositive = trend.direction === 'up';
   
   return (
     <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
       <div className="flex items-center justify-between mb-4">
         <div className="p-2 bg-blue-50 dark:bg-blue-900 rounded-lg">
-          {icon}
+          {React.createElement(icon, { className: "h-6 w-6" })}
         </div>
         <span className={`text-sm ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
-          {trend}
+          {`${trend.direction === 'up' ? '+' : '-'}${trend.value}`}
         </span>
       </div>
       <h3 className="text-gray-500 dark:text-gray-400 text-sm">{title}</h3>
@@ -54,6 +66,8 @@ function StatsCard({ title, value, icon, trend }) {
     </div>
   );
 }
+
+// Remove the duplicate Card component since it's not being used
 
 export default function DashboardPage() {
   return (
@@ -65,26 +79,26 @@ export default function DashboardPage() {
         <StatsCard
           title="Total Bookings"
           value="1,234"
-          icon={<Calendar className="h-6 w-6" />}
-          trend="+12.5%"
+          icon={Calendar}
+          trend={{ direction: 'up', value: '12.5%' }}
         />
         <StatsCard
           title="Total Guests"
           value="5,678"
-          icon={<Users className="h-6 w-6" />}
-          trend="+8.2%"
+          icon={Users}
+          trend={{ direction: 'up', value: '8.2%' }}
         />
         <StatsCard
           title="Available Rooms"
           value="45"
-          icon={<Hotel className="h-6 w-6" />}
-          trend="-3.1%"
+          icon={Hotel}
+          trend={{ direction: 'down', value: '3.1%' }}
         />
         <StatsCard
           title="Revenue"
           value="$52,389"
-          icon={<DollarSign className="h-6 w-6" />}
-          trend="+15.3%"
+          icon={DollarSign}
+          trend={{ direction: 'up', value: '15.3%' }}
         />
       </div>
 
