@@ -48,31 +48,29 @@ interface CardProps {
   };
 }
 
-function StatsCard({ title ,value, icon, trend }:CardProps) {
+function StatsCard({ title, value, icon, trend }: CardProps) {
   const isPositive = trend.direction === 'up';
   
   return (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+    <div className="bg-card p-6 rounded-lg shadow-sm border">
       <div className="flex items-center justify-between mb-4">
-        <div className="p-2 bg-blue-50 dark:bg-blue-900 rounded-lg">
-          {React.createElement(icon, { className: "h-6 w-6" })}
+        <div className="p-2 bg-primary/10 rounded-lg">
+          {React.createElement(icon, { className: "h-6 w-6 text-primary" })}
         </div>
-        <span className={`text-sm ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+        <span className={`text-sm ${isPositive ? 'text-emerald-500' : 'text-destructive'}`}>
           {`${trend.direction === 'up' ? '+' : '-'}${trend.value}`}
         </span>
       </div>
-      <h3 className="text-gray-500 dark:text-gray-400 text-sm">{title}</h3>
-      <p className="text-2xl font-semibold dark:text-white">{value}</p>
+      <h3 className="text-muted-foreground text-sm">{title}</h3>
+      <p className="text-2xl font-semibold text-foreground">{value}</p>
     </div>
   );
 }
 
-// Remove the duplicate Card component since it's not being used
-
 export default function DashboardPage() {
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold dark:text-white">Dashboard Overview</h1>
+      <h1 className="text-2xl font-bold text-foreground">Dashboard Overview</h1>
       
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -104,38 +102,38 @@ export default function DashboardPage() {
 
       {/* Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-          <h2 className="text-lg font-semibold mb-4 dark:text-white">Recent Bookings</h2>
+        <div className="bg-card p-6 rounded-lg shadow-sm border">
+          <h2 className="text-lg font-semibold mb-4 text-foreground">Recent Bookings</h2>
           <div className="space-y-4">
             {recentBookings.map((booking) => (
-              <div key={booking.id} className="flex items-center justify-between border-b dark:border-gray-700 pb-4">
+              <div key={booking.id} className="flex items-center justify-between border-b pb-4">
                 <div>
-                  <p className="font-medium dark:text-white">{booking.guestName}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{booking.roomType}</p>
+                  <p className="font-medium text-foreground">{booking.guestName}</p>
+                  <p className="text-sm text-muted-foreground">{booking.roomType}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium dark:text-white">{booking.date}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{booking.status}</p>
+                  <p className="font-medium text-foreground">{booking.date}</p>
+                  <p className="text-sm text-muted-foreground">{booking.status}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-          <h2 className="text-lg font-semibold mb-4 dark:text-white">Room Status</h2>
+        <div className="bg-card p-6 rounded-lg shadow-sm border">
+          <h2 className="text-lg font-semibold mb-4 text-foreground">Room Status</h2>
           <div className="space-y-4">
             {roomStatus.map((status) => (
               <div key={status.type} className="flex items-center justify-between">
-                <span className="dark:text-white">{status.type}</span>
+                <span className="text-foreground">{status.type}</span>
                 <div className="flex items-center gap-2">
-                  <div className="w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                  <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-blue-500" 
+                      className="h-full bg-primary" 
                       style={{ width: `${status.percentage}%` }}
                     />
                   </div>
-                  <span className="text-sm dark:text-gray-400">{status.percentage}%</span>
+                  <span className="text-sm text-muted-foreground">{status.percentage}%</span>
                 </div>
               </div>
             ))}
