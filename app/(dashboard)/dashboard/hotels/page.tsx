@@ -6,6 +6,9 @@ import { ColumnDef } from "@tanstack/react-table"
 import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
 import { Star } from "lucide-react"
+import Lightbox from "yet-another-react-lightbox"
+import "yet-another-react-lightbox/styles.css"
+import { useState } from "react"
 
 type Hotel = (typeof hotels.featured)[0]
 
@@ -14,15 +17,31 @@ const columns: ColumnDef<Hotel>[] = [
     accessorKey: "image",
     header: "Image",
     cell: ({ row }) => {
+      const [open, setOpen] = useState(false);
       return (
-        <div className="relative w-20 h-20">
-          <Image
-            src={row.getValue("image")}
-            alt={row.getValue("name")}
-            fill
-            className="object-cover rounded-md"
+        <>
+          <div 
+            className="relative w-20 h-20 cursor-pointer"
+            onClick={() => setOpen(true)}
+          >
+            <Image
+              src={row.getValue("image")}
+              alt={row.getValue("name")}
+              fill
+              className="object-cover rounded-md hover:opacity-80 transition-opacity"
+            />
+          </div>
+          <Lightbox
+            open={open}
+            close={() => setOpen(false)}
+            slides={[
+              {
+                src: row.getValue("image"),
+                alt: row.getValue("name"),
+              },
+            ]}
           />
-        </div>
+        </>
       )
     },
   },

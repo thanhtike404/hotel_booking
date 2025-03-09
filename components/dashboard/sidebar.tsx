@@ -21,7 +21,7 @@ const routes = [
   {
     label: 'Hotels',
     icon: Hotel,
-    href: '/hotels',
+    href: '/dashboard/hotels',
   },
   {
     label: 'Bookings',
