@@ -89,3 +89,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Add at the end of your globals.css */
+.leaflet-container {
+  z-index: 10;
+}

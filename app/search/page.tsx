@@ -1,5 +1,6 @@
 "use client"
 
+import { MainNav } from "@/components/main-nav"
 import { hotels } from "@/data/hotels"
 import { useState } from "react"
 import { CustomLink as Link } from "@/components/ui/custom-link"
@@ -28,26 +29,7 @@ export default function SearchPage() {
 
   return (
     <>
-      {/* Responsive header */}
-      <div className="border-b">
-        <div className="container flex h-16 items-center px-4">
-          <Link href="/">
-            <Button variant="ghost" className="flex items-center gap-2">
-              <HomeIcon className="h-5 w-5" />
-              <span className="font-bold">Hotel Booking</span>
-            </Button>
-          </Link>
-          <nav className="flex items-center space-x-6 ml-6">
-            <Link href="/hotels" className="text-sm font-medium transition-colors hover:text-primary">
-              Hotels
-            </Link>
-            <Link href="/dashboard" className="text-sm font-medium transition-colors hover:text-primary">
-              Dashboard
-            </Link>
-          </nav>
-        </div>
-      </div>
-
+      <MainNav />
       <div className="container mx-auto py-6 px-4 md:px-6 lg:px-8">
         {/* Mobile filter button */}
         <Button

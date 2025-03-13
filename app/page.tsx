@@ -1,5 +1,5 @@
 "use client"
-
+import { MainNav } from "@/components/main-nav"
 import { hotels } from "@/data/hotels"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -11,20 +11,38 @@ import { Badge } from "@/components/ui/badge"
 export default function HomePage() {
   const featuredHotels = hotels.featured.slice(0, 3)
   const popularDestinations = [
-    { name: "Paris", image: "/destinations/paris.jpg", hotels: 240 },
-    { name: "London", image: "/destinations/london.jpg", hotels: 185 },
-    { name: "New York", image: "/destinations/newyork.jpg", hotels: 310 },
-    { name: "Tokyo", image: "/destinations/tokyo.jpg", hotels: 275 },
+    { 
+      name: "Paris", 
+      image: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?q=80&w=2070&auto=format&fit=crop",
+      hotels: 240 
+    },
+    { 
+      name: "London", 
+      image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=2070&auto=format&fit=crop",
+      hotels: 185 
+    },
+    { 
+      name: "New York", 
+      image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=2070&auto=format&fit=crop",
+      hotels: 310 
+    },
+    { 
+      name: "Tokyo", 
+      image: "https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?q=80&w=2070&auto=format&fit=crop",
+      hotels: 275 
+    },
   ]
 
   return (
     <>
+      <MainNav />
       {/* Hero Section */}
       <div className="relative h-[600px]">
         <Image
-          src="/hero-image.jpg"
+          src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=2070&auto=format&fit=crop"
           alt="Luxury Hotel"
           fill
+          priority
           className="object-cover brightness-50"
         />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
@@ -107,27 +125,34 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Why Choose Us */}
+      {/* Why Choose Us - update icons */}
       <section className="container mx-auto py-16 px-4">
         <h2 className="text-3xl font-bold mb-12 text-center">Why Choose Us</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="text-center">
             <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
-              <Star className="h-8 w-8 text-primary" />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
             </div>
             <h3 className="font-semibold text-xl mb-2">Best Rates</h3>
             <p className="text-muted-foreground">Guaranteed best prices for quality stays</p>
           </div>
           <div className="text-center">
             <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
-              <Star className="h-8 w-8 text-primary" />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
             </div>
             <h3 className="font-semibold text-xl mb-2">24/7 Support</h3>
             <p className="text-muted-foreground">Round-the-clock assistance for any concern</p>
           </div>
           <div className="text-center">
             <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
-              <Star className="h-8 w-8 text-primary" />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
             </div>
             <h3 className="font-semibold text-xl mb-2">Secure Booking</h3>
             <p className="text-muted-foreground">Safe and secure payment systems</p>
