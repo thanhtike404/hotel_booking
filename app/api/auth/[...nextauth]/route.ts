@@ -1,44 +1,56 @@
-import NextAuth from "next-auth"
-import GoogleProvider from "next-auth/providers/google"
+import { NextAuthOptions } from "next-auth"
+import { PrismaAdapter } from "@auth/prisma-adapter"
 import CredentialsProvider from "next-auth/providers/credentials"
+import { PrismaClient } from "@prisma/client"
+import bcrypt from "bcryptjs"
 
-const handler = NextAuth({
+const prisma = new PrismaClient()
+
+export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma),
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
     CredentialsProvider({
-      name: "Credentials",
+      name: "credentials",
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        // Add your authentication logic here
-        // Example:
-        // const user = await db.user.findUnique({ where: { email: credentials.email }})
-        // if (user && await comparePasswords(credentials.password, user.password)) {
-        //   return user
-        // }
-        return null
-      }
-    }),
-  ],
-  pages: {
-    signIn: '/auth/signin',
-    error: '/auth/error',
-  },
-  callbacks: {
-    async session({ session, token }) {
-      // Add custom session handling
-      return session
-    },
-    async jwt({ token, user }) {
-      // Add custom token handling
-      return token
-    }
-  }
-})
+        if (!credentials?.email || !credentials?.password) {
+          return null
+        }
 
+        const user = await prisma.user.findUnique({
+          where: {
+            email: credentials.email
+          }
+        })
+
+        if (!user) {
+          return null
+        }
+
+        const passwordMatch = await bcrypt.compare(credentials.password, user.password)
+
+        if (!passwordMatch) {
+          return null
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+        }
+      }
+    })
+  ],
+  session: {
+    strategy: "jwt"
+  },
+  pages: {
+    signIn: "/login",
+  },
+}
+
+export const handler = NextAuth(authOptions)
 export { handler as GET, handler as POST }
