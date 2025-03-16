@@ -1,5 +1,4 @@
 "use client"
-import { MainNav } from "@/components/main-nav"
 import { hotels } from "@/data/hotels"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -34,8 +33,8 @@ export default function HomePage() {
   ]
 
   return (
-    <>
-      <MainNav />
+    <main>
+  
       {/* Hero Section */}
       <div className="relative h-[600px]">
         <Image
@@ -159,6 +158,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-    </>
+    </main>
   )
 }

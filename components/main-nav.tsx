@@ -1,28 +1,48 @@
-"use client"
-
-import { CustomLink as Link } from "@/components/ui/custom-link"
-import { Button } from "@/components/ui/button"
-import { HomeIcon } from "lucide-react"
+'use client'
+import Link from "next/link"
+import { useSession, signOut } from "next-auth/react"
+import { Button } from "./ui/button"
 
 export function MainNav() {
+  const { data: session } = useSession()
+
   return (
-    <div className="border-b">
-      <div className="container flex h-16 items-center px-4">
-        <Link href="/">
-          <Button variant="ghost" className="flex items-center gap-2">
-            <HomeIcon className="h-5 w-5" />
-            <span className="font-bold">Hotel Booking</span>
-          </Button>
-        </Link>
-        <nav className="flex items-center space-x-6 ml-6">
-          <Link href="/search" className="text-sm font-medium transition-colors hover:text-primary">
-            Search
+    <nav className="border-b">
+      <div className="container mx-auto px-4 flex h-16 items-center justify-between">
+        <div className="flex gap-6">
+          <Link href="/" className="font-semibold">
+            Hotel Booking
           </Link>
-          <Link href="/hotels" className="text-sm font-medium transition-colors hover:text-primary">
+          <Link href="/hotels" className="text-muted-foreground">
             Hotels
           </Link>
-        </nav>
+        </div>
+
+        <div className="flex items-center gap-4">
+          {session ? (
+            <>
+              <span className="text-sm text-muted-foreground">
+                {session.user?.name}
+              </span>
+              <Button
+                variant="ghost"
+                onClick={() => signOut()}
+              >
+                Logout
+              </Button>
+            </>
+          ) : (
+            <>
+              <Link href="/login">
+                <Button variant="ghost">Login</Button>
+              </Link>
+              <Link href="/register">
+                <Button>Register</Button>
+              </Link>
+            </>
+          )}
+        </div>
       </div>
-    </div>
+    </nav>
   )
 }

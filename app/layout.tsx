@@ -1,11 +1,17 @@
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import { ThemeProvider } from "next-themes"
-import { MainNav } from "@/components/nav"
+import { ThemeProvider } from "@/components/providers/theme-provider"
+import { MainNav } from "@/components/main-nav"
 import AuthProvider from "@/components/providers/session-provider"
-import { headers } from 'next/headers'
-import { NavigationProvider } from "@/components/providers/navigation-provider"
+import ThemeScript from "@/components/providers/theme-script"
+
+const inter = Inter({ subsets: ["latin"] })
+
+export const metadata: Metadata = {
+  title: "Hotel Booking",
+  description: "Find and book your perfect stay",
+}
 
 export default function RootLayout({
   children,
@@ -14,10 +20,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning>
-        <NavigationProvider>
-          {children}
-        </NavigationProvider>
+      <head>
+        <ThemeScript />
+      </head>
+      <body className={inter.className} suppressHydrationWarning>
+        <AuthProvider>
+          <ThemeProvider>
+            <MainNav />
+            {children}
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   )

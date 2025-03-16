@@ -1,6 +1,6 @@
 "use client"
 
-import { MainNav } from "@/components/main-nav"
+
 import { hotels } from "@/data/hotels"
 import { useState } from "react"
 import { CustomLink as Link } from "@/components/ui/custom-link"
@@ -29,7 +29,7 @@ export default function SearchPage() {
 
   return (
     <>
-      <MainNav />
+    
       <div className="container mx-auto py-6 px-4 md:px-6 lg:px-8">
         {/* Mobile filter button */}
         <Button
