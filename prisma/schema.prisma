@@ -11,16 +11,16 @@ datasource db {
 model Account {
   id                String  @id @default(cuid())
   userId            String
-  type             String
-  provider         String
+  type              String
+  provider          String
   providerAccountId String
-  refresh_token    String? @db.Text
-  access_token     String? @db.Text
-  expires_at       Int?
-  token_type       String?
-  scope            String?
-  id_token         String? @db.Text
-  session_state    String?
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -39,7 +39,7 @@ model User {
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
-  password      String?   // Add this line
+  password      String?   // Added field
   emailVerified DateTime?
   image         String?
   accounts      Account[]
@@ -66,21 +66,11 @@ model Hotel {
   pricePerNight Float
   featured      Boolean   @default(false)
   amenities     String[]
-  rooms         Room?
+  rooms         Room[]    // Changed from Room? to Room[] because a hotel can have many rooms
   reviews       Review[]
   bookings      Booking[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-}
-
-model Room {
-  id        String   @id @default(cuid())
-  hotelId   String   @unique
-  available Int
-  total     Int
-  hotel     Hotel    @relation(fields: [hotelId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model Review {
@@ -99,11 +89,33 @@ model Booking {
   id        String   @id @default(cuid())
   hotelId   String
   userId    String
+  roomId    String?   // Optional: for a specific room booking
   checkIn   DateTime
   checkOut  DateTime
   status    String
   hotel     Hotel    @relation(fields: [hotelId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
+  room      Room?    @relation(fields: [roomId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum RoomType {
+  SINGLE
+  DOUBLE
+  TWIN
+  SUITE
+  FAMILY
+}
+
+model Room {
+  id        String   @id @default(cuid())
+  hotelId   String   // Removed the @unique attribute so a hotel can have multiple rooms
+  available Int
+  total     Int
+  roomType  RoomType
+  hotel     Hotel    @relation(fields: [hotelId], references: [id])
+  bookings  Booking[] // Back relation for bookings referencing this room
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
