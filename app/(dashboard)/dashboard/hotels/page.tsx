@@ -1,7 +1,8 @@
+import { Button } from "@/components/ui/button"
 import { columns } from "./columns"
 import { DataTable } from "./data-table"
 import { Hotel } from "@/types/hotel"
-
+import Link from "next/link"
 async function getData(): Promise<Hotel[]> {
   // Return dummy hotel data that conforms to your types
   return [
@@ -161,6 +162,13 @@ export default async function Hotels() {
 
   return (
     <div className="container mx-auto py-10">
+      <div className="space-y-4">
+        <h1 className="text-3xl font-bold">Hotels</h1>
+        <p className="text-muted-foreground">List of all hotels</p>
+      </div>
+      <Button className="mt-8">
+        <Link href="/dashboard/hotels/create">Add Hotel</Link>
+      </Button>
       <DataTable columns={columns} data={data} />
     </div>
   )

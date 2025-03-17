@@ -1,3 +1,4 @@
+import MainNav from '@/components/main-nav';
 export default function SiteLayout({
   children,
 }: {
@@ -6,17 +7,16 @@ export default function SiteLayout({
   return (
     <div className="min-h-screen flex flex-col">
       {/* Site Header */}
-      <header className="bg-white shadow">
-        <nav className="container mx-auto px-4 py-6">
-          {/* Add your site navigation items here */}
-        </nav>
-      </header>
+
 
       {/* Site Content */}
-      <main className="flex-1">{children}</main>
+      <main className="flex-1">
+        <MainNav />
+
+        {children}</main>
 
       {/* Site Footer */}
-      <footer className="bg-gray-100">
+      <footer className="">
         <div className="container mx-auto px-4 py-8">
           {/* Add your footer content here */}
         </div>

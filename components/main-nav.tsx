@@ -3,7 +3,7 @@ import Link from "next/link"
 import { useSession, signOut } from "next-auth/react"
 import { Button } from "./ui/button"
 
-export function MainNav() {
+export default function MainNav() {
   const { data: session } = useSession()
 
   return (
