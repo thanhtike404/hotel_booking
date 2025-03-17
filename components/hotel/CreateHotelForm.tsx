@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
+import { useMutation } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -16,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
+import axios from "axios"
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -52,6 +54,12 @@ const amenitiesOptions = [
   "Air Conditioning",
 ]
 
+// Add type for API response
+type CreateHotelResponse = {
+  id: string
+  // ... other hotel fields
+}
+
 export default function CreateHotelForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -61,9 +69,34 @@ export default function CreateHotelForm() {
     },
   })
 
+  const createHotel = useMutation({
+    mutationFn: async (values: z.infer<typeof formSchema>) => {
+      const { data } = await axios.post<CreateHotelResponse>(
+        '/api/hotels',
+        values,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+      return data
+    },
+    onSuccess: () => {
+      form.reset()
+      // You can add toast notification here
+      // You can also redirect to the hotels list page
+    },
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        console.error('Error creating hotel:', error.response?.data)
+      }
+      // You can add error toast notification here
+    },
+  })
+
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Add your submission logic here
-    console.log(values)
+    createHotel.mutate(values)
   }
 
   return (
@@ -246,7 +279,12 @@ export default function CreateHotelForm() {
           )}
         />
 
-        <Button type="submit">Create Hotel</Button>
+        <Button 
+          type="submit" 
+          disabled={createHotel.isPending}
+        >
+          {createHotel.isPending ? "Creating..." : "Create Hotel"}
+        </Button>
       </form>
     </Form>
   )

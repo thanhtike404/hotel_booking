@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/providers/theme-provider"
-
+import QueryProvider from "@/components/providers/queryProvider"
 import AuthProvider from "@/components/providers/session-provider"
 import ThemeScript from "@/components/providers/theme-script"
 
@@ -24,11 +24,13 @@ export default function RootLayout({
         <ThemeScript />
       </head>
       <body className={inter.className} suppressHydrationWarning>
+        <QueryProvider>
         <AuthProvider>
           <ThemeProvider>
             {children}
           </ThemeProvider>
         </AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   )
