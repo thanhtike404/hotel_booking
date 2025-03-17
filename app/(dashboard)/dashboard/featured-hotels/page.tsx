@@ -17,7 +17,7 @@ export default function FeaturedHotelsPage() {
         </p>
       </div>
       <div className="mt-6">
-        <DataTable columns={columns} data={featuredHotels} />
+        {/* <DataTable columns={columns} data={featuredHotels} /> */}
       </div>
     </div>
   )

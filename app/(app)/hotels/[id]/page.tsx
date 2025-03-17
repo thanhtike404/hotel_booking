@@ -11,7 +11,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import dynamic from 'next/dynamic'
 
-const Map = dynamic(() => import('../../../components/map'), {
+const Map = dynamic(() => import('@/components/map'), {
   ssr: false,
   loading: () => <div className="h-[400px] w-full bg-muted animate-pulse rounded-lg" />
 })
@@ -27,10 +27,10 @@ export default function HotelDetailPage({ params }: { params: { id: string } }) 
   // Unwrap params with React.use()
   const unwrappedParams = React.use(params)
   const id = unwrappedParams.id
-  
+
   // Find the hotel using the unwrapped id
   const hotel = hotels.featured.find((hotel) => hotel.id.toString() === id)
-  
+
   if (!hotel) {
     return <div>Hotel not found</div>
   }
@@ -44,7 +44,7 @@ export default function HotelDetailPage({ params }: { params: { id: string } }) 
           <Link href="/hotels">
             <Button variant="ghost" className="flex items-center gap-2">
               <ArrowLeft className="h-5 w-5" />
-              <span>Back to fucking hotels</span>
+              <span>Back to Hotels</span>
             </Button>
           </Link>
         </div>
@@ -106,7 +106,7 @@ export default function HotelDetailPage({ params }: { params: { id: string } }) 
           {/* Add Map Section */}
           <div className="col-span-full">
             <h2 className="text-2xl font-semibold mb-4">Location</h2>
-            <Map 
+            <Map
               center={hotelCoords}
               name={hotel.name}
               location={hotel.location}
