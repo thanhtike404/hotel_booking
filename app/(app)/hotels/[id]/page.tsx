@@ -44,7 +44,7 @@ export default function HotelDetailPage({ params }: { params: { id: string } }) 
           <Link href="/hotels">
             <Button variant="ghost" className="flex items-center gap-2">
               <ArrowLeft className="h-5 w-5" />
-              <span>Back to Hotels</span>
+              <span>Back to fucking hotels</span>
             </Button>
           </Link>
         </div>

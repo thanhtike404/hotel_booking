@@ -1,10 +1,12 @@
-'use client'
-import { ColumnDef } from "@tanstack/react-table";
-import { Hotel } from "@/types/hotel"; // Adjust path based on where your types are stored
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils"; // Helper function for conditional classNames
+"use client"
+import { ColumnDef } from "@tanstack/react-table"
+import { Hotel } from "@prisma/client"
+import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
+import { format, parseISO } from "date-fns"
+import { Button } from "@/components/ui/button"
+import { Eye, Edit, Trash2 } from "lucide-react"
+import Link from "next/link"
 
 export const columns: ColumnDef<Hotel>[] = [
   {
@@ -29,7 +31,16 @@ export const columns: ColumnDef<Hotel>[] = [
   {
     accessorKey: "name",
     header: "Hotel Name",
-    cell: ({ row }) => <span className="font-medium">{row.getValue("name")}</span>,
+    cell: ({ row }) => (
+      <div className="flex items-center gap-2">
+        <img 
+          src={row.original.image} 
+          alt={row.getValue("name")} 
+          className="h-8 w-8 rounded-full object-cover"
+        />
+        <span className="font-medium">{row.getValue("name")}</span>
+      </div>
+    ),
   },
   {
     accessorKey: "location",
@@ -38,13 +49,19 @@ export const columns: ColumnDef<Hotel>[] = [
   {
     accessorKey: "pricePerNight",
     header: "Price Per Night",
-    cell: ({ row }) => <span>${row.getValue("pricePerNight")}</span>,
+    cell: ({ row }) => (
+      <span className="font-medium">
+        ${row.getValue("pricePerNight")}
+      </span>
+    ),
   },
   {
     accessorKey: "rating",
     header: "Rating",
     cell: ({ row }) => (
-      <span className="text-yellow-500 font-medium">{row.getValue("rating")} ★</span>
+      <span className="text-yellow-500 font-medium">
+        {row.getValue("rating")} ★
+      </span>
     ),
   },
   {
@@ -59,18 +76,41 @@ export const columns: ColumnDef<Hotel>[] = [
   {
     accessorKey: "createdAt",
     header: "Created At",
-    cell: ({ row }) => format(new Date(row.getValue("createdAt")), "PPpp"),
+    cell: ({ row }) => {
+      const dateStr = row.getValue("createdAt")
+      if (!dateStr) return null
+      const date = new Date(dateStr)
+      return date.toLocaleString()
+    },
   },
   {
     id: "actions",
     header: "Actions",
     cell: ({ row }) => (
-      <button
-        className="text-sm text-blue-500 hover:underline"
-        onClick={() => console.log("Edit", row.original.id)}
-      >
-        Edit
-      </button>
+      <div className="flex items-center gap-2">
+        <Link href={`/dashboard/hotels/${row.original.id}`}>
+          <Button variant="ghost" size="icon">
+            <Eye className="h-4 w-4" />
+          </Button>
+        </Link>
+        <Link href={`/dashboard/hotels/${row.original.id}/edit`}>
+          <Button variant="ghost" size="icon">
+            <Edit className="h-4 w-4" />
+          </Button>
+        </Link>
+        <Button 
+          variant="ghost" 
+          size="icon"
+          className="text-destructive"
+          onClick={() => {
+            if (confirm("Are you sure you want to delete this hotel?")) {
+              console.log("Delete hotel:", row.original.id)
+            }
+          }}
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </div>
     ),
   },
-];
+]
