@@ -23,7 +23,7 @@ export default function Map({ center, name, location }: MapProps) {
     // Fix for map container not rendering properly
     const container = document.getElementById('map-container')
     if (container) {
-      container.style.height = '400px'
+      container.style.height = '100px'
       container.style.width = '100%'
     }
   }, [])

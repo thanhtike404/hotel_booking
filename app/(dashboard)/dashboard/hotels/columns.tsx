@@ -7,6 +7,9 @@ import { format, parseISO } from "date-fns"
 import { Button } from "@/components/ui/button"
 import { Eye, Edit, Trash2 } from "lucide-react"
 import Link from "next/link"
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+
 
 export const columns: ColumnDef<Hotel>[] = [
   {
@@ -33,9 +36,9 @@ export const columns: ColumnDef<Hotel>[] = [
     header: "Hotel Name",
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <img 
-          src={row.original.image} 
-          alt={row.getValue("name")} 
+        <img
+          src={row.original.image}
+          alt={row.getValue("name")}
           className="h-8 w-8 rounded-full object-cover"
         />
         <span className="font-medium">{row.getValue("name")}</span>
@@ -86,31 +89,44 @@ export const columns: ColumnDef<Hotel>[] = [
   {
     id: "actions",
     header: "Actions",
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        <Link href={`/dashboard/hotels/${row.original.id}`}>
-          <Button variant="ghost" size="icon">
-            <Eye className="h-4 w-4" />
+    cell: ({ row }) => {
+      const queryClient = useQueryClient();
+
+      const deleteHotel = useMutation({
+        mutationFn: async (id: string) => {
+          await axios.delete("/api/dashboard/hotels", { data: { id } });
+        },
+        onSuccess: () => {
+          queryClient.invalidateQueries("hotels");
+        },
+      });
+
+      return (
+        <div className="flex items-center gap-2">
+          <Link href={`/dashboard/hotels/${row.original.id}`}>
+            <Button variant="ghost" size="icon">
+              <Eye className="h-4 w-4" />
+            </Button>
+          </Link>
+          <Link href={`/dashboard/hotels/${row.original.id}/edit`}>
+            <Button variant="ghost" size="icon">
+              <Edit className="h-4 w-4" />
+            </Button>
+          </Link>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-destructive"
+            onClick={() => {
+              if (confirm("Are you sure you want to delete this hotel?")) {
+                deleteHotel.mutate(row.original.id);
+              }
+            }}
+          >
+            <Trash2 className="h-4 w-4" />
           </Button>
-        </Link>
-        <Link href={`/dashboard/hotels/${row.original.id}/edit`}>
-          <Button variant="ghost" size="icon">
-            <Edit className="h-4 w-4" />
-          </Button>
-        </Link>
-        <Button 
-          variant="ghost" 
-          size="icon"
-          className="text-destructive"
-          onClick={() => {
-            if (confirm("Are you sure you want to delete this hotel?")) {
-              console.log("Delete hotel:", row.original.id)
-            }
-          }}
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      </div>
-    ),
+        </div>
+      );
+    },
   },
 ]

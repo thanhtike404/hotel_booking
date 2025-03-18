@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma"
 
 export async function GET() {
   try {
-    console.log('Fetching hotels...')  // Add logging
     const hotels = await prisma.hotel.findMany({
       include: {
         rooms: true,
@@ -36,6 +35,10 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     
+    if (!body.name || !body.location || !body.description || !body.image || body.rating === undefined || !body.pricePerNight || !body.amenities) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    }
+
     const hotel = await prisma.hotel.create({
       data: {
         name: body.name,
@@ -49,12 +52,31 @@ export async function POST(request: Request) {
       },
     })
 
-    return NextResponse.json(hotel)
+    return NextResponse.json(hotel, { status: 201 })
   } catch (error) {
     console.error('Error creating hotel:', error)
     return NextResponse.json(
-      { error: 'Failed to create hotel' },
+      { error: 'Internal server error' },
       { status: 500 }
     )
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { id } = await request.json();
+
+    if (!id) {
+      return NextResponse.json({ error: 'Hotel ID is required' }, { status: 400 });
+    }
+
+    await prisma.hotel.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ message: 'Hotel deleted successfully' }, { status: 200 });
+  } catch (error) {
+    console.error('Error deleting hotel:', error);
+    return NextResponse.json({ error: 'Failed to delete hotel' }, { status: 500 });
   }
 }

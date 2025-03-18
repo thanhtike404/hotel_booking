@@ -25,11 +25,11 @@ export default function RootLayout({
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <QueryProvider>
-        <AuthProvider>
-          <ThemeProvider>
-            {children}
-          </ThemeProvider>
-        </AuthProvider>
+          <AuthProvider>
+            <ThemeProvider>
+              {children}
+            </ThemeProvider>
+          </AuthProvider>
         </QueryProvider>
       </body>
     </html>

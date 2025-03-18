@@ -64,6 +64,12 @@ export default function CreateHotelForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: '',
+      description: '',
+      location: '',
+      image: '',
+      rating: 0,
+      pricePerNight: 0,
       featured: false,
       amenities: [],
     },
