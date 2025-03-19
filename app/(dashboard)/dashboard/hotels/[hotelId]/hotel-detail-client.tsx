@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Edit } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
@@ -21,12 +21,21 @@ export default function HotelDetailClient({ hotel }: { hotel: HotelWithRelations
   return (
     <div className="container mx-auto py-10">
       <div className="mb-8">
-        <Button variant="ghost" asChild className="mb-6">
-          <Link href="/dashboard/hotels" className="flex items-center gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Back to fucking Hotels
-          </Link>
-        </Button>
+        <div className="flex justify-between items-center mb-6">
+          <Button variant="ghost" asChild>
+            <Link href="/dashboard/hotels" className="flex items-center gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Back to Hotels
+            </Link>
+          </Button>
+          
+          <Button asChild>
+            <Link href={`/dashboard/hotels/edit/${hotel.id}`} className="flex items-center gap-2">
+              <Edit className="h-4 w-4" />
+              Edit Hotel
+            </Link>
+          </Button>
+        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>

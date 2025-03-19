@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { DashboardNavbar } from "@/components/dashboard/navbar"
 import { Sidebar } from "@/components/dashboard/sidebar"
-
+import { Toaster } from "@/components/ui/toaster"
 export default function DashboardLayout({
   children,
 }: {
@@ -14,6 +14,7 @@ export default function DashboardLayout({
   return (
     <div>
       <DashboardNavbar onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
+      <Toaster />
       <div className="flex pt-16 h-screen">
         <div className={`
           fixed inset-y-0 pt-16 

@@ -87,6 +87,7 @@ export const columns: ColumnDef<Hotel>[] = [
     },
   },
   {
+
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {
@@ -108,7 +109,7 @@ export const columns: ColumnDef<Hotel>[] = [
               <Eye className="h-4 w-4" />
             </Button>
           </Link>
-          <Link href={`/dashboard/hotels/${row.original.id}/edit`}>
+          <Link href={`/dashboard/hotels/edit/${row.original.id}`}>
             <Button variant="ghost" size="icon">
               <Edit className="h-4 w-4" />
             </Button>
