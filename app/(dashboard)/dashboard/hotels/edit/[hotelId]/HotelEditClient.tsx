@@ -45,7 +45,7 @@ const hotelFormSchema = z.object({
 type HotelFormValues = z.infer<typeof hotelFormSchema>
 
 export default function HotelEditClient({ hotel }: { hotel: HotelWithRelations | null }) {
-  const toast = useToast()
+  const { toast } = useToast()
   const router = useRouter()
   const queryClient = useQueryClient()
   const [amenity, setAmenity] = useState("")
@@ -80,7 +80,13 @@ export default function HotelEditClient({ hotel }: { hotel: HotelWithRelations |
       })
       queryClient.invalidateQueries({ queryKey: ["hotels"] })
       queryClient.invalidateQueries({ queryKey: ["hotel", hotel.id] })
-      router.push(`/dashboard/hotels/${hotel.id}`)
+      try {
+        router.push(`/dashboard/hotels/${hotel.id}`)
+
+      } catch (error) {
+        console.error("Error navigating to hotel details:", error)
+
+      }
     },
     onError: (error) => {
       toast({
@@ -98,7 +104,7 @@ export default function HotelEditClient({ hotel }: { hotel: HotelWithRelations |
 
   const addAmenity = () => {
     if (amenity.trim() === "") return
-    
+
     const currentAmenities = form.getValues("amenities") || []
     form.setValue("amenities", [...currentAmenities, amenity.trim()])
     setAmenity("")
@@ -179,13 +185,13 @@ export default function HotelEditClient({ hotel }: { hotel: HotelWithRelations |
                   <FormItem>
                     <FormLabel>Rating (0-5)</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        placeholder="Enter rating" 
-                        min={0} 
-                        max={5} 
-                        step={0.1} 
-                        {...field} 
+                      <Input
+                        type="number"
+                        placeholder="Enter rating"
+                        min={0}
+                        max={5}
+                        step={0.1}
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -214,10 +220,10 @@ export default function HotelEditClient({ hotel }: { hotel: HotelWithRelations |
                   <FormItem className="col-span-2">
                     <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <Textarea 
-                        placeholder="Enter hotel description" 
-                        className="min-h-[120px]" 
-                        {...field} 
+                      <Textarea
+                        placeholder="Enter hotel description"
+                        className="min-h-[120px]"
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -291,7 +297,7 @@ export default function HotelEditClient({ hotel }: { hotel: HotelWithRelations |
               >
                 Cancel
               </Button>
-              <Button 
+              <Button
                 type="submit"
                 disabled={updateHotelMutation.isPending}
               >

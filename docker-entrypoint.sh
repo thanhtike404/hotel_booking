@@ -1,7 +1,12 @@
 #!/bin/sh
 
-# Run migrations
-pnpm prisma migrate dev
+# Exit immediately if any command fails
+set -e
+
+# Run database migrations
+echo "Running database migrations..."
+pnpm prisma migrate deploy
 
 # Start the application
-pnpm run dev
+echo "Starting application..."
+exec "$@"

@@ -1,45 +1,32 @@
 FROM node:18-alpine AS base
 
-# Create app directory and set permissions
+# Install build dependencies
+USER root
+RUN apk add --no-cache openssl python3 make g++ libc6-compat
+
+# Create app directory
 RUN mkdir -p /app && chown -R node:node /app
 WORKDIR /app
 
-# Create pnpm store directory with correct permissions
-RUN mkdir -p /home/node/.pnpm-store && chown -R node:node /home/node/.pnpm-store
+# Install pnpm
+RUN npm install -g pnpm
 
-# Install pnpm globally as root and configure it
-USER root
-RUN npm install -g pnpm && \
-    pnpm config set registry https://registry.npmmirror.com/ && \
-    pnpm config set network-timeout 300000 && \
-    pnpm config set fetch-retries 5 && \
-    pnpm config set fetch-retry-mintimeout 20000 && \
-    pnpm config set fetch-retry-maxtimeout 60000
-
-# Switch to non-root user
-USER node
-
-# Copy package files with correct ownership
+# Copy package files
 COPY --chown=node:node package.json pnpm-lock.yaml* ./
 
-# Install dependencies with retry mechanism
-RUN pnpm install --prefer-offline --store-dir /home/node/.pnpm-store || \
-    (sleep 5 && pnpm install --prefer-offline --store-dir /home/node/.pnpm-store) || \
-    (sleep 10 && pnpm install --prefer-offline --store-dir /home/node/.pnpm-store)
+# Install dependencies
+USER node
+RUN pnpm install --prefer-offline
 
-# Copy application files with correct ownership
+# Copy source files
 COPY --chown=node:node . .
 
-# Generate Prisma client
-RUN pnpm prisma generate
+# Rebuild native modules
+RUN pnpm rebuild bcrypt
 
-# Build the application
-RUN pnpm run build
-
-# Make entrypoint script executable
-COPY --chown=node:node docker-entrypoint.sh .
-RUN chmod +x docker-entrypoint.sh
+# Build application
+RUN pnpm prisma generate && pnpm build
 
 EXPOSE 3000
+CMD ["pnpm", "start"]
 
-CMD ["./docker-entrypoint.sh"]

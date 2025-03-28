@@ -10,31 +10,31 @@ import { Badge } from "@/components/ui/badge"
 export default function HomePage() {
   const featuredHotels = hotels.featured.slice(0, 3)
   const popularDestinations = [
-    { 
-      name: "Paris", 
+    {
+      name: "Paris",
       image: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?q=80&w=2070&auto=format&fit=crop",
-      hotels: 240 
+      hotels: 240
     },
-    { 
-      name: "London", 
+    {
+      name: "London",
       image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=2070&auto=format&fit=crop",
-      hotels: 185 
+      hotels: 185
     },
-    { 
-      name: "New York", 
+    {
+      name: "New York",
       image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=2070&auto=format&fit=crop",
-      hotels: 310 
+      hotels: 310
     },
-    { 
-      name: "Tokyo", 
+    {
+      name: "Tokyo",
       image: "https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?q=80&w=2070&auto=format&fit=crop",
-      hotels: 275 
+      hotels: 275
     },
   ]
 
   return (
     <main>
-  
+
       {/* Hero Section */}
       <div className="relative h-[600px]">
         <Image
@@ -47,6 +47,7 @@ export default function HomePage() {
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
           <h1 className="text-4xl md:text-6xl font-bold text-center max-w-3xl">
             Find Your Perfect Stay
+            Whatever
           </h1>
           <p className="mt-4 text-xl text-center max-w-2xl">
             Discover handpicked hotels for your next adventure
@@ -131,7 +132,7 @@ export default function HomePage() {
           <div className="text-center">
             <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
               </svg>
             </div>
             <h3 className="font-semibold text-xl mb-2">Best Rates</h3>
@@ -140,7 +141,7 @@ export default function HomePage() {
           <div className="text-center">
             <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
               </svg>
             </div>
             <h3 className="font-semibold text-xl mb-2">24/7 Support</h3>
@@ -149,8 +150,8 @@ export default function HomePage() {
           <div className="text-center">
             <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
             </div>
             <h3 className="font-semibold text-xl mb-2">Secure Booking</h3>

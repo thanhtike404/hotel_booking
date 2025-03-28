@@ -9,10 +9,12 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/hotel_booking?schema=public
+      - DATABASE_URLpostgresql://admin:secret@hotel-booking-postgres:5432/hotel_booking
       - NODE_ENV=development
       # Add user mapping for permissions
       - CHOWN_USER=node
+    command: ["pnpm", "run", "dev"]
+
     volumes:
       - .:/app
       - /app/node_modules
@@ -30,13 +32,13 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
       POSTGRES_DB: hotel_booking
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U admin"]
       interval: 5s
       timeout: 5s
       retries: 5
