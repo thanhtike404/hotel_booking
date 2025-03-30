@@ -26,7 +26,7 @@ const coordinates: { [key: string]: [number, number] } = {
 export default function HotelDetailPage({ params }: { params: { id: string } }) {
   // Unwrap params with React.use()
   const unwrappedParams = React.use(params)
-  const id = unwrappedParams.id
+  const id = unwrappedParams?.id as string | undefined
 
   // Find the hotel using the unwrapped id
   const hotel = hotels.featured.find((hotel) => hotel.id.toString() === id)

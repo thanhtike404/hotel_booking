@@ -31,3 +31,22 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export async function GET() {
+  try {
+    const hotels = await prisma.hotel.findMany({
+      include: {
+        rooms: true,
+        reviews: true,
+        bookings: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return NextResponse.json(hotels, { status: 200 });
+  } catch (error) {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

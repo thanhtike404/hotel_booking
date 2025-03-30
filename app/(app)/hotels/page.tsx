@@ -7,15 +7,27 @@ import { Star, MapPin } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-
+import { useQuery } from "@tanstack/react-query"
+import axios from "axios"
 export default function HotelsPage() {
+  const fetchHotels = async () => {
+    const response = await axios.get("/api/hotels")
+    return response.data
+  }
+  const { data: hotels, isLoading } = useQuery({
+    queryKey: ['hotels'],
+    queryFn: fetchHotels,
+
+  })
+
   return (
     <>
-    
+
       <div className="container mx-auto py-6 px-4">
-        <h1 className="text-3xl font-bold mb-8">Our Hotels</h1>
+        <h1 className="text-3xl font-bold mb-8">Our Hotels </h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {hotels.featured.map((hotel) => (
+          {/* if featured hotels hotels?.featured?.map */}
+          {hotels?.map((hotel: any) => (
             <Card key={hotel.id} className="flex flex-col">
               <CardHeader className="p-0">
                 <div className="relative h-48 w-full">
