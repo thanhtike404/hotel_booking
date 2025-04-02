@@ -38,7 +38,7 @@ export default function HomePage() {
       {/* Hero Section */}
       <div className="relative h-[600px]">
         <Image
-          src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=2070&auto=format&fit=crop"
+          src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=2070&auto=format&fit=crop "
           alt="Luxury Hotel"
           fill
           priority
@@ -66,29 +66,29 @@ export default function HomePage() {
         <h2 className="text-3xl font-bold mb-8">Featured Hotels</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {featuredHotels.map((hotel) => (
-            <Card key={hotel.id}>
+            <Card key={hotel?.id}>
               <div className="relative h-48">
                 <Image
-                  src={hotel.image}
-                  alt={hotel.name}
+                  src={hotel?.image}
+                  alt={hotel?.name}
                   fill
                   className="object-cover rounded-t-lg"
                 />
                 <div className="absolute top-2 right-2">
                   <Badge className="flex items-center gap-1">
                     <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    {hotel.rating}
+                    {hotel?.rating}
                   </Badge>
                 </div>
               </div>
               <CardContent className="p-4">
-                <h3 className="font-semibold text-lg">{hotel.name}</h3>
+                <h3 className="font-semibold text-lg">{hotel?.name}</h3>
                 <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
                   <MapPin className="h-4 w-4" />
-                  {hotel.location}
+                  {hotel?.location}
                 </p>
                 <p className="mt-4 font-bold text-lg">
-                  ${hotel.pricePerNight} <span className="text-sm font-normal text-muted-foreground">per night</span>
+                  ${hotel?.pricePerNight} <span className="text-sm font-normal text-muted-foreground">per night</span>
                 </p>
               </CardContent>
             </Card>
@@ -102,19 +102,19 @@ export default function HomePage() {
           <h2 className="text-3xl font-bold mb-8">Popular Destinations</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             {popularDestinations.map((destination) => (
-              <Link key={destination.name} href={`/search?location=${destination.name}`}>
+              <Link key={destination?.name} href={`/search?location=${destination?.name}`}>
                 <Card className="group cursor-pointer overflow-hidden">
                   <div className="relative h-48">
                     <Image
-                      src={destination.image}
-                      alt={destination.name}
+                      src={destination?.image}
+                      alt={destination?.name}
                       fill
                       className="object-cover group-hover:scale-110 transition-transform duration-300"
                     />
                     <div className="absolute inset-0 bg-black/40 flex items-end p-4">
                       <div className="text-white">
-                        <h3 className="font-bold text-xl">{destination.name}</h3>
-                        <p className="text-sm">{destination.hotels} hotels</p>
+                        <h3 className="font-bold text-xl">{destination?.name}</h3>
+                        <p className="text-sm">{destination?.hotels} hotels</p>
                       </div>
                     </div>
                   </div>

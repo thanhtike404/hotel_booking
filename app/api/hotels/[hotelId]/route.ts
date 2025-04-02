@@ -1,58 +1,37 @@
-import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
-export async function PATCH(
-  req: NextRequest,
+export async function GET(
+  request: Request,
   { params }: { params: { hotelId: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session || !session.user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      )
+    // Direct access is fine in API routes
+    const hotelId = params.hotelId;
+
+    if (!hotelId) {
+      return NextResponse.json({ error: "Missing hotel ID" }, { status: 400 });
     }
-    
-    const hotelId = params.hotelId
-    const body = await req.json()
-    
-    // Validate hotel exists
-    const existingHotel = await prisma.hotel.findUnique({
-      where: { id: hotelId }
-    })
-    
-    if (!existingHotel) {
-      return NextResponse.json(
-        { error: "Hotel not found" },
-        { status: 404 }
-      )
-    }
-    
-    // Update hotel
-    const updatedHotel = await prisma.hotel.update({
+
+    const hotel = await prisma.hotel.findUnique({
       where: { id: hotelId },
-      data: {
-        name: body.name,
-        description: body.description,
-        location: body.location,
-        pricePerNight: body.pricePerNight,
-        image: body.image,
-        rating: body.rating,
-        amenities: body.amenities,
-        featured: body.featured,
-      }
-    })
-    
-    return NextResponse.json(updatedHotel)
+      include: {
+        rooms: true,
+        reviews: true,
+        bookings: true,
+      },
+    });
+
+    if (!hotel) {
+      return NextResponse.json({ error: "Hotel not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(hotel);
   } catch (error) {
-    console.error("Error updating hotel:", error)
+    console.error("Error fetching hotel:", error);
     return NextResponse.json(
-      { error: "Failed to update hotel" },
+      { error: "Failed to fetch hotel" },
       { status: 500 }
-    )
+    );
   }
 }

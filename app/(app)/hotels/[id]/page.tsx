@@ -1,41 +1,46 @@
-"use client"
 
-import React from 'react'
-import { hotels } from '@/data/hotels'
 
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Star, MapPin, ArrowLeft } from "lucide-react"
-import Link from "next/link"
-import { notFound } from "next/navigation"
+"use client";
+
+import React from 'react';
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Star, MapPin, ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import axios from 'axios';
+import { useQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic'
 
-const Map = dynamic(() => import('@/components/map'), {
-  ssr: false,
-  loading: () => <div className="h-[400px] w-full bg-muted animate-pulse rounded-lg" />
-})
+// // const Map = dynamic(() => import('@/components/map'), {
+// //   ssr: false,
+// //   loading: () => <div className="h-[400px] w-full bg-muted animate-pulse rounded-lg" />
+// // })
+export default function HotelDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  // Unwrap the params promise
+  const unwrappedParams = React.use(params);
+  const { id } = unwrappedParams;
 
-// Example coordinates - you should add these to your hotel data
-const coordinates: { [key: string]: [number, number] } = {
-  "Bali, Indonesia": [-8.4095, 115.1889],
-  "New York, USA": [40.7128, -74.0060],
-  "Maldives": [3.2028, 73.2207]
-}
-
-export default function HotelDetailPage({ params }: { params: { id: string } }) {
-  // Unwrap params with React.use()
-  const unwrappedParams = React.use(params)
-  const id = unwrappedParams?.id as string | undefined
-
-  // Find the hotel using the unwrapped id
-  const hotel = hotels.featured.find((hotel) => hotel.id.toString() === id)
-
-  if (!hotel) {
-    return <div>Hotel not found</div>
+  if (!id) {
+    return notFound();
   }
 
-  const hotelCoords = coordinates[hotel.location] || [-8.4095, 115.1889] // Default to Bali
+  const { data: hotel, isLoading, error } = useQuery({
+    queryKey: ['hotels', id],
+    queryFn: async () => {
+      const response = await axios.get(`/api/hotels/${id}`);
+      return response.data;
+    },
+  });
+
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
+
+  if (error || !hotel) {
+    return notFound();
+  }
 
   return (
     <>
@@ -53,13 +58,15 @@ export default function HotelDetailPage({ params }: { params: { id: string } }) 
       <div className="container mx-auto py-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="relative h-[400px]">
-            <Image
-              src={hotel.image}
-              alt={hotel.name}
-              fill
-              className="object-cover rounded-lg"
-              priority
-            />
+            {hotel.image && (
+              <Image
+                alt={hotel.name}
+                src={hotel.image}
+                fill
+                className="object-cover rounded-lg"
+                priority
+              />
+            )}
           </div>
 
           <div className="space-y-6">
@@ -72,7 +79,7 @@ export default function HotelDetailPage({ params }: { params: { id: string } }) 
               <div className="flex items-center gap-2 mt-2">
                 <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                 <span className="font-medium">{hotel.rating}</span>
-                <span className="text-muted-foreground">({hotel.reviews} reviews)</span>
+                <span className="text-muted-foreground">({hotel.reviews?.length || 0} reviews)</span>
               </div>
             </div>
 
@@ -84,7 +91,7 @@ export default function HotelDetailPage({ params }: { params: { id: string } }) 
             <div>
               <h2 className="text-xl font-semibold mb-2">Amenities</h2>
               <div className="flex flex-wrap gap-2">
-                {hotel.amenities.map((amenity) => (
+                {hotel.amenities?.map((amenity: string) => (
                   <Badge key={amenity} variant="secondary">
                     {amenity}
                   </Badge>
@@ -103,17 +110,16 @@ export default function HotelDetailPage({ params }: { params: { id: string } }) 
             </div>
           </div>
 
-          {/* Add Map Section */}
           <div className="col-span-full">
             <h2 className="text-2xl font-semibold mb-4">Location</h2>
-            <Map
+            {/* <Map
               center={hotelCoords}
               name={hotel.name}
               location={hotel.location}
-            />
+            /> */}
           </div>
         </div>
       </div>
     </>
-  )
+  );
 }

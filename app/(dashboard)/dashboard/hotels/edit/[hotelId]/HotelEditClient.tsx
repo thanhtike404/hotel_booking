@@ -21,7 +21,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
-// import {tos}
 import { useToast } from "@/hooks/use-toast"
 import { Hotel, Room, Review, Booking } from "@prisma/client"
 

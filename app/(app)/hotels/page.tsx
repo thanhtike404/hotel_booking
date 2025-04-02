@@ -32,15 +32,15 @@ export default function HotelsPage() {
               <CardHeader className="p-0">
                 <div className="relative h-48 w-full">
                   <Image
-                    src={hotel.image}
-                    alt={hotel.name}
+                    src={hotel?.image}
+                    alt={hotel?.name}
                     fill
                     className="object-cover rounded-t-lg"
                   />
                   <div className="absolute top-2 right-2">
                     <Badge className="flex items-center gap-1">
                       <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      {hotel.rating}
+                      {hotel?.rating}
                     </Badge>
                   </div>
                 </div>
@@ -48,18 +48,18 @@ export default function HotelsPage() {
               <CardContent className="p-4 flex-grow">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="font-semibold text-lg">{hotel.name}</h3>
+                    <h3 className="font-semibold text-lg">{hotel?.name}</h3>
                     <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
                       <MapPin className="h-4 w-4" />
-                      {hotel.location}
+                      {hotel?.location}
                     </p>
                   </div>
                 </div>
                 <p className="mt-4 text-sm text-muted-foreground line-clamp-2">
-                  {hotel.description}
+                  {hotel?.description}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  {hotel.amenities.slice(0, 3).map((amenity) => (
+                  {hotel?.amenities.slice(0, 3).map((amenity) => (
                     <Badge key={amenity} variant="secondary">
                       {amenity}
                     </Badge>
@@ -67,10 +67,10 @@ export default function HotelsPage() {
                 </div>
                 <div className="mt-4 flex justify-between items-end">
                   <div>
-                    <p className="text-2xl font-bold">${hotel.pricePerNight}</p>
+                    <p className="text-2xl font-bold">${hotel?.pricePerNight}</p>
                     <p className="text-sm text-muted-foreground">per night</p>
                   </div>
-                  <Link href={`/hotels/${hotel.id}`}>
+                  <Link href={`/hotels/${hotel?.id}`}>
                     <Button>View Details</Button>
                   </Link>
                 </div>
