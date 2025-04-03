@@ -7,8 +7,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, ArrowLeft } from "lucide-react";
-import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic'
@@ -19,6 +18,7 @@ import dynamic from 'next/dynamic'
 // // })
 export default function HotelDetailPage({ params }: { params: Promise<{ id: string }> }) {
   // Unwrap the params promise
+  const router = useRouter()
   const unwrappedParams = React.use(params);
   const { id } = unwrappedParams;
 
@@ -46,12 +46,14 @@ export default function HotelDetailPage({ params }: { params: Promise<{ id: stri
     <>
       <div className="border-b">
         <div className="container flex h-16 items-center px-4">
-          <Link href="/hotels">
-            <Button variant="ghost" className="flex items-center gap-2">
-              <ArrowLeft className="h-5 w-5" />
-              <span>Back to Hotels</span>
-            </Button>
-          </Link>
+
+          <Button variant="ghost" className="flex items-center gap-2" onClick={() =>
+            router.back()
+          }>
+            <ArrowLeft className="h-5 w-5" />
+            <span>Back to Hotels</span>
+          </Button>
+
         </div>
       </div>
 

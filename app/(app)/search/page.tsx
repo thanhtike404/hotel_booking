@@ -12,13 +12,35 @@ import { Slider } from "@/components/ui/slider"
 import Image from "next/image"
 import { Star, MapPin } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-
+import axios from "axios"
+import { useQuery } from "@tanstack/react-query"
+import { notFound } from "next/navigation"
 export default function SearchPage() {
+
   const [searchQuery, setSearchQuery] = useState("")
   const [priceRange, setPriceRange] = useState([0, 1000])
   const [rating, setRating] = useState(0)
 
-  const filteredHotels = hotels.featured.filter(hotel => {
+  const fetchHotels = async () => {
+    const response = await axios.get("/api/hotels")
+    return response.data
+  }
+
+  const { data: hotels, isLoading } = useQuery({
+    queryKey: ['hotels'],
+    queryFn: fetchHotels,
+  })
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>
+  }
+  if (!hotels) {
+    return notFound()
+  }
+  if (hotels.length === 0) {
+    return <div className="flex justify-center items-center h-screen">No hotels found</div>
+  }
+
+  const filteredHotels = hotels?.filter(hotel => {
     const matchesSearch = hotel.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       hotel.location.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesPrice = hotel.pricePerNight >= priceRange[0] && hotel.pricePerNight <= priceRange[1]
