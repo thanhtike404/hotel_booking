@@ -1,33 +1,66 @@
 "use client"
 
-import { hotels } from "@/data/hotels"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import Image from "next/image"
-import { Star, MapPin } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { useQuery } from "@tanstack/react-query"
 import axios from "axios"
+import Image from "next/image"
+import Link from "next/link"
+import { Star, MapPin } from "lucide-react"
+
+const SkeletonCard = () => (
+  <Card className="flex flex-col animate-pulse">
+    <CardHeader className="p-0">
+      <div className="relative h-48 w-full bg-gray-200 rounded-t-lg" />
+    </CardHeader>
+    <CardContent className="p-4 flex-grow">
+      <div className="space-y-3">
+        <div className="h-6 bg-gray-200 rounded w-3/4" />
+        <div className="h-4 bg-gray-200 rounded w-1/2" />
+
+        <div className="space-y-2">
+          <div className="h-4 bg-gray-200 rounded w-full" />
+          <div className="h-4 bg-gray-200 rounded w-4/5" />
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-6 w-16 bg-gray-200 rounded-full" />
+          ))}
+        </div>
+
+        <div className="flex justify-between items-end">
+          <div className="space-y-1">
+            <div className="h-6 bg-gray-200 rounded w-16" />
+            <div className="h-4 bg-gray-200 rounded w-12" />
+          </div>
+          <div className="h-10 w-24 bg-gray-200 rounded-lg" />
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+)
+
 export default function HotelsPage() {
   const fetchHotels = async () => {
     const response = await axios.get("/api/hotels")
     return response.data
   }
+
   const { data: hotels, isLoading } = useQuery({
     queryKey: ['hotels'],
     queryFn: fetchHotels,
-
   })
 
   return (
-    <>
-
-      <div className="container mx-auto py-6 px-4">
-        <h1 className="text-3xl font-bold mb-8">Our Hotels </h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* if featured hotels hotels?.featured?.map */}
-          {hotels?.map((hotel: any) => (
+    <div className="container mx-auto py-6 px-4">
+      <h1 className="text-3xl font-bold mb-8">Our Hotels</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {isLoading ? (
+          Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
+        ) : (
+          hotels?.map((hotel: any) => (
             <Card key={hotel.id} className="flex flex-col">
               <CardHeader className="p-0">
                 <div className="relative h-48 w-full">
@@ -59,7 +92,7 @@ export default function HotelsPage() {
                   {hotel?.description}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  {hotel?.amenities.slice(0, 3).map((amenity) => (
+                  {hotel?.amenities.slice(0, 3).map((amenity: string) => (
                     <Badge key={amenity} variant="secondary">
                       {amenity}
                     </Badge>
@@ -76,9 +109,9 @@ export default function HotelsPage() {
                 </div>
               </CardContent>
             </Card>
-          ))}
-        </div>
+          ))
+        )}
       </div>
-    </>
+    </div>
   )
 }
