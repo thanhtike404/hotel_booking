@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, ArrowLeft } from "lucide-react";
+import { BookingModal } from '@/components/hotel/BookingModal';
 import { notFound, useRouter } from "next/navigation";
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
@@ -35,7 +36,13 @@ export default function HotelDetailPage({ params }: { params: Promise<{ id: stri
   });
 
   if (isLoading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    return (
+      <div className="container mx-auto py-10">
+        <div className="flex justify-center items-center h-[60vh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
   }
 
   if (error || !hotel) {
@@ -93,7 +100,7 @@ export default function HotelDetailPage({ params }: { params: Promise<{ id: stri
             <div>
               <h2 className="text-xl font-semibold mb-2">Amenities</h2>
               <div className="flex flex-wrap gap-2">
-                {hotel.amenities?.map((amenity: string) => (
+                {(hotel.amenities || [])?.map((amenity: string) => (
                   <Badge key={amenity} variant="secondary">
                     {amenity}
                   </Badge>
@@ -107,7 +114,7 @@ export default function HotelDetailPage({ params }: { params: Promise<{ id: stri
                   <p className="text-3xl font-bold">${hotel.pricePerNight}</p>
                   <p className="text-muted-foreground">per night</p>
                 </div>
-                <Button size="lg">Book Now</Button>
+                <BookingModal hotelId={id} pricePerNight={hotel.pricePerNight} />
               </div>
             </div>
           </div>

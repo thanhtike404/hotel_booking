@@ -59,8 +59,12 @@ export default function HotelsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {isLoading ? (
           Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
+        ) : !hotels || hotels.length === 0 ? (
+          <div className="col-span-full text-center py-10">
+            <p className="text-lg text-muted-foreground">No hotels found</p>
+          </div>
         ) : (
-          hotels?.map((hotel: any) => (
+          hotels.map((hotel: any) => (
             <Card key={hotel.id} className="flex flex-col">
               <CardHeader className="p-0">
                 <div className="relative h-48 w-full">
@@ -100,7 +104,7 @@ export default function HotelsPage() {
                 </div>
                 <div className="mt-4 flex justify-between items-end">
                   <div>
-                    <p className="text-2xl font-bold">${hotel?.pricePerNight}</p>
+                    <p className="font-semibold">${hotel?.pricePerNight}</p>
                     <p className="text-sm text-muted-foreground">per night</p>
                   </div>
                   <Link href={`/hotels/${hotel?.id}`}>

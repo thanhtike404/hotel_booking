@@ -6,8 +6,7 @@ export async function GET(
   { params }: { params: { hotelId: string } }
 ) {
   try {
-    // Direct access is fine in API routes
-    const hotelId = params.hotelId;
+    const { hotelId } = params;
 
     if (!hotelId) {
       return NextResponse.json({ error: "Missing hotel ID" }, { status: 400 });

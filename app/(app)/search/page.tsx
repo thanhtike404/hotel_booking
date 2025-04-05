@@ -1,6 +1,5 @@
 "use client"
 
-
 import { hotels } from "@/data/hotels"
 import { useState } from "react"
 import { CustomLink as Link } from "@/components/ui/custom-link"
@@ -40,18 +39,17 @@ export default function SearchPage() {
     return <div className="flex justify-center items-center h-screen">No hotels found</div>
   }
 
-  const filteredHotels = hotels?.filter(hotel => {
+  const filteredHotels = hotels ? hotels.filter(hotel => {
     const matchesSearch = hotel.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       hotel.location.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesPrice = hotel.pricePerNight >= priceRange[0] && hotel.pricePerNight <= priceRange[1]
     const matchesRating = hotel.rating >= rating
 
     return matchesSearch && matchesPrice && matchesRating
-  })
+  }) : []
 
   return (
     <>
-
       <div className="container mx-auto py-6 px-4 md:px-6 lg:px-8">
         {/* Mobile filter button */}
         <Button
@@ -103,56 +101,58 @@ export default function SearchPage() {
                 ))}
               </div>
             </div>
+            {/* Close missing div here */}
           </div>
 
           {/* Results - Now responsive */}
           <div className="order-1 lg:order-2 lg:col-span-3">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-              {filteredHotels.map((hotel) => (
-                <Card key={hotel.id} className="flex flex-col">
-                  <CardHeader className="p-0">
-                    <div className="relative h-48 w-full">
-                      <Image
-                        src={hotel.image}
-                        alt={hotel.name}
-                        fill
-                        className="object-cover rounded-t-lg"
-                      />
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-4 flex-grow">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-semibold">{hotel.name}</h3>
-                        <p className="text-sm text-muted-foreground flex items-center gap-1">
-                          <MapPin className="h-4 w-4" />
-                          {hotel.location}
-                        </p>
+              {filteredHotels.length > 0 ? (
+                filteredHotels.map((hotel) => (
+                  <Card key={hotel.id} className="flex flex-col">
+                    <CardHeader className="p-0">
+                      <div className="relative h-48 w-full">
+                        <Image
+                          src={hotel.image}
+                          alt={hotel.name}
+                          fill
+                          className="object-cover rounded-t-lg"
+                        />
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        <span className="font-medium">{hotel.rating}</span>
+                    </CardHeader>
+                    <CardContent className="p-4 flex-grow">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-semibold">{hotel.name}</h3>
+                          <p className="text-sm text-muted-foreground flex items-center gap-1">
+                            <MapPin className="h-4 w-4" />
+                            {hotel.location}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                          <span className="font-medium">{hotel.rating}</span>
+                        </div>
                       </div>
-                    </div>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {hotel.amenities.slice(0, 3).map((amenity) => (
-                        <Badge key={amenity} variant="secondary">
-                          {amenity}
-                        </Badge>
-                      ))}
-                    </div>
-                  </CardContent>
-                  <CardFooter className="p-4 pt-0 flex justify-between items-center">
-                    <div>
-                      <p className="text-2xl font-bold">${hotel.pricePerNight}</p>
-                      <p className="text-sm text-muted-foreground">per night</p>
-                    </div>
-                    <Link href={`/hotels/${hotel.id}`}>
-                      <Button>View Details</Button>
-                    </Link>
-                  </CardFooter>
-                </Card>
-              ))}
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {hotel.amenities.slice(0, 3).map((amenity) => (
+                          <Badge key={amenity} variant="secondary">
+                            {amenity}
+                          </Badge>
+                        ))}
+                      </div>
+                    </CardContent>
+                    <CardFooter className="flex justify-between items-center p-4">
+                      <span className="font-semibold">${hotel.pricePerNight} / night</span>
+                      <Link href={`/hotel/${hotel.id}`} className="text-primary-600">View Details</Link>
+                    </CardFooter>
+                  </Card>
+                ))
+              ) : (
+                <div className="col-span-full text-center py-10">
+                  <p className="text-lg text-muted-foreground">No hotels found matching your criteria</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

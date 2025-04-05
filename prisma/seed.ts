@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, RoomType } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -58,7 +58,57 @@ async function main() {
     }),
   ])
 
-  console.log('Seeded:', hotels)
+  console.log('Seeded hotels:', hotels)
+
+  // Create rooms for each hotel
+  for (const hotel of hotels) {
+    const roomTypes = [
+      {
+        type: RoomType.SINGLE,
+        total: Math.floor(Math.random() * 10) + 10, // 10-20 single rooms
+        availabilityPercentage: 0.7, // 70% availability
+      },
+      {
+        type: RoomType.DOUBLE,
+        total: Math.floor(Math.random() * 15) + 15, // 15-30 double rooms
+        availabilityPercentage: 0.8, // 80% availability
+      },
+      {
+        type: RoomType.TWIN,
+        total: Math.floor(Math.random() * 8) + 7, // 7-15 twin rooms
+        availabilityPercentage: 0.75, // 75% availability
+      },
+      {
+        type: RoomType.SUITE,
+        total: Math.floor(Math.random() * 5) + 5, // 5-10 suites
+        availabilityPercentage: 0.9, // 90% availability
+      },
+      {
+        type: RoomType.FAMILY,
+        total: Math.floor(Math.random() * 6) + 4, // 4-10 family rooms
+        availabilityPercentage: 0.85, // 85% availability
+      },
+    ];
+
+    // Create rooms for each type
+    for (const roomConfig of roomTypes) {
+      const total = roomConfig.total;
+      const available = Math.floor(total * roomConfig.availabilityPercentage);
+
+      await prisma.room.create({
+        data: {
+          hotelId: hotel.id,
+          roomType: roomConfig.type,
+          total: total,
+          available: available,
+        },
+      });
+    }
+
+    console.log(`Created rooms for hotel: ${hotel.name}`);
+  }
+
+  console.log('Seeding completed successfully');
 }
 
 main()

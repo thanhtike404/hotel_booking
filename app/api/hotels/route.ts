@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
   try {
@@ -45,8 +43,16 @@ export async function GET() {
       },
     });
 
+    if (!hotels) {
+      return NextResponse.json({ error: 'No hotels found' }, { status: 404 });
+    }
+
     return NextResponse.json(hotels, { status: 200 });
   } catch (error) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Error fetching hotels:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch hotels' },
+      { status: 500 }
+    );
   }
 }
