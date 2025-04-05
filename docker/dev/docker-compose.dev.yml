@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: ../..
+      dockerfile: docker/dev/Dockerfile.dev
+    container_name: hotel-booking-web
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://admin:secret@hotel-booking-postgres:5432/hotel_booking
+      - NODE_ENV=development
+      - CHOWN_USER=node
+    command: ["pnpm", "run", "dev"]
+    volumes:
+      - ../.:/app
+      - /app/node_modules
+      - pnpm_store:/root/.pnpm-store
+    user: "node"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: always
+
+  postgres:
+    image: postgres:15
+    container_name: hotel-booking-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: hotel_booking
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=trust"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d hotel_booking"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres_data:
+  pnpm_store:
