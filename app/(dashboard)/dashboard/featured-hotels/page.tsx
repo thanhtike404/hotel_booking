@@ -1,8 +1,7 @@
 "use client"
 
 import { hotels } from "@/data/hotels"
-import { DataTable } from "@/components/ui/data-table"
-import { columns } from "@/components/hotels/columns"
+
 
 export default function FeaturedHotelsPage() {
   // You can filter or transform the data differently here

@@ -49,4 +49,7 @@ export type Hotel = {
   bookings: Booking[];
   createdAt: string;
   updatedAt: string;
+  _count: {
+    rooms: number
+  }
 };

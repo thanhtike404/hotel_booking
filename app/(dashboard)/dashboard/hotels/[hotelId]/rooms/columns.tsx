@@ -4,13 +4,16 @@ import { ColumnDef } from "@tanstack/react-table"
 import { Room } from "@/types/rooms"
 import { Badge } from "@/components/ui/badge"
 
-export const roomColumns: ColumnDef<Room>[] = [
+export const columns: ColumnDef<Room>[] = [
     {
         accessorKey: "roomType",
         header: "Room Type",
         cell: ({ row }) => {
             const type = row.getValue("roomType") as string
             return <Badge variant="default">{type}</Badge>
+        },
+        meta: {
+            search: true,
         },
     },
     {
@@ -24,11 +27,11 @@ export const roomColumns: ColumnDef<Room>[] = [
         cell: ({ row }) => <div>{row.getValue("total")}</div>,
     },
     {
-        accessorKey: "hotel.name",
+        id: "name",
+        accessorFn: (row) => row.hotel?.name ?? "",
         header: "Hotel",
-        cell: ({ row }) => {
-            const hotel = row.original.hotel
-            return <div>{hotel?.name || "—"}</div>
+        meta: {
+            search: false,
         },
     },
     {

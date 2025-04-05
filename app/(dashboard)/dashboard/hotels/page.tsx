@@ -2,12 +2,12 @@
 
 import { Button } from "@/components/ui/button"
 import { columns } from "./columns"
-import { DataTable } from "./data-table"
+import { DataTable } from "@/components/dataTable/data-table"
 import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import axios from "axios"
 
-export default function Hotels() {
+export default function Page() {
   const { data, isLoading } = useQuery({
     queryKey: ['hotels'],
     queryFn: async () => {

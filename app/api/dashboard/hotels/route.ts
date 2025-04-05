@@ -5,7 +5,11 @@ export async function GET() {
   try {
     const hotels = await prisma.hotel.findMany({
       include: {
-        rooms: true,
+        _count: {
+          select: {
+            rooms: true,
+          },
+        },
         reviews: true,
         bookings: true,
       },
@@ -14,7 +18,7 @@ export async function GET() {
       },
     })
 
-    if (!hotels) {
+    if (!hotels || hotels.length === 0) {
       return NextResponse.json(
         { error: 'No hotels found' },
         { status: 404 }
@@ -31,10 +35,11 @@ export async function GET() {
   }
 }
 
+
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    
+
     if (!body.name || !body.location || !body.description || !body.image || body.rating === undefined || !body.pricePerNight || !body.amenities) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }

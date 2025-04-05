@@ -1,6 +1,6 @@
 "use client"
 import { ColumnDef } from "@tanstack/react-table"
-import { Hotel } from "@prisma/client"
+import { Hotel } from "@/types/hotel"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { format, parseISO } from "date-fns"
@@ -66,6 +66,14 @@ export const columns: ColumnDef<Hotel>[] = [
         {row.getValue("rating")} ★
       </span>
     ),
+  },
+  {
+    accessorKey: "_count.rooms",
+    header: "Rooms",
+    cell: ({ row }) => {
+      const count = row.original._count?.rooms ?? 0
+      return <div>{count}</div>
+    },
   },
   {
     accessorKey: "featured",

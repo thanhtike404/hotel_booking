@@ -43,14 +43,20 @@ export function DataTable<TData, TValue>({
     return (
         <div className="rounded-md border">
             <div className="flex items-center py-4">
-                <Input
-                    placeholder="Filter Hotel Naem..."
-                    value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-                    onChange={(event) =>
-                        table.getColumn("name")?.setFilterValue(event.target.value)
-                    }
-                    className="max-w-sm"
-                />
+
+                {table
+                    .getAllColumns()
+                    .filter((col) => col.columnDef.meta?.search)
+                    .map((col) => (
+                        <Input
+                            key={col.id}
+                            placeholder={`Search ${col.id}...`}
+                            value={(col.getFilterValue() as string) ?? ""}
+                            onChange={(event) => col.setFilterValue(event.target.value)}
+                            className="max-w-sm"
+                        />
+                    ))}
+
             </div>
             <Table>
                 <TableHeader>

@@ -15,7 +15,7 @@ export const columns = ({ onImageClick }: ColumnsProps): ColumnDef<Hotel>[] => [
     accessorKey: "image",
     header: "Image",
     cell: ({ row }) => (
-      <div 
+      <div
         className="relative w-20 h-20 cursor-pointer"
         onClick={() => onImageClick(row.getValue("image"))}
       >
