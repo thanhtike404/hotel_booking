@@ -17,7 +17,7 @@ export default function Page() {
   })
   console.log(data)
   if (isLoading) {
-    return <div>Loading...Mother fucker</div>
+    return <div>It loading</div>
   }
 
   return (

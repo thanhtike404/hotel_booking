@@ -144,7 +144,7 @@ export default function SearchPage() {
                     </CardContent>
                     <CardFooter className="flex justify-between items-center p-4">
                       <span className="font-semibold">${hotel.pricePerNight} / night</span>
-                      <Link href={`/hotel/${hotel.id}`} className="text-primary-600">View Details</Link>
+                      <Link href={`/hotels/${hotel.id}`} className="text-primary-600">View Details</Link>
                     </CardFooter>
                   </Card>
                 ))

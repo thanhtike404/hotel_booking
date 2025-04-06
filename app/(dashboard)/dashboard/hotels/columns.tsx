@@ -34,6 +34,9 @@ export const columns: ColumnDef<Hotel>[] = [
   {
     accessorKey: "name",
     header: "Hotel Name",
+    meta: {
+      search: true
+    },
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
         <img
@@ -41,7 +44,7 @@ export const columns: ColumnDef<Hotel>[] = [
           alt={row.getValue("name")}
           className="h-8 w-8 rounded-full object-cover"
         />
-        <span className="font-medium">{row.getValue("name")}</span>
+        <Link href={`/dashboard/hotels/${row.original.id}/rooms`}> <span className="font-medium">{row.getValue("name")}</span></Link>
       </div>
     ),
   },
@@ -88,7 +91,7 @@ export const columns: ColumnDef<Hotel>[] = [
     accessorKey: "createdAt",
     header: "Created At",
     cell: ({ row }) => {
-      const dateStr = row.getValue("createdAt")
+      const dateStr = row.getValue("createdAt") as string
       if (!dateStr) return null
       const date = new Date(dateStr)
       return date.toLocaleString()
@@ -106,7 +109,9 @@ export const columns: ColumnDef<Hotel>[] = [
           await axios.delete("/api/dashboard/hotels", { data: { id } });
         },
         onSuccess: () => {
-          queryClient.invalidateQueries("hotels");
+          queryClient.invalidateQueries({
+            queryKey: ["hotels"]
+          });
         },
       });
 

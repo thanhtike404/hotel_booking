@@ -13,7 +13,7 @@ export const columns: ColumnDef<Room>[] = [
             return <Badge variant="default">{type}</Badge>
         },
         meta: {
-            search: true,
+            search: false,
         },
     },
     {
@@ -25,14 +25,6 @@ export const columns: ColumnDef<Room>[] = [
         accessorKey: "total",
         header: "Total",
         cell: ({ row }) => <div>{row.getValue("total")}</div>,
-    },
-    {
-        id: "name",
-        accessorFn: (row) => row.hotel?.name ?? "",
-        header: "Hotel",
-        meta: {
-            search: false,
-        },
     },
     {
         accessorKey: "createdAt",

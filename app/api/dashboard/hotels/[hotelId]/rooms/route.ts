@@ -1,10 +1,16 @@
 import { prisma } from "@/lib/prisma"
-
+import { authGuard } from "@/lib/authGuard"
 export async function GET(
     req: Request,
     { params }: { params: { hotelId: string } }
 ) {
-    const { hotelId } = params
+    const session = await authGuard();
+    if (!session) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+            status: 401,
+        })
+    }
+    const { hotelId } = await params
 
     try {
         const rooms = await prisma.room.findMany({
@@ -17,8 +23,6 @@ export async function GET(
                 },
             },
         })
-
-        // 🔥 Flatten the hotel name into each room
 
 
         return new Response(JSON.stringify({ rooms }), {

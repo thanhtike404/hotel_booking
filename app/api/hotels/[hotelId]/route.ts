@@ -6,7 +6,7 @@ export async function GET(
   { params }: { params: { hotelId: string } }
 ) {
   try {
-    const { hotelId } = params;
+    const { hotelId } = await params;
 
     if (!hotelId) {
       return NextResponse.json({ error: "Missing hotel ID" }, { status: 400 });
