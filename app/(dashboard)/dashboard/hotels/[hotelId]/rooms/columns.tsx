@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { Room } from "@/types/rooms"
 import { Badge } from "@/components/ui/badge"
-
+import Image from "next/image"
 export const columns: ColumnDef<Room>[] = [
     {
         accessorKey: "roomType",
@@ -25,6 +25,19 @@ export const columns: ColumnDef<Room>[] = [
         accessorKey: "total",
         header: "Total",
         cell: ({ row }) => <div>{row.getValue("total")}</div>,
+    },
+    {
+        accessorKey: "image",
+        header: "Image",
+        cell: ({ row }) => {
+            const image = row.getValue("image") as string
+            return <div className="relative w-20 h-20">
+                <Image src={image} alt="room image"
+                    height={300}
+                    width={300}
+                    className="object-cover rounded-md hover:opacity-80 transition-opacity" />
+            </div>
+        }
     },
     {
         accessorKey: "createdAt",

@@ -2,6 +2,23 @@ import { PrismaClient, RoomType } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
+function getRoomImage(type: RoomType): string {
+  switch (type) {
+    case RoomType.SINGLE:
+      return "https://images.unsplash.com/photo-1600585154340-be6161a56a0c";
+    case RoomType.DOUBLE:
+      return "https://images.unsplash.com/photo-1600585154154-146c2fd5f9b2";
+    case RoomType.TWIN:
+      return "https://images.unsplash.com/photo-1582719478181-51f1f8c1b2ec";
+    case RoomType.SUITE:
+      return "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf";
+    case RoomType.FAMILY:
+      return "https://images.unsplash.com/photo-1600585154035-00c1f8a6ee12";
+    default:
+      return "https://images.unsplash.com/photo-1600585154340-be6161a56a0c";
+  }
+}
+
 async function main() {
   // Clear existing data
   await prisma.hotel.deleteMany()
@@ -66,31 +83,30 @@ async function main() {
       {
         type: RoomType.SINGLE,
         total: Math.floor(Math.random() * 10) + 10, // 10-20 single rooms
-        availabilityPercentage: 0.7, // 70% availability
+        availabilityPercentage: 0.7,
       },
       {
         type: RoomType.DOUBLE,
         total: Math.floor(Math.random() * 15) + 15, // 15-30 double rooms
-        availabilityPercentage: 0.8, // 80% availability
+        availabilityPercentage: 0.8,
       },
       {
         type: RoomType.TWIN,
         total: Math.floor(Math.random() * 8) + 7, // 7-15 twin rooms
-        availabilityPercentage: 0.75, // 75% availability
+        availabilityPercentage: 0.75,
       },
       {
         type: RoomType.SUITE,
         total: Math.floor(Math.random() * 5) + 5, // 5-10 suites
-        availabilityPercentage: 0.9, // 90% availability
+        availabilityPercentage: 0.9,
       },
       {
         type: RoomType.FAMILY,
         total: Math.floor(Math.random() * 6) + 4, // 4-10 family rooms
-        availabilityPercentage: 0.85, // 85% availability
+        availabilityPercentage: 0.85,
       },
     ];
 
-    // Create rooms for each type
     for (const roomConfig of roomTypes) {
       const total = roomConfig.total;
       const available = Math.floor(total * roomConfig.availabilityPercentage);
@@ -101,6 +117,7 @@ async function main() {
           roomType: roomConfig.type,
           total: total,
           available: available,
+          image: getRoomImage(roomConfig.type),
         },
       });
     }

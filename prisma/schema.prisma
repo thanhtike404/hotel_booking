@@ -109,16 +109,19 @@ enum RoomType {
 }
 
 model Room {
-  id        String   @id @default(cuid())
-  hotelId   String   // Removed the @unique attribute so a hotel can have multiple rooms
-  available Int
-  total     Int
-  roomType  RoomType
-  hotel     Hotel    @relation(fields: [hotelId], references: [id])
-  bookings  Booking[] // Back relation for bookings referencing this room
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String    @id @default(cuid())
+  hotelId    String
+  available  Int
+  total      Int
+  roomType   RoomType
+  image      String    // New column for room image
+  amenities  String[]  // New column for room-specific amenities
+  hotel      Hotel     @relation(fields: [hotelId], references: [id])
+  bookings   Booking[] // Back relation for bookings referencing this room
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
+
 
 model Destination {
   id        String   @id @default(cuid())
