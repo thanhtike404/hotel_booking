@@ -41,7 +41,7 @@ function Page() {
                     <p className="text-muted-foreground">Manage your Room listings</p>
                 </div>
                 <Button>
-                    <a href={`/dashboard/hotels/${hotelId}/rooms/create`}>Add Room</a>
+                    <a href={`/dashboard/rooms/create`}>Add Room</a>
                 </Button>
             </div>
             <DataTable columns={columns} data={data || []} />
