@@ -34,7 +34,7 @@ const hotelFormSchema = z.object({
   name: z.string().min(1, "Hotel name is required"),
   description: z.string().min(10, "Description must be at least 10 characters"),
   location: z.string().min(1, "Location is required"),
-  pricePerNight: z.coerce.number().min(1, "Price must be greater than 0"),
+
   image: z.string().url("Please provide a valid image URL"),
   rating: z.coerce.number().min(0).max(5, "Rating must be between 0 and 5"),
   amenities: z.array(z.string()).min(1, "At least one amenity is required"),
@@ -59,7 +59,7 @@ export default function HotelEditClient({ hotel }: { hotel: HotelWithRelations |
       name: hotel.name,
       description: hotel.description,
       location: hotel.location,
-      pricePerNight: hotel.pricePerNight,
+
       image: hotel.image,
       rating: hotel.rating,
       amenities: hotel.amenities as string[],
@@ -163,19 +163,6 @@ export default function HotelEditClient({ hotel }: { hotel: HotelWithRelations |
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="pricePerNight"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Price Per Night ($)</FormLabel>
-                    <FormControl>
-                      <Input type="number" placeholder="Enter price" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
               <FormField
                 control={form.control}

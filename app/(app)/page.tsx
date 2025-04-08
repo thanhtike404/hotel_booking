@@ -87,9 +87,7 @@ export default function HomePage() {
                   <MapPin className="h-4 w-4" />
                   {hotel?.location}
                 </p>
-                <p className="mt-4 font-bold text-lg">
-                  ${hotel?.pricePerNight} <span className="text-sm font-normal text-muted-foreground">per night</span>
-                </p>
+
               </CardContent>
             </Card>
           ))}

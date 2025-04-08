@@ -63,7 +63,6 @@ model Hotel {
   location      String
   image         String
   rating        Float
-  pricePerNight Float
   featured      Boolean   @default(false)
   amenities     String[]
   rooms         Room[]    // Changed from Room? to Room[] because a hotel can have many rooms
@@ -114,10 +113,11 @@ model Room {
   available  Int
   total      Int
   roomType   RoomType
-  image      String    // New column for room image
-  amenities  String[]  // New column for room-specific amenities
+  image      String
+  amenities  String[]
+  price      Float     // <-- ✅ Add this
   hotel      Hotel     @relation(fields: [hotelId], references: [id])
-  bookings   Booking[] // Back relation for bookings referencing this room
+  bookings   Booking[]
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 }

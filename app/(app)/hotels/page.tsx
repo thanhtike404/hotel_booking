@@ -103,10 +103,7 @@ export default function HotelsPage() {
                   ))}
                 </div>
                 <div className="mt-4 flex justify-between items-end">
-                  <div>
-                    <p className="font-semibold">${hotel?.pricePerNight}</p>
-                    <p className="text-sm text-muted-foreground">per night</p>
-                  </div>
+
                   <Link href={`/hotels/${hotel?.id}`}>
                     <Button>View Details</Button>
                   </Link>

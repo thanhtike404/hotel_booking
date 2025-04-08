@@ -39,7 +39,6 @@ export async function PATCH(
         name: body.name,
         description: body.description,
         location: body.location,
-        pricePerNight: body.pricePerNight,
         image: body.image,
         rating: body.rating,
         amenities: body.amenities,

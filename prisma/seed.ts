@@ -5,25 +5,40 @@ const prisma = new PrismaClient()
 function getRoomImage(type: RoomType): string {
   switch (type) {
     case RoomType.SINGLE:
-      return "https://images.unsplash.com/photo-1600585154340-be6161a56a0c";
+      return "https://images.unsplash.com/photo-1600585154340-be6161a56a0c"
     case RoomType.DOUBLE:
-      return "https://images.unsplash.com/photo-1600585154154-146c2fd5f9b2";
+      return "https://images.unsplash.com/photo-1600585154154-146c2fd5f9b2"
     case RoomType.TWIN:
-      return "https://images.unsplash.com/photo-1582719478181-51f1f8c1b2ec";
+      return "https://images.unsplash.com/photo-1582719478181-51f1f8c1b2ec"
     case RoomType.SUITE:
-      return "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf";
+      return "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf"
     case RoomType.FAMILY:
-      return "https://images.unsplash.com/photo-1600585154035-00c1f8a6ee12";
+      return "https://images.unsplash.com/photo-1600585154035-00c1f8a6ee12"
     default:
-      return "https://images.unsplash.com/photo-1600585154340-be6161a56a0c";
+      return "https://images.unsplash.com/photo-1600585154340-be6161a56a0c"
+  }
+}
+
+function getRoomPrice(type: RoomType): number {
+  switch (type) {
+    case RoomType.SINGLE:
+      return 100
+    case RoomType.DOUBLE:
+      return 150
+    case RoomType.TWIN:
+      return 130
+    case RoomType.SUITE:
+      return 250
+    case RoomType.FAMILY:
+      return 200
+    default:
+      return 120
   }
 }
 
 async function main() {
-  // Clear existing data
   await prisma.hotel.deleteMany()
 
-  // Create hotels
   const hotels = await Promise.all([
     prisma.hotel.create({
       data: {
@@ -32,7 +47,6 @@ async function main() {
         location: "Malibu, California",
         image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d",
         rating: 4.8,
-        pricePerNight: 450,
         featured: true,
         amenities: ["Free WiFi", "Pool", "Spa", "Restaurant", "Beach Access", "Room Service"],
       },
@@ -44,7 +58,6 @@ async function main() {
         location: "Aspen, Colorado",
         image: "https://images.unsplash.com/photo-1566073771259-6a8506099945",
         rating: 4.5,
-        pricePerNight: 350,
         featured: true,
         amenities: ["Free WiFi", "Parking", "Fitness Center", "Restaurant", "Bar"],
       },
@@ -56,7 +69,6 @@ async function main() {
         location: "New York City, NY",
         image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa",
         rating: 4.6,
-        pricePerNight: 300,
         featured: false,
         amenities: ["Free WiFi", "Restaurant", "Bar", "Room Service", "Business Center"],
       },
@@ -68,7 +80,6 @@ async function main() {
         location: "Phoenix, Arizona",
         image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b",
         rating: 4.7,
-        pricePerNight: 400,
         featured: true,
         amenities: ["Free WiFi", "Pool", "Spa", "Restaurant", "Bar", "Fitness Center"],
       },
@@ -77,55 +88,56 @@ async function main() {
 
   console.log('Seeded hotels:', hotels)
 
-  // Create rooms for each hotel
   for (const hotel of hotels) {
     const roomTypes = [
       {
         type: RoomType.SINGLE,
-        total: Math.floor(Math.random() * 10) + 10, // 10-20 single rooms
+        total: Math.floor(Math.random() * 10) + 10,
         availabilityPercentage: 0.7,
       },
       {
         type: RoomType.DOUBLE,
-        total: Math.floor(Math.random() * 15) + 15, // 15-30 double rooms
+        total: Math.floor(Math.random() * 15) + 15,
         availabilityPercentage: 0.8,
       },
       {
         type: RoomType.TWIN,
-        total: Math.floor(Math.random() * 8) + 7, // 7-15 twin rooms
+        total: Math.floor(Math.random() * 8) + 7,
         availabilityPercentage: 0.75,
       },
       {
         type: RoomType.SUITE,
-        total: Math.floor(Math.random() * 5) + 5, // 5-10 suites
+        total: Math.floor(Math.random() * 5) + 5,
         availabilityPercentage: 0.9,
       },
       {
         type: RoomType.FAMILY,
-        total: Math.floor(Math.random() * 6) + 4, // 4-10 family rooms
+        total: Math.floor(Math.random() * 6) + 4,
         availabilityPercentage: 0.85,
       },
-    ];
+    ]
 
     for (const roomConfig of roomTypes) {
-      const total = roomConfig.total;
-      const available = Math.floor(total * roomConfig.availabilityPercentage);
+      const total = roomConfig.total
+      const available = Math.floor(total * roomConfig.availabilityPercentage)
 
       await prisma.room.create({
         data: {
           hotelId: hotel.id,
           roomType: roomConfig.type,
-          total: total,
-          available: available,
+          total,
+          available,
           image: getRoomImage(roomConfig.type),
+          price: getRoomPrice(roomConfig.type),
+          amenities: ["Free WiFi", "Air Conditioning", "Private Bathroom"],
         },
-      });
+      })
     }
 
-    console.log(`Created rooms for hotel: ${hotel.name}`);
+    console.log(`Created rooms for hotel: ${hotel.name}`)
   }
 
-  console.log('Seeding completed successfully');
+  console.log('Seeding completed successfully')
 }
 
 main()

@@ -47,11 +47,6 @@ export const columns = ({ onImageClick }: ColumnsProps): ColumnDef<Hotel>[] => [
     ),
   },
   {
-    accessorKey: "pricePerNight",
-    header: "Price",
-    cell: ({ row }) => <div>${row.getValue("pricePerNight")}</div>,
-  },
-  {
     accessorKey: "amenities",
     header: "Amenities",
     cell: ({ row }) => {

@@ -1,9 +1,9 @@
-import Form from "next/form";
+import { createRoom, getHotels } from "./createRoom";
 import { amenitiesList } from "@/data/aminities";
-import { createRoom, hotels } from "./createRoom";
+import Form from "next/form";
 
 export default async function CreateRoomPage() {
-
+    const hotels = await getHotels();
 
     return (
         <div className="min-h-screen bg-black text-white p-6">
@@ -11,12 +11,12 @@ export default async function CreateRoomPage() {
                 <h1 className="text-3xl font-semibold mb-6">Create Room</h1>
 
                 <Form action={createRoom} className="space-y-6">
-                    {/* Hotel Select */}
                     <div>
                         <label className="block text-sm font-medium mb-1">Hotel</label>
                         <select
                             name="hotelId"
                             className="w-full bg-gray-900 border border-gray-700 rounded-md p-3"
+                            required
                         >
                             <option value="">Select hotel</option>
                             {hotels.map((hotel) => (
@@ -27,22 +27,33 @@ export default async function CreateRoomPage() {
                         </select>
                     </div>
 
-                    {/* Room Type */}
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Room Type</label>
-                        <select
-                            name="roomType"
-                            className="w-full bg-gray-900 border border-gray-700 rounded-md p-3"
-                        >
-                            <option value="">Select room type</option>
-                            <option value="SINGLE">Single</option>
-                            <option value="DOUBLE">Double</option>
-                            <option value="TWIN">Twin</option>
-                            <option value="SUITE">Suite</option>
-                            <option value="FAMILY">Family</option>
-                        </select>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium mb-1">Room Type</label>
+                            <select
+                                name="roomType"
+                                className="w-full bg-gray-900 border border-gray-700 rounded-md p-3"
+                                required
+                            >
+                                <option value="">Select room type</option>
+                                <option value="SINGLE">Single</option>
+                                <option value="DOUBLE">Double</option>
+                                <option value="TWIN">Twin</option>
+                                <option value="SUITE">Suite</option>
+                                <option value="FAMILY">Family</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium mb-1">Price Per Night</label>
+                            <input
+                                type="number"
+                                name="price"
+                                min="0"
+                                className="w-full bg-gray-900 border border-gray-700 rounded-md p-3"
+                                required
+                            />
+                        </div>
                     </div>
-
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
@@ -52,6 +63,7 @@ export default async function CreateRoomPage() {
                                 name="totalRooms"
                                 min="1"
                                 className="w-full bg-gray-900 border border-gray-700 rounded-md p-3"
+                                required
                             />
                         </div>
                         <div>
@@ -61,10 +73,10 @@ export default async function CreateRoomPage() {
                                 name="availableRooms"
                                 min="0"
                                 className="w-full bg-gray-900 border border-gray-700 rounded-md p-3"
+                                required
                             />
                         </div>
                     </div>
-
 
                     <div>
                         <label className="block text-sm font-medium mb-1">Room Image URL</label>
@@ -72,6 +84,7 @@ export default async function CreateRoomPage() {
                             type="url"
                             name="roomImage"
                             className="w-full bg-gray-900 border border-gray-700 rounded-md p-3"
+                            required
                         />
                     </div>
 

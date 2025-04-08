@@ -53,15 +53,6 @@ export const columns: ColumnDef<Hotel>[] = [
     header: "Location",
   },
   {
-    accessorKey: "pricePerNight",
-    header: "Price Per Night",
-    cell: ({ row }) => (
-      <span className="font-medium">
-        ${row.getValue("pricePerNight")}
-      </span>
-    ),
-  },
-  {
     accessorKey: "rating",
     header: "Rating",
     cell: ({ row }) => (

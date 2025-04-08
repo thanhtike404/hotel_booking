@@ -40,7 +40,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
 
-    if (!body.name || !body.location || !body.description || !body.image || body.rating === undefined || !body.pricePerNight || !body.amenities) {
+    if (!body.name || !body.location || !body.description || !body.image || body.rating === undefined || !body.amenities) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
         location: body.location,
         image: body.image,
         rating: body.rating,
-        pricePerNight: body.pricePerNight,
+
         featured: body.featured,
         amenities: body.amenities,
       },

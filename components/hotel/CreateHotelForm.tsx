@@ -33,9 +33,7 @@ const formSchema = z.object({
     message: "Please enter a valid image URL.",
   }),
   rating: z.number().min(0).max(5),
-  pricePerNight: z.number().positive({
-    message: "Price must be a positive number.",
-  }),
+
   featured: z.boolean().default(false),
   amenities: z.array(z.string()).min(1, {
     message: "Please select at least one amenity.",
@@ -69,7 +67,7 @@ export default function CreateHotelForm() {
       location: '',
       image: '',
       rating: 0,
-      pricePerNight: 0,
+
       featured: false,
       amenities: [],
     },
@@ -191,26 +189,7 @@ export default function CreateHotelForm() {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="pricePerNight"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Price per Night</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    min={0}
-                    step={0.01}
-                    placeholder="Enter price"
-                    {...field}
-                    onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+
         </div>
 
         <FormField
@@ -264,10 +243,10 @@ export default function CreateHotelForm() {
                                 return checked
                                   ? field.onChange([...field.value, amenity])
                                   : field.onChange(
-                                      field.value?.filter(
-                                        (value) => value !== amenity
-                                      )
+                                    field.value?.filter(
+                                      (value) => value !== amenity
                                     )
+                                  )
                               }}
                             />
                           </FormControl>
@@ -285,8 +264,8 @@ export default function CreateHotelForm() {
           )}
         />
 
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
           disabled={createHotel.isPending}
         >
           {createHotel.isPending ? "Creating..." : "Create Hotel"}

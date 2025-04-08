@@ -3,10 +3,10 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
   try {
-    const { name, location, description, image, rating, pricePerNight, featured, amenities } = await request.json();
+    const { name, location, description, image, rating, featured, amenities } = await request.json();
 
     // Validate input
-    if (!name || !location || !description || !image || rating === undefined || !pricePerNight || !amenities) {
+    if (!name || !location || !description || !image || rating === undefined || !amenities) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
         description,
         image,
         rating,
-        pricePerNight,
+
         featured,
         amenities,
       },

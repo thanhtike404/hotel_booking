@@ -108,15 +108,6 @@ export default function HotelDetailPage({ params }: { params: Promise<{ id: stri
               </div>
             </div>
 
-            <div className="pt-6 border-t">
-              <div className="flex items-end justify-between">
-                <div>
-                  <p className="text-3xl font-bold">${hotel.pricePerNight}</p>
-                  <p className="text-muted-foreground">per night</p>
-                </div>
-                <BookingModal hotelId={id} pricePerNight={hotel.pricePerNight} />
-              </div>
-            </div>
           </div>
 
           <div className="col-span-full">

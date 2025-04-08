@@ -49,12 +49,12 @@ const formSchema = z.object({
 
 interface BookingModalProps {
   hotelId: string
-  pricePerNight: number
+
 }
 
 export function BookingModal({
   hotelId,
-  pricePerNight,
+
 }: BookingModalProps) {
   const [open, setOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -237,10 +237,7 @@ export function BookingModal({
             />
 
             <div className="pt-4 border-t">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-muted-foreground">Price per night</span>
-                <span className="font-semibold">${pricePerNight}</span>
-              </div>
+
               {error && <div className="mb-4 text-sm text-red-500">{error}</div>}
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? 'Processing...' : 'Confirm Booking'}
