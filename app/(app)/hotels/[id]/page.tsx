@@ -12,6 +12,7 @@ import { notFound, useRouter } from "next/navigation";
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic'
+import { RoomCard } from '@/components/hotel/RoomCard';
 
 // // const Map = dynamic(() => import('@/components/map'), {
 // //   ssr: false,
@@ -117,6 +118,18 @@ export default function HotelDetailPage({ params }: { params: Promise<{ id: stri
               name={hotel.name}
               location={hotel.location}
             /> */}
+          </div>
+
+          <div className="col-span-full">
+            <h2 className="text-2xl font-semibold mb-4">Available Rooms</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {(hotel.rooms || []).map((room) => (
+                <RoomCard key={room.id} room={room} />
+              ))}
+              {(!hotel.rooms || hotel.rooms.length === 0) && (
+                <p className="text-muted-foreground col-span-full text-center">No rooms available at the moment.</p>
+              )}
+            </div>
           </div>
         </div>
       </div>

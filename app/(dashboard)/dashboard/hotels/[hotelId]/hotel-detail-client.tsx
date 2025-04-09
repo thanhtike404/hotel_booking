@@ -5,10 +5,16 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { format } from "date-fns"
-import { Hotel, Booking, Review, Room } from "@prisma/client"
+import { Hotel, Booking, Review, Room, RoomType } from "@prisma/client"
 
 type HotelWithRelations = Hotel & {
-  rooms: Room[]
+  rooms: (Room & {
+    roomType: RoomType
+    image: string
+    available: number
+    total: number
+    createdAt: Date
+  })[]
   reviews: Review[]
   bookings: Booking[]
 }
@@ -92,6 +98,65 @@ export default function HotelDetailClient({ hotel }: { hotel: HotelWithRelations
               </div>
             </div>
           </div>
+        </div>
+      </div>
+      <div className="mt-12">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h2 className="text-2xl font-bold">Rooms</h2>
+            <p className="text-muted-foreground">Manage rooms for this hotel</p>
+          </div>
+          <Button asChild>
+            <Link href={`/dashboard/hotels/${hotel.id}/rooms/create`}>Add Room</Link>
+          </Button>
+        </div>
+
+        <div className="rounded-md border">
+          <table className="w-full text-sm">
+            <thead className="border-b bg-muted/50">
+              <tr>
+                <th className="py-3 px-4 text-left">Room Type</th>
+                <th className="py-3 px-4 text-left">Image</th>
+                <th className="py-3 px-4 text-left">Available</th>
+                <th className="py-3 px-4 text-left">Total</th>
+                <th className="py-3 px-4 text-left">Created At</th>
+                <th className="py-3 px-4 text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {hotel.rooms.map((room) => (
+                <tr key={room.id} className="border-b">
+                  <td className="py-3 px-4">
+                    <Badge variant="default">{room.roomType}</Badge>
+                  </td>
+                  <td className="py-3 px-4">
+                    <div className="relative w-16 h-16">
+                      <img
+                        src={room.image}
+                        alt={room.roomType}
+                        className="object-cover rounded-md"
+                        style={{ width: '100%', height: '100%' }}
+                      />
+                    </div>
+                  </td>
+                  <td className="py-3 px-4">{room.available}</td>
+                  <td className="py-3 px-4">{room.total}</td>
+                  <td className="py-3 px-4">
+                    {format(new Date(room.createdAt), "PP")}
+                  </td>
+                  <td className="py-3 px-4">
+                    <div className="flex items-center gap-2">
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link href={`/dashboard/hotels/${hotel.id}/rooms/${room.id}`}>
+                          <Edit className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
