@@ -5,17 +5,17 @@ const prisma = new PrismaClient()
 function getRoomImage(type: RoomType): string {
   switch (type) {
     case RoomType.SINGLE:
-      return "https://images.unsplash.com/photo-1600585154340-be6161a56a0c"
+      return "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80" // Single room
     case RoomType.DOUBLE:
-      return "https://images.unsplash.com/photo-1600585154154-146c2fd5f9b2"
+      return "https://images.unsplash.com/photo-1618773928121-c32242e63f39?q=80" // Double room
     case RoomType.TWIN:
-      return "https://images.unsplash.com/photo-1582719478181-51f1f8c1b2ec"
+      return "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?q=80" // Twin room
     case RoomType.SUITE:
-      return "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf"
+      return "https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80" // Suite
     case RoomType.FAMILY:
-      return "https://images.unsplash.com/photo-1600585154035-00c1f8a6ee12"
+      return "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?q=80" // Family room
     default:
-      return "https://images.unsplash.com/photo-1600585154340-be6161a56a0c"
+      return "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80"
   }
 }
 
@@ -37,51 +37,100 @@ function getRoomPrice(type: RoomType): number {
 }
 
 async function main() {
+  // Clear existing data
+  await prisma.booking.deleteMany()
+  await prisma.room.deleteMany()
   await prisma.hotel.deleteMany()
+  await prisma.city.deleteMany()
+  await prisma.country.deleteMany()
+
+    // Create countries
+  const usa = await prisma.country.create({
+    data: {
+      name: "United States",
+      code: "US"
+    }
+  })
+
+  // Create cities
+  const cities = await Promise.all([
+    prisma.city.create({
+      data: {
+        name: "Malibu",
+        countryId: usa.id
+      }
+    }),
+    prisma.city.create({
+      data: {
+        name: "Aspen",
+        countryId: usa.id
+      }
+    }),
+    prisma.city.create({
+      data: {
+        name: "New York City",
+        countryId: usa.id
+      }
+    }),
+    prisma.city.create({
+      data: {
+        name: "Phoenix",
+        countryId: usa.id
+      }
+    })
+  ])
 
   const hotels = await Promise.all([
     prisma.hotel.create({
       data: {
         name: "Luxury Ocean Resort",
         description: "A beautiful beachfront resort with stunning ocean views and world-class amenities.",
-        location: "Malibu, California",
-        image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d",
+        cityId: cities[0].id,
+        image: "https://images.unsplash.com/photo-1582719508461-905c673771fd?q=80",
         rating: 4.8,
         featured: true,
         amenities: ["Free WiFi", "Pool", "Spa", "Restaurant", "Beach Access", "Room Service"],
+        latitude: 34.0259,
+        longitude: -118.7798
       },
     }),
     prisma.hotel.create({
       data: {
         name: "Mountain View Lodge",
         description: "Cozy mountain retreat perfect for outdoor enthusiasts and nature lovers.",
-        location: "Aspen, Colorado",
-        image: "https://images.unsplash.com/photo-1566073771259-6a8506099945",
+        cityId: cities[1].id,
+        image: "https://images.unsplash.com/photo-1610530531783-56a4e92a3305?q=80",
         rating: 4.5,
         featured: true,
         amenities: ["Free WiFi", "Parking", "Fitness Center", "Restaurant", "Bar"],
+        latitude: 39.1911,
+        longitude: -106.8175
       },
     }),
     prisma.hotel.create({
       data: {
         name: "Urban Boutique Hotel",
         description: "Modern boutique hotel in the heart of the city, walking distance to major attractions.",
-        location: "New York City, NY",
-        image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa",
+        cityId: cities[2].id,
+        image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80",
         rating: 4.6,
         featured: false,
         amenities: ["Free WiFi", "Restaurant", "Bar", "Room Service", "Business Center"],
+        latitude: 40.7128,
+        longitude: -74.0060
       },
     }),
     prisma.hotel.create({
       data: {
         name: "Desert Oasis Resort",
         description: "Luxurious desert resort featuring private pools and spectacular sunset views.",
-        location: "Phoenix, Arizona",
-        image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b",
+        cityId: cities[3].id,
+        image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80",
         rating: 4.7,
         featured: true,
         amenities: ["Free WiFi", "Pool", "Spa", "Restaurant", "Bar", "Fitness Center"],
+        latitude: 33.4484,
+        longitude: -112.0740
       },
     }),
   ])
@@ -129,7 +178,7 @@ async function main() {
           available,
           image: getRoomImage(roomConfig.type),
           price: getRoomPrice(roomConfig.type),
-          amenities: ["Free WiFi", "Air Conditioning", "Private Bathroom"],
+          amenities: ["Free WiFi", "Air Conditioning", "Private Bathroom", "TV", "Mini Bar"],
         },
       })
     }

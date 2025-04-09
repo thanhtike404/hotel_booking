@@ -57,19 +57,22 @@ model VerificationToken {
 
 // Hotel Booking Models
 model Hotel {
-  id            String    @id @default(cuid())
-  name          String
-  description   String    @db.Text
-  location      String
-  image         String
-  rating        Float
-  featured      Boolean   @default(false)
-  amenities     String[]
-  rooms         Room[]    // Changed from Room? to Room[] because a hotel can have many rooms
-  reviews       Review[]
-  bookings      Booking[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id          String    @id @default(cuid())
+  name        String
+  description String    @db.Text
+  cityId      String
+  city        City      @relation(fields: [cityId], references: [id])
+  image       String
+  rating      Float
+  featured    Boolean   @default(false)
+  amenities   String[]
+  latitude    Float     // Geographical coordinate for Leaflet.js map
+  longitude   Float     // Geographical coordinate for Leaflet.js map
+  rooms       Room[]
+  reviews     Review[]
+  bookings    Booking[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Review {
@@ -132,4 +135,17 @@ model Destination {
   rating    Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+model Country {
+  id     String @id @default(cuid())
+  name   String @unique
+  code   String @unique // e.g., 'US', 'IN'
+  cities City[]
+}
+model City {
+  id        String   @id @default(cuid())
+  name      String
+  countryId String
+  country   Country  @relation(fields: [countryId], references: [id])
+  hotels    Hotel[]
 }
