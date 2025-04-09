@@ -2,52 +2,38 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { 
-  LayoutDashboard, 
-  Hotel, 
-  Users, 
-  Settings, 
-  Calendar,
-  CreditCard,
-  Building
-} from "lucide-react"
+import { LuLayoutDashboard } from "react-icons/lu"
+import { BsBuildings } from "react-icons/bs"
+import { IoBedOutline } from "react-icons/io5"
+import { TbWorld } from "react-icons/tb"
+import { MdLocationCity } from "react-icons/md"
 
-const routes = [
+export const routes = [
   {
-    label: 'Overview',
-    icon: LayoutDashboard,
-    href: '/overview',
+    label: "Dashboard",
+    icon: LuLayoutDashboard,
+    href: "/dashboard",
   },
   {
-    label: 'Hotels',
-    icon: Hotel,
-    href: '/dashboard/hotels',
+    label: "Hotels",
+    icon: BsBuildings,
+    href: "/dashboard/hotels",
   },
   {
-    label: 'Bookings',
-    icon: Calendar,
-    href: '/bookings',
+    label: "Rooms",
+    icon: IoBedOutline,
+    href: "/dashboard/rooms",
   },
   {
-    label: 'Guests',
-    icon: Users,
-    href: '/guests',
+    label: "Countries",
+    icon: TbWorld,
+    href: "/dashboard/countries",
   },
   {
-    label: 'Services',
-    icon: Building,
-    href: '/services',
-  },
-  {
-    label: 'Payments',
-    icon: CreditCard,
-    href: '/payments',
-  },
-  {
-    label: 'Settings',
-    icon: Settings,
-    href: '/settings',
-  },
+    label: "Cities",
+    icon: MdLocationCity,
+    href: "/dashboard/cities",
+  }
 ]
 
 export function Sidebar() {
