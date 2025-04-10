@@ -17,6 +17,15 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { countries } from "@/data/locations"
+import { useState } from "react"
 import axios from "axios"
 
 const formSchema = z.object({
@@ -26,8 +35,11 @@ const formSchema = z.object({
   description: z.string().min(10, {
     message: "Description must be at least 10 characters.",
   }),
-  location: z.string().min(2, {
-    message: "Location is required.",
+  country: z.string().min(1, {
+    message: "Country is required.",
+  }),
+  city: z.string().min(1, {
+    message: "City is required.",
   }),
   image: z.string().url({
     message: "Please enter a valid image URL.",
@@ -59,12 +71,16 @@ type CreateHotelResponse = {
 }
 
 export default function CreateHotelForm() {
+  const [selectedCountry, setSelectedCountry] = useState<string>("");
+  const availableCities = countries.find(c => c.name === selectedCountry)?.cities || [];
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
       description: '',
-      location: '',
+      country: '',
+      city: '',
       image: '',
       rating: 0,
 
@@ -100,7 +116,9 @@ export default function CreateHotelForm() {
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    createHotel.mutate(values)
+    const { country, city, ...rest } = values;
+    const location = `${city}, ${country}`;
+    createHotel.mutate({ ...rest, location });
   }
 
   return (
@@ -138,19 +156,68 @@ export default function CreateHotelForm() {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="location"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Location</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter hotel location" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="country"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Country</FormLabel>
+                <Select
+                  onValueChange={(value) => {
+                    field.onChange(value);
+                    setSelectedCountry(value);
+                    form.setValue('city', '');
+                  }}
+                  value={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a country" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {countries.map((country) => (
+                      <SelectItem key={country.name} value={country.name}>
+                        {country.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="city"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>City</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  disabled={!selectedCountry}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a city" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {availableCities.map((city) => (
+                      <SelectItem key={city} value={city}>
+                        {city}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormField
           control={form.control}
