@@ -1,29 +1,20 @@
 "use client"
 
 import { useState } from "react"
-import { CustomLink as Link } from "@/components/ui/custom-link"
-import { HomeIcon, Star, MapPin } from "lucide-react"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import Image from "next/image"
-import { Badge } from "@/components/ui/badge"
-import axios from "axios"
 import { useQuery } from "@tanstack/react-query"
+import axios from "axios"
 import { notFound } from "next/navigation"
-type Hotel = {
-  id: string
-  name: string
-  description: string
-  location: string
-  image: string
-  rating: number
-  amenities: string[]
-}
+import { SearchFilters } from "@/components/search/SearchFilters"
+import { HotelCard } from "@/components/search/HotelCard"
+import type { Hotel } from "@/types/hotel"
 
 export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [rating, setRating] = useState(0)
+  const [selectedCountry, setSelectedCountry] = useState<string>("")
+  const [selectedCity, setSelectedCity] = useState<string>("")
+
   const fetchHotels = async (): Promise<Hotel[]> => {
     const response = await axios.get("/api/hotels")
     return response.data
@@ -45,10 +36,15 @@ export default function SearchPage() {
   }
 
   const filteredHotels = hotels.filter(hotel => {
-    const matchesSearch = hotel.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      hotel.location.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesRating = hotel.rating >= rating
-    return matchesSearch && matchesRating
+    const matchesSearch = (hotel.name?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+      (hotel.location?.toLowerCase() || '').includes(searchQuery.toLowerCase())
+    const matchesRating = (hotel.rating || 0) >= rating
+    const matchesLocation = !selectedCountry || (
+      hotel.location && 
+      hotel.location.includes(selectedCity || '') && 
+      hotel.location.includes(selectedCountry || '')
+    )
+    return matchesSearch && matchesRating && matchesLocation
   })
 
   return (
@@ -63,76 +59,23 @@ export default function SearchPage() {
       </Button>
 
       <div className="flex flex-col lg:grid lg:grid-cols-4 gap-6">
-        {/* Filters Sidebar */}
-        <div id="filters" className="order-2 lg:order-1 space-y-6 lg:sticky lg:top-6 lg:h-fit">
-          <div>
-            <h3 className="font-semibold mb-4">Search</h3>
-            <Input
-              placeholder="Search hotels..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <h3 className="font-semibold mb-4">Minimum Rating</h3>
-            <div className="flex flex-wrap items-center gap-2">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Button
-                  key={star}
-                  variant={rating === star ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setRating(rating === star ? 0 : star)}
-                >
-                  {star}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </div>
+        <SearchFilters
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          rating={rating}
+          setRating={setRating}
+          selectedCountry={selectedCountry}
+          setSelectedCountry={setSelectedCountry}
+          selectedCity={selectedCity}
+          setSelectedCity={setSelectedCity}
+        />
 
         {/* Results */}
         <div className="order-1 lg:order-2 lg:col-span-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {filteredHotels.length > 0 ? (
               filteredHotels.map((hotel) => (
-                <Card key={hotel.id} className="flex flex-col">
-                  <CardHeader className="p-0">
-                    <div className="relative h-48 w-full">
-                      <Image
-                        src={hotel.image}
-                        alt={hotel.name}
-                        fill
-                        className="object-cover rounded-t-lg"
-                      />
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-4 flex-grow">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-semibold">{hotel.name}</h3>
-                        <p className="text-sm text-muted-foreground flex items-center gap-1">
-                          <MapPin className="h-4 w-4" />
-                          {hotel.location}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        <span className="font-medium">{hotel.rating}</span>
-                      </div>
-                    </div>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {hotel.amenities.slice(0, 3).map((amenity) => (
-                        <Badge key={amenity} variant="secondary">
-                          {amenity}
-                        </Badge>
-                      ))}
-                    </div>
-                  </CardContent>
-                  <CardFooter className="flex justify-between items-center p-4">
-                    <Link href={`/hotels/${hotel.id}`} className="text-primary-600">View Details</Link>
-                  </CardFooter>
-                </Card>
+                <HotelCard key={hotel.id} hotel={hotel} />
               ))
             ) : (
               <div className="col-span-full text-center py-10">
