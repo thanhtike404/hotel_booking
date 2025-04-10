@@ -7,7 +7,7 @@ export const hotels = {
       image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d",
       description: "Experience ultimate luxury with private beach access and world-class spa facilities",
       rating: 4.8,
-      pricePerNight: 300,
+
       amenities: ["Spa", "Private Beach", "Pool", "Restaurant", "Gym"],
       rooms: {
         available: 15,
@@ -22,7 +22,7 @@ export const hotels = {
       image: "https://images.unsplash.com/photo-1566073771259-6a8506099945",
       description: "Modern luxury in the heart of Manhattan with stunning city views",
       rating: 4.5,
-      pricePerNight: 200,
+
       amenities: ["Business Center", "Restaurant", "Gym", "Bar", "Conference Rooms"],
       rooms: {
         available: 25,
@@ -37,7 +37,7 @@ export const hotels = {
       image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4",
       description: "Exclusive overwater villas with direct access to crystal clear waters",
       rating: 4.9,
-      pricePerNight: 500,
+
       amenities: ["Private Pool", "Water Sports", "Spa", "Fine Dining", "Butler Service"],
       rooms: {
         available: 8,

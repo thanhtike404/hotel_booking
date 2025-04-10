@@ -2,27 +2,26 @@ generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl", "linux-musl-openssl-3.0.x"]
 }
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-// NextAuth Models
 model Account {
   id                String  @id @default(cuid())
   userId            String
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -39,12 +38,12 @@ model User {
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
-  password      String?   // Added field
+  password      String?
   emailVerified DateTime?
   image         String?
   accounts      Account[]
-  sessions      Session[]
   bookings      Booking[]
+  sessions      Session[]
 }
 
 model VerificationToken {
@@ -55,24 +54,23 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// Hotel Booking Models
 model Hotel {
   id          String    @id @default(cuid())
   name        String
-  description String    @db.Text
+  description String
   cityId      String
-  city        City      @relation(fields: [cityId], references: [id])
   image       String
   rating      Float
   featured    Boolean   @default(false)
   amenities   String[]
-  latitude    Float     // Geographical coordinate for Leaflet.js map
-  longitude   Float     // Geographical coordinate for Leaflet.js map
-  rooms       Room[]
-  reviews     Review[]
-  bookings    Booking[]
+  latitude    Float
+  longitude   Float
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  bookings    Booking[]
+  city        City      @relation(fields: [cityId], references: [id])
+  reviews     Review[]
+  rooms       Room[]
 }
 
 model Review {
@@ -80,51 +78,42 @@ model Review {
   hotelId   String
   userId    String?
   rating    Float
-  comment   String   @db.Text
+  comment   String
   date      DateTime @default(now())
-  hotel     Hotel    @relation(fields: [hotelId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  hotel     Hotel    @relation(fields: [hotelId], references: [id], onDelete: Cascade)
 }
 
 model Booking {
   id        String   @id @default(cuid())
   hotelId   String
   userId    String
-  roomId    String?   // Optional: for a specific room booking
+  roomId    String?
   checkIn   DateTime
   checkOut  DateTime
   status    String
-  hotel     Hotel    @relation(fields: [hotelId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
-  room      Room?    @relation(fields: [roomId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
-
-enum RoomType {
-  SINGLE
-  DOUBLE
-  TWIN
-  SUITE
-  FAMILY
+  hotel     Hotel    @relation(fields: [hotelId], references: [id])
+  room      Room?    @relation(fields: [roomId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Room {
-  id         String    @id @default(cuid())
-  hotelId    String
-  available  Int
-  total      Int
-  roomType   RoomType
-  image      String
-  amenities  String[]
-  price      Float     // <-- ✅ Add this
-  hotel      Hotel     @relation(fields: [hotelId], references: [id])
-  bookings   Booking[]
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id        String    @id @default(cuid())
+  hotelId   String
+  available Int
+  total     Int
+  roomType  RoomType
+  image     String
+  amenities String[]
+  price     Float
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  bookings  Booking[]
+  hotel     Hotel     @relation(fields: [hotelId], references: [id])
 }
-
 
 model Destination {
   id        String   @id @default(cuid())
@@ -136,16 +125,26 @@ model Destination {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
 model Country {
   id     String @id @default(cuid())
   name   String @unique
-  code   String @unique // e.g., 'US', 'IN'
+  code   String @unique
   cities City[]
 }
+
 model City {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   name      String
   countryId String
-  country   Country  @relation(fields: [countryId], references: [id])
+  country   Country @relation(fields: [countryId], references: [id])
   hotels    Hotel[]
+}
+
+enum RoomType {
+  SINGLE
+  DOUBLE
+  TWIN
+  SUITE
+  FAMILY
 }
