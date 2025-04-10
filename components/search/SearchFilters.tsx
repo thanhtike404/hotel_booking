@@ -3,7 +3,9 @@
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { countries } from "@/data/locations"
+import { useQuery } from "@tanstack/react-query"
+import axios from "axios"
+import type { Country } from "@/types/country"
 
 type SearchFiltersProps = {
   searchQuery: string
@@ -26,6 +28,14 @@ export function SearchFilters({
   selectedCity,
   setSelectedCity,
 }: SearchFiltersProps) {
+  const { data: countries = [], isLoading } = useQuery<Country[]>({
+    queryKey: ['locations'],
+    queryFn: async () => {
+      const response = await axios.get('/api/locations')
+      return response.data
+    }
+  })
+
   const availableCities = countries.find(c => c.name === selectedCountry)?.cities || []
 
   return (

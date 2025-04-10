@@ -34,16 +34,29 @@ export type Booking = {
   updatedAt: string;
 };
 
+export type City = {
+  id: string;
+  name: string;
+  countryId: string;
+  country: {
+    id: string;
+    name: string;
+    code: string;
+  };
+};
+
 export type Hotel = {
   id: string;
   name: string;
   description: string;
-  location: string;
+  cityId: string;
+  city: City;
   image: string;
   rating: number;
-  pricePerNight: number;
   featured: boolean;
   amenities: string[];
+  latitude: number;
+  longitude: number;
   rooms: Room[];
   reviews: Review[];
   bookings: Booking[];
@@ -51,5 +64,5 @@ export type Hotel = {
   updatedAt: string;
   _count: {
     rooms: number
-  }
+  };
 };

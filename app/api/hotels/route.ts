@@ -3,10 +3,10 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
   try {
-    const { name, location, description, image, rating, featured, amenities } = await request.json();
+    const { name, cityId, description, image, rating, featured, amenities, latitude, longitude } = await request.json();
 
     // Validate input
-    if (!name || !location || !description || !image || rating === undefined || !amenities) {
+    if (!name || !cityId || !description || !image || rating === undefined || !amenities || latitude === undefined || longitude === undefined) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
@@ -14,19 +14,21 @@ export async function POST(request: Request) {
     const newHotel = await prisma.hotel.create({
       data: {
         name,
-        location,
+        cityId,
         description,
         image,
         rating,
-
-        featured,
+        featured: featured || false,
         amenities,
+        latitude,
+        longitude
       },
     });
 
     return NextResponse.json(newHotel, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Error creating hotel:', error);
+    return NextResponse.json({ error: 'Failed to create hotel' }, { status: 500 });
   }
 }
 
@@ -37,6 +39,11 @@ export async function GET() {
         rooms: true,
         reviews: true,
         bookings: true,
+        city: {
+          include: {
+            country: true
+          }
+        }
       },
       orderBy: {
         createdAt: 'desc',

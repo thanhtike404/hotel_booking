@@ -30,7 +30,7 @@ export function HotelCard({ hotel }: HotelCardProps) {
             <h3 className="font-semibold">{hotel.name}</h3>
             <p className="text-sm text-muted-foreground flex items-center gap-1">
               <MapPin className="h-4 w-4" />
-              {hotel.location}
+              {hotel.city?.name}, {hotel.city?.country?.name}
             </p>
           </div>
           <div className="flex items-center gap-1">

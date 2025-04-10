@@ -37,12 +37,11 @@ export default function SearchPage() {
 
   const filteredHotels = hotels.filter(hotel => {
     const matchesSearch = (hotel.name?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
-      (hotel.location?.toLowerCase() || '').includes(searchQuery.toLowerCase())
+      (hotel.city?.name?.toLowerCase() || '').includes(searchQuery.toLowerCase())
     const matchesRating = (hotel.rating || 0) >= rating
     const matchesLocation = !selectedCountry || (
-      hotel.location && 
-      hotel.location.includes(selectedCity || '') && 
-      hotel.location.includes(selectedCountry || '')
+      hotel.city?.country?.name === selectedCountry &&
+      (!selectedCity || hotel.city?.name === selectedCity)
     )
     return matchesSearch && matchesRating && matchesLocation
   })
