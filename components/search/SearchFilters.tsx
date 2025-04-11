@@ -91,12 +91,9 @@ export function SearchFilters({
               <SelectValue placeholder="Select a city" />
             </SelectTrigger>
             <SelectContent>
-              {availableCities.map((city: {
-                name: string,
-                countryId: string
-              }) => (
-                <SelectItem key={city.name} value={city.name}>
-                  {city.name}
+              {availableCities.map((city: string) => (
+                <SelectItem key={city} value={city}>
+                  {city}
                 </SelectItem>
               ))}
             </SelectContent>

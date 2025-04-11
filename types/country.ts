@@ -2,7 +2,7 @@ export interface Country {
   id: string;
   name: string;
   code: string;
-  cities?: City[];
+  cities?: [];
 }
 
 export interface City {
