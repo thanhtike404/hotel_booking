@@ -3,10 +3,10 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
   try {
-    const { name, cityId, description, image, rating, featured, amenities, latitude, longitude } = await request.json();
+    const { name, location, description, image, rating, featured, amenities } = await request.json();
 
     // Validate input
-    if (!name || !cityId || !description || !image || rating === undefined || !amenities || latitude === undefined || longitude === undefined) {
+    if (!name || !location || !description || !image || rating === undefined || !amenities) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
@@ -14,47 +14,76 @@ export async function POST(request: Request) {
     const newHotel = await prisma.hotel.create({
       data: {
         name,
-        cityId,
+        location,
         description,
         image,
         rating,
-        featured: featured || false,
+        featured,
         amenities,
-        latitude,
-        longitude
       },
     });
 
     return NextResponse.json(newHotel, { status: 201 });
   } catch (error) {
-    console.error('Error creating hotel:', error);
-    return NextResponse.json({ error: 'Failed to create hotel' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    const url = new URL(req.url);
+    const searchParams = url.searchParams;
+
+    const search = searchParams.get("search") || undefined;
+    const city = searchParams.get("city") || undefined;
+    const country = searchParams.get("country") || undefined;
+    const rating = searchParams.get("rating") || undefined;
+
+    const filters: any = {};
+
+    if (search) {
+      filters.name = { contains: search, mode: 'insensitive' };
+    }
+
+    if (rating) {
+      filters.rating = {
+        gte: parseFloat(rating),
+      };
+    }
+
+    if (city) {
+      filters.city = {
+        name: {
+          equals: city,
+          mode: 'insensitive',
+        },
+      };
+    }
+
+    if (country) {
+      filters.city = {
+        ...(filters.city || {}),
+        country: {
+          name: {
+            equals: country,
+            mode: 'insensitive',
+          },
+        },
+      };
+    }
+
     const hotels = await prisma.hotel.findMany({
+      where: filters,
       include: {
-        rooms: true,
-        reviews: true,
-        bookings: true,
         city: {
           include: {
-            country: true
-          }
-        }
-      },
-      orderBy: {
-        createdAt: 'desc',
+            country: true,
+          },
+        },
       },
     });
 
-    if (!hotels) {
-      return NextResponse.json({ error: 'No hotels found' }, { status: 404 });
-    }
-
-    return NextResponse.json(hotels, { status: 200 });
+    return NextResponse.json({ hotels }, { status: 200 });
   } catch (error) {
     console.error('Error fetching hotels:', error);
     return NextResponse.json(

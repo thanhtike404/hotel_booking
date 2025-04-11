@@ -2,7 +2,13 @@
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { useQuery } from "@tanstack/react-query"
 import axios from "axios"
 import type { Country } from "@/types/country"
@@ -28,28 +34,34 @@ export function SearchFilters({
   selectedCity,
   setSelectedCity,
 }: SearchFiltersProps) {
-  const { data: countries = [], isLoading } = useQuery<Country[]>({
-    queryKey: ['locations'],
+  const { data: countries = [] } = useQuery<Country[]>({
+    queryKey: ["locations"],
     queryFn: async () => {
-      const response = await axios.get('/api/locations')
+      const response = await axios.get("/api/locations")
       return response.data
-    }
+    },
   })
 
-  const availableCities = countries.find(c => c.name === selectedCountry)?.cities || []
+
+
+  const availableCities = countries.find((c) => c.name === selectedCountry)?.cities || []
+  console.log('avialiable cities', selectedCity)
 
   return (
-    <div id="filters" className="order-2 lg:order-1 space-y-6 lg:sticky lg:top-6 lg:h-fit">
+    <div className="w-full lg:max-w-xs space-y-6 bg-zinc-900 rounded-lg p-4 lg:sticky lg:top-6 lg:h-fit">
+      {/* Search */}
       <div>
-        <h3 className="font-semibold mb-4">Search</h3>
+        <h3 className="text-sm font-semibold mb-2">Search</h3>
         <Input
           placeholder="Search hotels..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
+
+      {/* Location */}
       <div>
-        <h3 className="font-semibold mb-4">Location</h3>
+        <h3 className="text-sm font-semibold mb-2">Location</h3>
         <div className="space-y-4">
           <Select
             value={selectedCountry}
@@ -79,18 +91,23 @@ export function SearchFilters({
               <SelectValue placeholder="Select a city" />
             </SelectTrigger>
             <SelectContent>
-              {availableCities.map((city) => (
-                <SelectItem key={city} value={city}>
-                  {city}
+              {availableCities.map((city: {
+                name: string,
+                countryId: string
+              }) => (
+                <SelectItem key={city.name} value={city.name}>
+                  {city.name}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
       </div>
+
+      {/* Rating */}
       <div>
-        <h3 className="font-semibold mb-4">Minimum Rating</h3>
-        <div className="flex flex-wrap items-center gap-2">
+        <h3 className="text-sm font-semibold mb-2">Minimum Rating</h3>
+        <div className="flex flex-wrap gap-2">
           {[1, 2, 3, 4, 5].map((star) => (
             <Button
               key={star}
@@ -103,7 +120,9 @@ export function SearchFilters({
           ))}
         </div>
       </div>
-      <div className="pt-4">
+
+      {/* Reset */}
+      <div className="pt-2">
         <Button
           variant="outline"
           className="w-full"

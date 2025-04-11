@@ -45,7 +45,7 @@ const SkeletonCard = () => (
 export default function HotelsPage() {
   const fetchHotels = async () => {
     const response = await axios.get("/api/hotels")
-    return response.data
+    return response.data.hotels
   }
 
   const { data: hotels, isLoading } = useQuery({

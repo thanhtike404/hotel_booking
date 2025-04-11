@@ -66,3 +66,8 @@ export type Hotel = {
     rooms: number
   };
 };
+
+export type CreateHotelResponse = {
+  id: string
+  // ... other hotel fields
+}

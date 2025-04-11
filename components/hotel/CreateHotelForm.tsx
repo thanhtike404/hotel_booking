@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { useMutation } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
+import { SearchFilters } from "../search/SearchFilters"
+import { CreateHotelResponse } from "@/types/hotel"
 import {
   Form,
   FormControl,
@@ -65,10 +67,7 @@ const amenitiesOptions = [
 ]
 
 // Add type for API response
-type CreateHotelResponse = {
-  id: string
-  // ... other hotel fields
-}
+
 
 export default function CreateHotelForm() {
   const [selectedCountry, setSelectedCountry] = useState<string>("");
@@ -118,7 +117,8 @@ export default function CreateHotelForm() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     const { country, city, ...rest } = values;
     const location = `${city}, ${country}`;
-    createHotel.mutate({ ...rest, location });
+    // createHotel.mutate({ ...rest, location });
+    console.log(values)
   }
 
   return (
