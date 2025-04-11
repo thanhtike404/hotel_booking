@@ -13,7 +13,7 @@ import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic'
 import { RoomCard } from '@/components/hotel/RoomCard';
-
+import { Hotel, Room } from '@/types/hotel';
 // // const Map = dynamic(() => import('@/components/map'), {
 // //   ssr: false,
 // //   loading: () => <div className="h-[400px] w-full bg-muted animate-pulse rounded-lg" />
@@ -28,7 +28,7 @@ export default function HotelDetailPage({ params }: { params: Promise<{ id: stri
     return notFound();
   }
 
-  const { data: hotel, isLoading, error } = useQuery({
+  const { data: hotel, isLoading, error } = useQuery<Hotel>({
     queryKey: ['hotels', id],
     queryFn: async () => {
       const response = await axios.get(`/api/hotels/${id}`);
@@ -84,7 +84,9 @@ export default function HotelDetailPage({ params }: { params: Promise<{ id: stri
               <h1 className="text-3xl font-bold">{hotel.name}</h1>
               <p className="text-muted-foreground flex items-center gap-2 mt-2">
                 <MapPin className="h-4 w-4" />
-                {hotel.location}
+                {
+                  hotel?.city?.name + ", " + hotel?.city?.country?.name
+                }
               </p>
               <div className="flex items-center gap-2 mt-2">
                 <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />

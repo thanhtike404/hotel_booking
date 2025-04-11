@@ -6,9 +6,9 @@ export type Room = {
     roomType: 'SINGLE' | 'DOUBLE' | 'TWIN' | 'SUITE' | 'FAMILY';
     createdAt: string;
     updatedAt: string;
-    hotel: {
-        name: string;
-    };
+    image: string;
+    price: number;
+    amenities: string[];
 };
 
 export type RoomResponse = {

@@ -65,6 +65,7 @@ export type Hotel = {
   _count: {
     rooms: number
   };
+  room: Room[]
 };
 
 export type CreateHotelResponse = {

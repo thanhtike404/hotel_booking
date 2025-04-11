@@ -5,7 +5,7 @@ import { ThemeProvider } from "@/components/providers/theme-provider"
 import QueryProvider from "@/components/providers/queryProvider"
 import AuthProvider from "@/components/providers/session-provider"
 import ThemeScript from "@/components/providers/theme-script"
-
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
@@ -28,6 +28,8 @@ export default function RootLayout({
           <AuthProvider>
             <ThemeProvider>
               {children}
+              <ReactQueryDevtools initialIsOpen={false} />
+
             </ThemeProvider>
           </AuthProvider>
         </QueryProvider>

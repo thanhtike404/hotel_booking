@@ -27,6 +27,7 @@ export const HotelsList = ({ searchQuery, rating, selectedCity }: { searchQuery:
         queryFn: fetchHotels,
     })
 
+
     const SkeletonCard = () => (
         <Card className="flex flex-col animate-pulse">
             <CardHeader className="p-0">
@@ -90,7 +91,7 @@ export const HotelsList = ({ searchQuery, rating, selectedCity }: { searchQuery:
                                     <h3 className="font-semibold text-lg">{hotel?.name}</h3>
                                     <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
                                         <MapPin className="h-4 w-4" />
-                                        {hotel?.location}
+                                        {hotel?.city.name}, {hotel?.city.country.name}
                                     </p>
                                 </div>
                             </div>

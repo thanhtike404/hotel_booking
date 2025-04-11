@@ -16,13 +16,11 @@ export async function GET() {
 
     const formattedCountries = countries.map(country => ({
       name: country.name,
-
       cities: country.cities.map(city => city.name)
     }));
 
     return NextResponse.json(formattedCountries);
   } catch (error) {
-    console.error("Error fetching locations:", error);
     return NextResponse.json(
       { error: "Failed to fetch locations" },
       { status: 500 }

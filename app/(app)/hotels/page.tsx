@@ -88,7 +88,8 @@ export default function HotelsPage() {
                     <h3 className="font-semibold text-lg">{hotel?.name}</h3>
                     <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
                       <MapPin className="h-4 w-4" />
-                      {hotel?.location}
+                      {hotel?.
+                        city?.name}, {hotel?.city?.country?.name}
                     </p>
                   </div>
                 </div>
