@@ -15,8 +15,8 @@ import { Button } from "@/components/ui/button"
 export default function HotelsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [rating, setRating] = useState(0)
-  const [selectedCountry, setSelectedCountry] = useState("")
-  const [selectedCity, setSelectedCity] = useState("")
+  const [selectedCountryId, setSelectedCountryId] = useState("")
+  const [selectedCityId, setSelectedCityId] = useState("")
 
   return (
     <div className="min-h-screen bg-black text-white p-4">
@@ -38,10 +38,10 @@ export default function HotelsPage() {
                 setSearchQuery={setSearchQuery}
                 rating={rating}
                 setRating={setRating}
-                selectedCountry={selectedCountry}
-                setSelectedCountry={setSelectedCountry}
-                selectedCity={selectedCity}
-                setSelectedCity={setSelectedCity}
+                selectedCountryId={selectedCountryId}
+                setSelectedCountryId={setSelectedCountryId}
+                selectedCityId={selectedCityId}
+                setSelectedCityId={setSelectedCityId}
               />
             </div>
           </SheetContent>
@@ -57,10 +57,10 @@ export default function HotelsPage() {
             setSearchQuery={setSearchQuery}
             rating={rating}
             setRating={setRating}
-            selectedCountry={selectedCountry}
-            setSelectedCountry={setSelectedCountry}
-            selectedCity={selectedCity}
-            setSelectedCity={setSelectedCity}
+            selectedCountryId={selectedCountryId}
+            setSelectedCountryId={setSelectedCountryId}
+            selectedCityId={selectedCityId}
+            setSelectedCityId={setSelectedCityId}
           />
         </aside>
 
@@ -70,8 +70,8 @@ export default function HotelsPage() {
           <HotelsList
             searchQuery={searchQuery}
             rating={rating}
-
-            selectedCity={selectedCity}
+            selectedCountryId={selectedCountryId}
+            selectedCityId={selectedCityId}
 
           />
         </main>

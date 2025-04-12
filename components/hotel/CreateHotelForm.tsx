@@ -2,11 +2,11 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
-import { SearchFilters } from "../search/SearchFilters"
 import { CreateHotelResponse } from "@/types/hotel"
+import { formSchema } from "@/app/(dashboard)/dashboard/hotels/create/hotelSchema"
+import z from "zod"
 import {
   Form,
   FormControl,
@@ -26,33 +26,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { countries } from "@/data/locations"
 import { useState } from "react"
 import axios from "axios"
-
-const formSchema = z.object({
-  name: z.string().min(2, {
-    message: "Hotel name must be at least 2 characters.",
-  }),
-  description: z.string().min(10, {
-    message: "Description must be at least 10 characters.",
-  }),
-  country: z.string().min(1, {
-    message: "Country is required.",
-  }),
-  city: z.string().min(1, {
-    message: "City is required.",
-  }),
-  image: z.string().url({
-    message: "Please enter a valid image URL.",
-  }),
-  rating: z.number().min(0).max(5),
-
-  featured: z.boolean().default(false),
-  amenities: z.array(z.string()).min(1, {
-    message: "Please select at least one amenity.",
-  }),
-})
 
 const amenitiesOptions = [
   "Free WiFi",
@@ -66,36 +41,42 @@ const amenitiesOptions = [
   "Air Conditioning",
 ]
 
-// Add type for API response
-
-
 export default function CreateHotelForm() {
-  const [selectedCountry, setSelectedCountry] = useState<string>("");
-  const availableCities = countries.find(c => c.name === selectedCountry)?.cities || [];
+  const [selectedCountryId, setSelectedCountryId] = useState<string>("")
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
-      description: '',
-      country: '',
-      city: '',
-      image: '',
+      name: "",
+      description: "",
+      country: "",
+      cityId: "",
+      image: "",
       rating: 0,
-
       featured: false,
       amenities: [],
     },
   })
 
+  const { data: locations } = useQuery({
+    queryKey: ["locations"],
+    queryFn: async () => {
+      const response = await axios.get("/api/locations")
+      return response.data
+    },
+  })
+
+  const availableCities =
+    locations?.find((c) => c.id === selectedCountryId)?.cities || []
+
   const createHotel = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => {
       const { data } = await axios.post<CreateHotelResponse>(
-        '/api/hotels',
+        "/api/hotels",
         values,
         {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         }
       )
@@ -103,22 +84,17 @@ export default function CreateHotelForm() {
     },
     onSuccess: () => {
       form.reset()
-      // You can add toast notification here
-      // You can also redirect to the hotels list page
     },
     onError: (error) => {
       if (axios.isAxiosError(error)) {
-        console.error('Error creating hotel:', error.response?.data)
+        console.error("Error creating hotel:", error.response?.data)
       }
-      // You can add error toast notification here
     },
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    const { country, city, ...rest } = values;
-    const location = `${city}, ${country}`;
-    // createHotel.mutate({ ...rest, location });
     console.log(values)
+    createHotel.mutate(values)
   }
 
   return (
@@ -145,11 +121,7 @@ export default function CreateHotelForm() {
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea
-                  placeholder="Enter hotel description"
-                  {...field}
-                  rows={5}
-                />
+                <Textarea placeholder="Enter hotel description" {...field} rows={5} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -165,9 +137,9 @@ export default function CreateHotelForm() {
                 <FormLabel>Country</FormLabel>
                 <Select
                   onValueChange={(value) => {
-                    field.onChange(value);
-                    setSelectedCountry(value);
-                    form.setValue('city', '');
+                    field.onChange(value)
+                    setSelectedCountryId(value)
+                    form.setValue("cityId", "")
                   }}
                   value={field.value}
                 >
@@ -177,8 +149,8 @@ export default function CreateHotelForm() {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {countries.map((country) => (
-                      <SelectItem key={country.name} value={country.name}>
+                    {locations?.map((country) => (
+                      <SelectItem key={country.id} value={country.id}>
                         {country.name}
                       </SelectItem>
                     ))}
@@ -191,14 +163,14 @@ export default function CreateHotelForm() {
 
           <FormField
             control={form.control}
-            name="city"
+            name="cityId"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>City</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   value={field.value}
-                  disabled={!selectedCountry}
+                  disabled={!selectedCountryId}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -207,8 +179,8 @@ export default function CreateHotelForm() {
                   </FormControl>
                   <SelectContent>
                     {availableCities.map((city) => (
-                      <SelectItem key={city} value={city}>
-                        {city}
+                      <SelectItem key={city.id} value={city.id}>
+                        {city.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -255,8 +227,6 @@ export default function CreateHotelForm() {
               </FormItem>
             )}
           />
-
-
         </div>
 
         <FormField
@@ -299,10 +269,7 @@ export default function CreateHotelForm() {
                     name="amenities"
                     render={({ field }) => {
                       return (
-                        <FormItem
-                          key={amenity}
-                          className="flex flex-row items-start space-x-3 space-y-0"
-                        >
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                           <FormControl>
                             <Checkbox
                               checked={field.value?.includes(amenity)}
@@ -331,10 +298,7 @@ export default function CreateHotelForm() {
           )}
         />
 
-        <Button
-          type="submit"
-          disabled={createHotel.isPending}
-        >
+        <Button type="submit" disabled={createHotel.isPending}>
           {createHotel.isPending ? "Creating..." : "Create Hotel"}
         </Button>
       </form>

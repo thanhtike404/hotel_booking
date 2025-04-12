@@ -10,20 +10,21 @@ import { Star, MapPin } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
-export const HotelsList = ({ searchQuery, rating, selectedCity }: { searchQuery: string, rating: number, selectedCity: string }) => {
+export const HotelsList = ({ searchQuery, rating, selectedCityId, selectedCountryId }: { searchQuery: string, rating: number, selectedCityId: string, selectedCountryId: string }) => {
     const fetchHotels = async () => {
         const response = await axios.get("/api/hotels", {
             params: {
                 search: searchQuery,
                 rating: rating,
-                city: selectedCity
+                city: selectedCityId,
+                country: selectedCountryId
             },
         })
         return response.data.hotels
     }
-    console.log(searchQuery, rating, selectedCity)
+    console.log(searchQuery, rating, selectedCityId)
     const { data: hotels, isLoading } = useQuery({
-        queryKey: ['hotels', searchQuery, rating, selectedCity],
+        queryKey: ['hotels', searchQuery, rating, selectedCityId],
         queryFn: fetchHotels,
     })
 

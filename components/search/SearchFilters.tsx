@@ -18,10 +18,10 @@ type SearchFiltersProps = {
   setSearchQuery: (value: string) => void
   rating: number
   setRating: (value: number) => void
-  selectedCountry: string
-  setSelectedCountry: (value: string) => void
-  selectedCity: string
-  setSelectedCity: (value: string) => void
+  selectedCountryId: string
+  setSelectedCountryId: (value: string) => void
+  selectedCityId: string
+  setSelectedCityId: (value: string) => void
 }
 
 export function SearchFilters({
@@ -29,10 +29,10 @@ export function SearchFilters({
   setSearchQuery,
   rating,
   setRating,
-  selectedCountry,
-  setSelectedCountry,
-  selectedCity,
-  setSelectedCity,
+  selectedCountryId,
+  setSelectedCountryId,
+  selectedCityId,
+  setSelectedCityId,
 }: SearchFiltersProps) {
   const { data: countries = [] } = useQuery<Country[]>({
     queryKey: ["locations"],
@@ -44,8 +44,8 @@ export function SearchFilters({
 
 
 
-  const availableCities = countries.find((c) => c.name === selectedCountry)?.cities || []
-  console.log('avialiable cities', selectedCity)
+  const availableCities = countries.find((c) => c.id === selectedCountryId)?.cities || []
+  console.log('avialiable cities', selectedCityId)
 
   return (
     <div className="w-full lg:max-w-xs space-y-6 bg-zinc-900 rounded-lg p-4 lg:sticky lg:top-6 lg:h-fit">
@@ -64,10 +64,10 @@ export function SearchFilters({
         <h3 className="text-sm font-semibold mb-2">Location</h3>
         <div className="space-y-4">
           <Select
-            value={selectedCountry}
+            value={selectedCountryId}
             onValueChange={(value) => {
-              setSelectedCountry(value)
-              setSelectedCity("")
+              setSelectedCountryId(value)
+              setSelectedCityId("")
             }}
           >
             <SelectTrigger>
@@ -75,7 +75,7 @@ export function SearchFilters({
             </SelectTrigger>
             <SelectContent>
               {countries.map((country) => (
-                <SelectItem key={country.name} value={country.name}>
+                <SelectItem key={country.name} value={country.id}>
                   {country.name}
                 </SelectItem>
               ))}
@@ -83,17 +83,17 @@ export function SearchFilters({
           </Select>
 
           <Select
-            value={selectedCity}
-            onValueChange={setSelectedCity}
-            disabled={!selectedCountry}
+            value={selectedCityId}
+            onValueChange={setSelectedCityId}
+            disabled={!selectedCountryId}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select a city" />
             </SelectTrigger>
             <SelectContent>
               {availableCities.map((city: string) => (
-                <SelectItem key={city} value={city}>
-                  {city}
+                <SelectItem key={city.id} value={city.id}>
+                  {city.name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -126,8 +126,8 @@ export function SearchFilters({
           onClick={() => {
             setSearchQuery("")
             setRating(0)
-            setSelectedCountry("")
-            setSelectedCity("")
+            setSelectedCountryId("")
+            setSelectedCityId("")
           }}
         >
           Reset Filters
