@@ -78,7 +78,7 @@ export async function PATCH(
       data: {
         name: body.name,
         description: body.description,
-        location: body.location,
+        cityId: body.cityId,
         image: body.image,
         rating: body.rating,
         amenities: body.amenities,

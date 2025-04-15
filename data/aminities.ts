@@ -9,3 +9,14 @@ export const amenitiesList = [
     "Room Service",
     "Air Conditioning",
 ];
+export const amenitiesOptions = [
+    "Free WiFi",
+    "Parking",
+    "Pool",
+    "Spa",
+    "Restaurant",
+    "Room Service",
+    "Fitness Center",
+    "Bar",
+    "Air Conditioning",
+]

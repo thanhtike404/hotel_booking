@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -23,6 +23,14 @@ import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/hooks/use-toast"
 import { Hotel, Room, Review, Booking } from "@prisma/client"
+import { useQuery } from "@tanstack/react-query"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 type HotelWithRelations = Hotel & {
   rooms: Room[]
@@ -33,8 +41,8 @@ type HotelWithRelations = Hotel & {
 const hotelFormSchema = z.object({
   name: z.string().min(1, "Hotel name is required"),
   description: z.string().min(10, "Description must be at least 10 characters"),
-  location: z.string().min(1, "Location is required"),
-
+  countryId: z.string().min(1, "Country is required"),
+  cityId: z.string().min(1, "City is required"),
   image: z.string().url("Please provide a valid image URL"),
   rating: z.coerce.number().min(0).max(5, "Rating must be between 0 and 5"),
   amenities: z.array(z.string()).min(1, "At least one amenity is required"),
@@ -48,6 +56,29 @@ export default function HotelEditClient({ hotel }: { hotel: HotelWithRelations |
   const router = useRouter()
   const queryClient = useQueryClient()
   const [amenity, setAmenity] = useState("")
+  const [selectedCountryId, setSelectedCountryId] = useState<string | undefined>(undefined)
+  const [InitialCityId, setInitialCityId] = useState(hotel?.cityId)
+
+
+  const fetchCountries = async () => {
+    const response = await axios.get(`/api/locations/${hotel?.cityId}`)
+    return response.data.id
+  }
+
+  const { data: locations } = useQuery({
+    queryKey: ["locations"],
+    queryFn: async () => {
+      const response = await axios.get("/api/locations")
+      return response.data
+    },
+  })
+
+  const { data: InitialCountryId } = useQuery({
+    queryKey: ["countries", hotel?.cityId],
+    queryFn: fetchCountries,
+  })
+
+  console.log(InitialCountryId,)
 
   if (!hotel) {
     return <div>Hotel not found</div>
@@ -58,18 +89,30 @@ export default function HotelEditClient({ hotel }: { hotel: HotelWithRelations |
     defaultValues: {
       name: hotel.name,
       description: hotel.description,
-      location: hotel.location,
-
       image: hotel.image,
       rating: hotel.rating,
+      cityId: InitialCityId,
+      countryId: InitialCountryId,
       amenities: hotel.amenities as string[],
       featured: hotel.featured,
     },
   })
+  useEffect(() => {
+    if (InitialCountryId) {
+      setSelectedCountryId(InitialCountryId)
+      form.setValue("countryId", InitialCountryId)
+    }
+  }, [InitialCountryId, form])
+
+  const availableCities =
+    locations?.find((c: {
+      id: string,
+      cities: { id: string, name: string }[]
+    }) => c.id === selectedCountryId)?.cities || []
 
   const updateHotelMutation = useMutation({
     mutationFn: async (data: HotelFormValues) => {
-      const response = await axios.patch(`/api/hotels/${hotel.id}`, data)
+      const response = await axios.patch(`/api/dashboard/hotels/${hotel?.id}`, data)
       return response.data
     },
     onSuccess: () => {
@@ -98,7 +141,18 @@ export default function HotelEditClient({ hotel }: { hotel: HotelWithRelations |
   })
 
   const onSubmit = (data: HotelFormValues) => {
-    updateHotelMutation.mutate(data)
+
+    try {
+
+      updateHotelMutation.mutate(data)
+
+
+
+    } catch (error) {
+
+      console.error("Error updating hotel:", error)
+
+    }
   }
 
   const addAmenity = () => {
@@ -148,20 +202,77 @@ export default function HotelEditClient({ hotel }: { hotel: HotelWithRelations |
                   </FormItem>
                 )}
               />
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="countryId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Country</FormLabel>
+                      <Select
+                        onValueChange={(value) => {
+                          field.onChange(value)
+                          setSelectedCountryId(value)
+                          form.setValue("cityId", "")
+                        }}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a country" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {locations?.map((country: {
+                            id: string,
+                            name: string
+                          }) => (
+                            <SelectItem key={country.id} value={country.id}>
+                              {country.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="location"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Location</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter location" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="cityId"
+                  render={({ field }) => {
+                    const selectedCity = availableCities.find(city => city.id === field.value);
+
+                    return (
+                      <FormItem>
+                        <FormLabel>City</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value || ""}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a city">
+                                {selectedCity ? selectedCity.name : "Select a city"}
+                              </SelectValue>
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {availableCities.map((city) => (
+                              <SelectItem key={city.id} value={city.id}>
+                                {city.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
+                />
+
+              </div>
 
 
               <FormField
@@ -252,6 +363,7 @@ export default function HotelEditClient({ hotel }: { hotel: HotelWithRelations |
                   </p>
                 )}
               </div>
+
 
               <FormField
                 control={form.control}

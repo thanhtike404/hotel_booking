@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
 import { CreateHotelResponse } from "@/types/hotel"
-import { formSchema } from "@/app/(dashboard)/dashboard/hotels/create/hotelSchema"
 import z from "zod"
 import {
   Form,
@@ -42,7 +41,29 @@ const amenitiesOptions = [
 ]
 
 export default function CreateHotelForm() {
-  const [selectedCountryId, setSelectedCountryId] = useState<string>("")
+  const formSchema = z.object({
+    name: z.string().min(2, {
+      message: "Hotel name must be at least 2 characters.",
+    }),
+    description: z.string().min(10, {
+      message: "Description must be at least 10 characters.",
+    }),
+    country: z.string().min(1, {
+      message: "Country is required.",
+    }),
+    cityId: z.string().min(1, {
+      message: "City is required.",
+    }),
+    image: z.string().url({
+      message: "Please enter a valid image URL.",
+    }),
+    rating: z.number().min(0).max(5),
+
+    featured: z.boolean().default(false),
+    amenities: z.array(z.string()).min(1, {
+      message: "Please select at least one amenity.",
+    }),
+  })
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -57,6 +78,10 @@ export default function CreateHotelForm() {
       amenities: [],
     },
   })
+
+  const [selectedCountryId, setSelectedCountryId] = useState<string>("")
+
+
 
   const { data: locations } = useQuery({
     queryKey: ["locations"],
