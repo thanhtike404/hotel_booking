@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { useMutation, useQuery } from "@tanstack/react-query"
-import { Button } from "@/components/ui/button"
-import { CreateHotelResponse } from "@/types/hotel"
-import z from "zod"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { CreateHotelResponse } from "@/types/hotel";
+import z from "zod";
 import {
   Form,
   FormControl,
@@ -14,19 +14,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { useState } from "react"
-import axios from "axios"
+} from "@/components/ui/select";
+import { useState } from "react";
+import axios from "axios";
 
 const amenitiesOptions = [
   "Free WiFi",
@@ -38,7 +38,7 @@ const amenitiesOptions = [
   "Fitness Center",
   "Bar",
   "Air Conditioning",
-]
+];
 
 export default function CreateHotelForm() {
   const formSchema = z.object({
@@ -63,7 +63,7 @@ export default function CreateHotelForm() {
     amenities: z.array(z.string()).min(1, {
       message: "Please select at least one amenity.",
     }),
-  })
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -77,22 +77,20 @@ export default function CreateHotelForm() {
       featured: false,
       amenities: [],
     },
-  })
+  });
 
-  const [selectedCountryId, setSelectedCountryId] = useState<string>("")
+  const [selectedCountryId, setSelectedCountryId] = useState<string>("");
 
-
-
-  const { data: locations } = useQuery({
+  const { data: locations, isLoading } = useQuery({
     queryKey: ["locations"],
     queryFn: async () => {
-      const response = await axios.get("/api/locations")
-      return response.data
+      const response = await axios.get("/api/locations");
+      return response.data;
     },
-  })
+  });
 
   const availableCities =
-    locations?.find((c) => c.id === selectedCountryId)?.cities || []
+    locations?.find((c) => c.id === selectedCountryId)?.cities || [];
 
   const createHotel = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => {
@@ -103,23 +101,23 @@ export default function CreateHotelForm() {
           headers: {
             "Content-Type": "application/json",
           },
-        }
-      )
-      return data
+        },
+      );
+      return data;
     },
     onSuccess: () => {
-      form.reset()
+      form.reset();
     },
     onError: (error) => {
       if (axios.isAxiosError(error)) {
-        console.error("Error creating hotel:", error.response?.data)
+        console.error("Error creating hotel:", error.response?.data);
       }
     },
-  })
+  });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
-    createHotel.mutate(values)
+    console.log(values);
+    createHotel.mutate(values);
   }
 
   return (
@@ -146,76 +144,82 @@ export default function CreateHotelForm() {
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea placeholder="Enter hotel description" {...field} rows={5} />
+                <Textarea
+                  placeholder="Enter hotel description"
+                  {...field}
+                  rows={5}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+        {isLoading ? (
+          <h3>Loading ....</h3>
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="country"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Country</FormLabel>
+                  <Select
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      setSelectedCountryId(value);
+                      form.setValue("cityId", "");
+                    }}
+                    value={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a country" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {locations?.map((country) => (
+                        <SelectItem key={country.id} value={country.id}>
+                          {country.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="country"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Country</FormLabel>
-                <Select
-                  onValueChange={(value) => {
-                    field.onChange(value)
-                    setSelectedCountryId(value)
-                    form.setValue("cityId", "")
-                  }}
-                  value={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a country" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {locations?.map((country) => (
-                      <SelectItem key={country.id} value={country.id}>
-                        {country.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="cityId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>City</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value}
-                  disabled={!selectedCountryId}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a city" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {availableCities.map((city) => (
-                      <SelectItem key={city.id} value={city.id}>
-                        {city.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
+            <FormField
+              control={form.control}
+              name="cityId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>City</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    disabled={!selectedCountryId}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a city" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {availableCities.map((city) => (
+                        <SelectItem key={city.id} value={city.id}>
+                          {city.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        )}
         <FormField
           control={form.control}
           name="image"
@@ -302,10 +306,10 @@ export default function CreateHotelForm() {
                                 return checked
                                   ? field.onChange([...field.value, amenity])
                                   : field.onChange(
-                                    field.value?.filter(
-                                      (value) => value !== amenity
-                                    )
-                                  )
+                                      field.value?.filter(
+                                        (value) => value !== amenity,
+                                      ),
+                                    );
                               }}
                             />
                           </FormControl>
@@ -313,7 +317,7 @@ export default function CreateHotelForm() {
                             {amenity}
                           </FormLabel>
                         </FormItem>
-                      )
+                      );
                     }}
                   />
                 ))}
@@ -328,5 +332,5 @@ export default function CreateHotelForm() {
         </Button>
       </form>
     </Form>
-  )
+  );
 }

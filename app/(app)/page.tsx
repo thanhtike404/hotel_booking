@@ -2,35 +2,45 @@
 import { hotels } from "@/data/hotels"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { Hotel } from "@/types/hotel"
 import Image from "next/image"
 import { Star, MapPin, Search } from "lucide-react"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
-
+import axios from "axios"
+import { useQuery } from "@tanstack/react-query"
 export default function HomePage() {
-  const featuredHotels = hotels.featured.slice(0, 3)
-  const popularDestinations = [
-    {
-      name: "Paris",
-      image: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?q=80&w=2070&auto=format&fit=crop",
-      hotels: 240
-    },
-    {
-      name: "London",
-      image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=2070&auto=format&fit=crop",
-      hotels: 185
-    },
-    {
-      name: "New York",
-      image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=2070&auto=format&fit=crop",
-      hotels: 310
-    },
-    {
-      name: "Tokyo",
-      image: "https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?q=80&w=2070&auto=format&fit=crop",
-      hotels: 275
-    },
-  ]
+  // const featuredHotels = hotels.featured.slice(0, 3)
+  const fetchFeaturedHotels = async () => {
+    try {
+      const response = await axios.get('/api/hotels/featureHotels')
+      return response.data
+    } catch (error) {
+      console.error('Error fetching featured hotels:', error)
+      return []
+    }
+  }
+  const { data: featuredHotels, isLoading: featureHotelLoading } = useQuery({
+    queryKey: ['featuredHotels'],
+    queryFn: fetchFeaturedHotels
+  })
+
+  const fetchPopularDestinations = async () => {
+    try {
+      const response = await axios.get('/api/locations/popularDestinations')
+      return response.data
+    }
+    catch (error) {
+      console.error('Error fetching popular destinations:', error)
+      return []
+    }
+  }
+  const { data: popularDestinationsData, isLoading: popularDestinationsLoading } = useQuery({
+    queryKey: ['popularDestinations'],
+    queryFn: fetchPopularDestinations
+  })
+
+
 
   return (
     <main>
@@ -64,64 +74,72 @@ export default function HomePage() {
       {/* Featured Hotels */}
       <section className="container mx-auto py-16 px-4">
         <h2 className="text-3xl font-bold mb-8">Featured Hotels</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {featuredHotels.map((hotel) => (
-            <Card key={hotel?.id}>
-              <div className="relative h-48">
-                <Image
-                  src={hotel?.image}
-                  alt={hotel?.name}
-                  fill
-                  className="object-cover rounded-t-lg"
-                />
-                <div className="absolute top-2 right-2">
-                  <Badge className="flex items-center gap-1">
-                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    {hotel?.rating}
-                  </Badge>
-                </div>
-              </div>
-              <CardContent className="p-4">
-                <h3 className="font-semibold text-lg">{hotel?.name}</h3>
-                <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
-                  <MapPin className="h-4 w-4" />
-                  {hotel?.location}
-                </p>
+        {
+          featureHotelLoading ? <h2>Loading</h2> :
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {featuredHotels?.map((hotel: Hotel) => (
+                <Card key={hotel?.id}>
+                  <div className="relative h-48">
+                    <Image
+                      src={hotel?.image}
+                      alt={hotel?.name}
+                      fill
+                      className="object-cover rounded-t-lg"
+                    />
+                    <div className="absolute top-2 right-2">
+                      <Badge className="flex items-center gap-1">
+                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        {hotel?.rating}
+                      </Badge>
+                    </div>
+                  </div>
+                  <CardContent className="p-4">
+                    <h3 className="font-semibold text-lg">{hotel?.name}</h3>
+                    <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                      <MapPin className="h-4 w-4" />
+                      {hotel?.city.name}, {hotel?.city.country.name}
+                    </p>
 
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+        }
+
+
+
       </section>
 
       {/* Popular Destinations */}
-      <section className="bg-muted py-16">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8">Popular Destinations</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            {popularDestinations.map((destination) => (
-              <Link key={destination?.name} href={`/search?location=${destination?.name}`}>
-                <Card className="group cursor-pointer overflow-hidden">
-                  <div className="relative h-48">
-                    <Image
-                      src={destination?.image}
-                      alt={destination?.name}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-black/40 flex items-end p-4">
-                      <div className="text-white">
-                        <h3 className="font-bold text-xl">{destination?.name}</h3>
-                        <p className="text-sm">{destination?.hotels} hotels</p>
+      {
+        popularDestinationsLoading ? <h2>Loading</h2> :
+          <section className="container mx-auto py-16 px-4">
+            <h2 className="text-3xl font-bold mb-8">Popular Destinations</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+              {popularDestinationsData?.map((destination: any) => (
+                <Link key={destination?.name} href={`/search?location=${destination?.name}`}>
+                  <Card className="group cursor-pointer overflow-hidden">
+                    <div className="relative h-48">
+                      <Image
+                        src={destination?.image}
+                        alt={destination?.name}
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-300"
+                      />
+                      <div className="absolute inset-0 bg-black/40 flex items-end p-4">
+                        <div className="text-white">
+                          <h3 className="font-bold text-xl">{destination?.name}</h3>
+                          <p className="text-sm">{destination?.hotelCount} hotels</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </section>
+      }
+
 
       {/* Why Choose Us - update icons */}
       <section className="container mx-auto py-16 px-4">

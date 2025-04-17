@@ -48,42 +48,156 @@ async function main() {
   await prisma.session.deleteMany()
   await prisma.user.deleteMany()
 
-  // Create countries
+  // Create countries with images
   const countries = await Promise.all([
-    prisma.country.create({ data: { name: "United States", code: "US" } }),
-    prisma.country.create({ data: { name: "Canada", code: "CA" } }),
-    prisma.country.create({ data: { name: "France", code: "FR" } }),
-    prisma.country.create({ data: { name: "Japan", code: "JP" } }),
-    prisma.country.create({ data: { name: "Australia", code: "AU" } }),
-    prisma.country.create({ data: { name: "Brazil", code: "BR" } }),
+    prisma.country.create({
+      data: {
+        name: "United States",
+        code: "US",
+        image: "https://images.unsplash.com/photo-1485738422979-f5c462d49f74?q=80"
+      }
+    }),
+    prisma.country.create({
+      data: {
+        name: "Canada",
+        code: "CA",
+        image: "https://images.unsplash.com/photo-1504941214544-9c1c44559ab4?q=80"
+      }
+    }),
+    prisma.country.create({
+      data: {
+        name: "France",
+        code: "FR",
+        image: "https://images.unsplash.com/photo-1503917988258-f87a78e3c995?q=80"
+      }
+    }),
+    prisma.country.create({
+      data: {
+        name: "Japan",
+        code: "JP",
+        image: "https://images.unsplash.com/photo-1492571350019-22de08371fd3?q=80"
+      }
+    }),
+    prisma.country.create({
+      data: {
+        name: "Australia",
+        code: "AU",
+        image: "https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?q=80"
+      }
+    }),
+    prisma.country.create({
+      data: {
+        name: "Brazil",
+        code: "BR",
+        image: "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?q=80"
+      }
+    }),
   ])
 
-  // Create cities for each country
+  // Create cities for each country with images
   const cities = await Promise.all([
     // US Cities
-    prisma.city.create({ data: { name: "New York", countryId: countries[0].id } }),
-    prisma.city.create({ data: { name: "Los Angeles", countryId: countries[0].id } }),
-    prisma.city.create({ data: { name: "Chicago", countryId: countries[0].id } }),
+    prisma.city.create({
+      data: {
+        name: "New York",
+        countryId: countries[0].id,
+        image: "https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?q=80"
+      }
+    }),
+    prisma.city.create({
+      data: {
+        name: "Los Angeles",
+        countryId: countries[0].id,
+        image: "https://images.unsplash.com/photo-1515896769750-31548aa180ed?q=80"
+      }
+    }),
+    prisma.city.create({
+      data: {
+        name: "Chicago",
+        countryId: countries[0].id,
+        image: "https://images.unsplash.com/photo-1494522855154-9297ac14b55f?q=80"
+      }
+    }),
 
     // Canada Cities
-    prisma.city.create({ data: { name: "Toronto", countryId: countries[1].id } }),
-    prisma.city.create({ data: { name: "Vancouver", countryId: countries[1].id } }),
+    prisma.city.create({
+      data: {
+        name: "Toronto",
+        countryId: countries[1].id,
+        image: "https://images.unsplash.com/photo-1534235826755-84464d97b044?q=80"
+      }
+    }),
+    prisma.city.create({
+      data: {
+        name: "Vancouver",
+        countryId: countries[1].id,
+        image: "https://images.unsplash.com/photo-1578640463869-80e0df0491e3?q=80"
+      }
+    }),
 
     // France Cities
-    prisma.city.create({ data: { name: "Paris", countryId: countries[2].id } }),
-    prisma.city.create({ data: { name: "Nice", countryId: countries[2].id } }),
+    prisma.city.create({
+      data: {
+        name: "Paris",
+        countryId: countries[2].id,
+        image: "https://images.unsplash.com/photo-1431274172761-fca41d930114?q=80"
+      }
+    }),
+    prisma.city.create({
+      data: {
+        name: "Nice",
+        countryId: countries[2].id,
+        image: "https://images.unsplash.com/photo-1503917988258-f87a78e3c995?q=80"
+      }
+    }),
 
     // Japan Cities
-    prisma.city.create({ data: { name: "Tokyo", countryId: countries[3].id } }),
-    prisma.city.create({ data: { name: "Kyoto", countryId: countries[3].id } }),
+    prisma.city.create({
+      data: {
+        name: "Tokyo",
+        countryId: countries[3].id,
+        image: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=80"
+      }
+    }),
+    prisma.city.create({
+      data: {
+        name: "Kyoto",
+        countryId: countries[3].id,
+        image: "https://images.unsplash.com/photo-1492571350019-22de08371fd3?q=80"
+      }
+    }),
 
     // Australia Cities
-    prisma.city.create({ data: { name: "Sydney", countryId: countries[4].id } }),
-    prisma.city.create({ data: { name: "Melbourne", countryId: countries[4].id } }),
+    prisma.city.create({
+      data: {
+        name: "Sydney",
+        countryId: countries[4].id,
+        image: "https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?q=80"
+      }
+    }),
+    prisma.city.create({
+      data: {
+        name: "Melbourne",
+        countryId: countries[4].id,
+        image: "https://images.unsplash.com/photo-1545044846-351ba102b6d5?q=80"
+      }
+    }),
 
     // Brazil Cities
-    prisma.city.create({ data: { name: "Rio de Janeiro", countryId: countries[5].id } }),
-    prisma.city.create({ data: { name: "São Paulo", countryId: countries[5].id } }),
+    prisma.city.create({
+      data: {
+        name: "Rio de Janeiro",
+        countryId: countries[5].id,
+        image: "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?q=80"
+      }
+    }),
+    prisma.city.create({
+      data: {
+        name: "São Paulo",
+        countryId: countries[5].id,
+        image: "https://images.unsplash.com/photo-1544989164-31f6a2a0b65e?q=80"
+      }
+    }),
   ])
 
   // Create destinations
@@ -361,7 +475,7 @@ async function main() {
     }
   })
 
-  console.log('Database seeded successfully!')
+  console.log('Database seeded successfully with images for countries and cities!')
 }
 
 main()

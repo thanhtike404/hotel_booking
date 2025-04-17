@@ -128,6 +128,7 @@ model Destination {
 
 model Country {
   id     String @id @default(cuid())
+  image   String
   name   String @unique
   code   String @unique
   cities City[]
@@ -136,6 +137,7 @@ model Country {
 model City {
   id        String  @id @default(cuid())
   name      String
+  image   String
   countryId String
   country   Country @relation(fields: [countryId], references: [id])
   hotels    Hotel[]
