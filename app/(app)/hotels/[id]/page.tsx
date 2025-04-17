@@ -1,140 +1,368 @@
+'use client'
 
+import { useState, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import { CalendarIcon } from 'lucide-react'
+import { format, addDays } from 'date-fns'
+import { Calendar } from '@/components/ui/calendar'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import { cn } from '@/lib/utils'
+import { Room } from '@/types/hotel'
 
-"use client";
+const formSchema = z.object({
+  checkIn: z.date({
+    required_error: 'Check-in date is required',
+  }),
+  checkOut: z.date({
+    required_error: 'Check-out date is required',
+  }),
+  guests: z
+    .number({
+      required_error: 'Number of guests is required',
+    })
+    .min(1, 'At least 1 guest is required'),
+  name: z.string().min(2, 'Name is required'),
+  email: z.string().email('Valid email is required'),
+  phone: z.string().min(5, 'Phone number is required'),
+})
 
-import React from 'react';
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Star, MapPin, ArrowLeft } from "lucide-react";
-import { BookingModal } from '@/components/hotel/BookingModal';
-import { notFound, useRouter } from "next/navigation";
-import axios from 'axios';
-import { useQuery } from '@tanstack/react-query';
-import dynamic from 'next/dynamic'
-import { RoomCard } from '@/components/hotel/RoomCard';
-import { Hotel, Room } from '@/types/hotel';
-// // const Map = dynamic(() => import('@/components/map'), {
-// //   ssr: false,
-// //   loading: () => <div className="h-[400px] w-full bg-muted animate-pulse rounded-lg" />
-// // })
-export default function HotelDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  // Unwrap the params promise
-  const router = useRouter()
-  const unwrappedParams = React.use(params);
-  const { id } = unwrappedParams;
+interface BookingModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  room: Room;
+  hotelId: string;
+  hotelName: string;
+}
 
-  if (!id) {
-    return notFound();
-  }
+export default function BookingModal({
+  isOpen,
+  onClose,
+  room,
+  hotelId,
+  hotelName
+}: BookingModalProps) {
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
 
-  const { data: hotel, isLoading, error } = useQuery<Hotel>({
-    queryKey: ['hotels', id],
-    queryFn: async () => {
-      const response = await axios.get(`/api/hotels/${id}`);
-      return response.data;
+  // Set up the form with default values
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      checkIn: new Date(),
+      checkOut: addDays(new Date(), 1),
+      guests: room?.available || 2,
+      name: '',
+      email: '',
+      phone: '',
     },
-  });
+  })
 
-  if (isLoading) {
-    return (
-      <div className="container mx-auto py-10">
-        <div className="flex justify-center items-center h-[60vh]">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-        </div>
-      </div>
-    );
-  }
+  // Reset form when modal opens with a new room
+  useEffect(() => {
+    if (isOpen && room) {
+      form.reset({
+        checkIn: new Date(),
+        checkOut: addDays(new Date(), 1),
+        guests: room.maxOccupancy || 2,
+        name: '',
+        email: '',
+        phone: '',
+      })
+      setError('')
+      setSuccess(false)
+    }
+  }, [isOpen, room, form])
 
-  if (error || !hotel) {
-    return notFound();
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      setIsLoading(true)
+      setError('')
+
+      // Calculate number of nights for the booking
+      const checkIn = new Date(values.checkIn)
+      const checkOut = new Date(values.checkOut)
+      const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24))
+
+      // Create booking payload
+      const bookingData = {
+        hotelId,
+        roomId: room.id,
+        roomName: room.name,
+        hotelName,
+        checkIn: values.checkIn.toISOString(),
+        checkOut: values.checkOut.toISOString(),
+        guests: values.guests,
+        customerName: values.name,
+        customerEmail: values.email,
+        customerPhone: values.phone,
+        totalPrice: (room.pricePerNight || room.price) * nights,
+        nights
+      }
+
+      const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(bookingData),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create booking')
+      }
+
+      setSuccess(true)
+
+      // Close modal after showing success message
+      setTimeout(() => {
+        onClose()
+        // Optionally reload or redirect
+        // window.location.href = `/bookings/${data.id}`;
+      }, 2000)
+
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to create booking')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
-    <>
-      <div className="border-b">
-        <div className="container flex h-16 items-center px-4">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle>Book {room?.name || 'Room'}</DialogTitle>
+        </DialogHeader>
 
-          <Button variant="ghost" className="flex items-center gap-2" onClick={() =>
-            router.back()
-          }>
-            <ArrowLeft className="h-5 w-5" />
-            <span>Back to Hotels</span>
-          </Button>
+        {success ? (
+          <div className="p-4 bg-green-50 text-green-700 rounded-md">
+            <h3 className="font-semibold">Booking Successful!</h3>
+            <p>Your reservation has been confirmed. Redirecting...</p>
+          </div>
+        ) : (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <div className="bg-muted/50 p-4 rounded-md mb-4">
+                <h3 className="font-semibold">{hotelName}</h3>
+                <p className="text-sm">{room?.name} - ${room?.pricePerNight || room?.price} per night</p>
+              </div>
 
-        </div>
-      </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="checkIn"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Check-in Date</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                'w-full pl-3 text-left font-normal',
+                                !field.value && 'text-muted-foreground'
+                              )}
+                            >
+                              {field.value ? format(field.value, 'PPP') : 'Pick a date'}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            disabled={(date) =>
+                              date < new Date() || date < new Date('1900-01-01')
+                            }
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-      <div className="container mx-auto py-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="relative h-[400px]">
-            {hotel.image && (
-              <Image
-                alt={hotel.name}
-                src={hotel.image}
-                fill
-                className="object-cover rounded-lg"
-                priority
+                <FormField
+                  control={form.control}
+                  name="checkOut"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Check-out Date</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                'w-full pl-3 text-left font-normal',
+                                !field.value && 'text-muted-foreground'
+                              )}
+                            >
+                              {field.value ? format(field.value, 'PPP') : 'Pick a date'}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            disabled={(date) =>
+                              date <= form.getValues().checkIn ||
+                              date < new Date('1900-01-01')
+                            }
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="guests"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Number of Guests</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={1}
+                        max={room.maxOccupancy || 10}
+                        {...field}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            )}
-          </div>
 
-          <div className="space-y-6">
-            <div>
-              <h1 className="text-3xl font-bold">{hotel.name}</h1>
-              <p className="text-muted-foreground flex items-center gap-2 mt-2">
-                <MapPin className="h-4 w-4" />
-                {
-                  hotel?.city?.name + ", " + hotel?.city?.country?.name
-                }
-              </p>
-              <div className="flex items-center gap-2 mt-2">
-                <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                <span className="font-medium">{hotel.rating}</span>
-                <span className="text-muted-foreground">({hotel.reviews?.length || 0} reviews)</span>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Full Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter your full name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="your@email.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Your contact number" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
-            </div>
 
-            <div>
-              <h2 className="text-xl font-semibold mb-2">Description</h2>
-              <p className="text-muted-foreground">{hotel.description}</p>
-            </div>
-
-            <div>
-              <h2 className="text-xl font-semibold mb-2">Amenities</h2>
-              <div className="flex flex-wrap gap-2">
-                {(hotel.amenities || [])?.map((amenity: string) => (
-                  <Badge key={amenity} variant="secondary">
-                    {amenity}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-
-          </div>
-
-          <div className="col-span-full">
-            <h2 className="text-2xl font-semibold mb-4">Location</h2>
-            {/* <Map
-              center={hotelCoords}
-              name={hotel.name}
-              location={hotel.location}
-            /> */}
-          </div>
-
-          <div className="col-span-full">
-            <h2 className="text-2xl font-semibold mb-4">Available Rooms</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {(hotel.rooms || []).map((room) => (
-                <RoomCard key={room.id} room={room} />
-              ))}
-              {(!hotel.rooms || hotel.rooms.length === 0) && (
-                <p className="text-muted-foreground col-span-full text-center">No rooms available at the moment.</p>
+              {/* Price calculation summary */}
+              {form.watch("checkIn") && form.watch("checkOut") && (
+                <div className="bg-muted/50 p-4 rounded-md">
+                  <h4 className="font-medium">Booking Summary</h4>
+                  <div className="text-sm mt-2 space-y-1">
+                    <div className="flex justify-between">
+                      <span>Room:</span>
+                      <span>{room?.name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Price per night:</span>
+                      <span>${room?.pricePerNight || room?.price}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Number of nights:</span>
+                      <span>
+                        {Math.ceil(
+                          (new Date(form.watch("checkOut")).getTime() -
+                            new Date(form.watch("checkIn")).getTime()) /
+                          (1000 * 60 * 60 * 24)
+                        )}
+                      </span>
+                    </div>
+                    <div className="flex justify-between font-medium pt-2 border-t mt-2">
+                      <span>Total:</span>
+                      <span>
+                        ${(room?.pricePerNight || room?.price) *
+                          Math.ceil(
+                            (new Date(form.watch("checkOut")).getTime() -
+                              new Date(form.watch("checkIn")).getTime()) /
+                            (1000 * 60 * 60 * 24)
+                          )}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               )}
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
-  );
+
+              <div className="pt-4 border-t">
+                {error && <div className="mb-4 text-sm text-red-500">{error}</div>}
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? 'Processing...' : 'Confirm Booking'}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        )}
+      </DialogContent>
+    </Dialog>
+  )
 }

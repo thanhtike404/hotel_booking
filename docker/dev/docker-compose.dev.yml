@@ -12,9 +12,9 @@ services:
       - DATABASE_URL=postgresql://admin:secret@hotel-booking-postgres:5432/hotel_booking
       - NODE_ENV=development
       - CHOWN_USER=node
-    command: ["pnpm", "run", "dev"]
+    command: ["sh", "-c", "npx prisma db push && npx prisma db seed && pnpm dev"]
     volumes:
-      - ../.:/app
+      - ../../.:/app
       - /app/node_modules
       - pnpm_store:/root/.pnpm-store
     user: "node"

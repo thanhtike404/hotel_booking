@@ -1,5 +1,4 @@
 "use client"
-import { hotels } from "@/data/hotels"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Hotel } from "@/types/hotel"
@@ -9,46 +8,42 @@ import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import axios from "axios"
 import { useQuery } from "@tanstack/react-query"
+
 export default function HomePage() {
-  // const featuredHotels = hotels.featured.slice(0, 3)
-  const fetchFeaturedHotels = async () => {
-    try {
-      const response = await axios.get('/api/hotels/featureHotels')
-      return response.data
-    } catch (error) {
-      console.error('Error fetching featured hotels:', error)
-      return []
-    }
-  }
+  // Fetch featured hotels
   const { data: featuredHotels, isLoading: featureHotelLoading } = useQuery({
     queryKey: ['featuredHotels'],
-    queryFn: fetchFeaturedHotels
+    queryFn: async () => {
+      try {
+        const response = await axios.get('/api/hotels/featureHotels')
+        return response.data
+      } catch (error) {
+        console.error('Error fetching featured hotels:', error)
+        return []
+      }
+    }
   })
 
-  const fetchPopularDestinations = async () => {
-    try {
-      const response = await axios.get('/api/locations/popularDestinations')
-      return response.data
-    }
-    catch (error) {
-      console.error('Error fetching popular destinations:', error)
-      return []
-    }
-  }
+  // Fetch popular destinations
   const { data: popularDestinationsData, isLoading: popularDestinationsLoading } = useQuery({
     queryKey: ['popularDestinations'],
-    queryFn: fetchPopularDestinations
+    queryFn: async () => {
+      try {
+        const response = await axios.get('/api/locations/popularDestinations')
+        return response.data
+      } catch (error) {
+        console.error('Error fetching popular destinations:', error)
+        return []
+      }
+    }
   })
-
-
 
   return (
     <main>
-
-      {/* Hero Section */}
+      {/* Hero Section (unchanged) */}
       <div className="relative h-[600px]">
         <Image
-          src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=2070&auto=format&fit=crop "
+          src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=2070&auto=format&fit=crop"
           alt="Luxury Hotel"
           fill
           priority
@@ -56,8 +51,7 @@ export default function HomePage() {
         />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
           <h1 className="text-4xl md:text-6xl font-bold text-center max-w-3xl">
-            Find Your Perfect Stay
-            Whatever
+            Find Your Perfect Stay Whatever
           </h1>
           <p className="mt-4 text-xl text-center max-w-2xl">
             Discover handpicked hotels for your next adventure
@@ -71,77 +65,99 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Featured Hotels */}
+      {/* Featured Hotels with Skeleton Loading */}
       <section className="container mx-auto py-16 px-4">
         <h2 className="text-3xl font-bold mb-8">Featured Hotels</h2>
-        {
-          featureHotelLoading ? <h2>Loading</h2> :
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {featuredHotels?.map((hotel: Hotel) => (
-                <Card key={hotel?.id}>
-                  <div className="relative h-48">
-                    <Image
-                      src={hotel?.image}
-                      alt={hotel?.name}
-                      fill
-                      className="object-cover rounded-t-lg"
-                    />
-                    <div className="absolute top-2 right-2">
-                      <Badge className="flex items-center gap-1">
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        {hotel?.rating}
-                      </Badge>
-                    </div>
+        {featureHotelLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[...Array(3)].map((_, index) => (
+              <Card key={index}>
+                <div className="relative h-48 bg-gray-200 animate-pulse rounded-t-lg" />
+                <CardContent className="p-4">
+                  <div className="h-6 w-3/4 bg-gray-200 animate-pulse rounded mb-2" />
+                  <div className="flex items-center gap-1 mt-1">
+                    <div className="h-4 w-4 bg-gray-200 animate-pulse rounded-full" />
+                    <div className="h-4 w-1/2 bg-gray-200 animate-pulse rounded" />
                   </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold text-lg">{hotel?.name}</h3>
-                    <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
-                      <MapPin className="h-4 w-4" />
-                      {hotel?.city.name}, {hotel?.city.country.name}
-                    </p>
-
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-        }
-
-
-
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {featuredHotels?.map((hotel: Hotel) => (
+              <Card key={hotel?.id}>
+                <div className="relative h-48">
+                  <Image
+                    src={hotel?.image}
+                    alt={hotel?.name}
+                    fill
+                    className="object-cover rounded-t-lg"
+                  />
+                  <div className="absolute top-2 right-2">
+                    <Badge className="flex items-center gap-1">
+                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      {hotel?.rating}
+                    </Badge>
+                  </div>
+                </div>
+                <CardContent className="p-4">
+                  <h3 className="font-semibold text-lg">{hotel?.name}</h3>
+                  <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                    <MapPin className="h-4 w-4" />
+                    {hotel?.city.name}, {hotel?.city.country.name}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </section>
 
-      {/* Popular Destinations */}
-      {
-        popularDestinationsLoading ? <h2>Loading</h2> :
-          <section className="container mx-auto py-16 px-4">
-            <h2 className="text-3xl font-bold mb-8">Popular Destinations</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-              {popularDestinationsData?.map((destination: any) => (
-                <Link key={destination?.name} href={`/search?location=${destination?.name}`}>
-                  <Card className="group cursor-pointer overflow-hidden">
-                    <div className="relative h-48">
-                      <Image
-                        src={destination?.image}
-                        alt={destination?.name}
-                        fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                      <div className="absolute inset-0 bg-black/40 flex items-end p-4">
-                        <div className="text-white">
-                          <h3 className="font-bold text-xl">{destination?.name}</h3>
-                          <p className="text-sm">{destination?.hotelCount} hotels</p>
-                        </div>
+      {/* Popular Destinations with Skeleton Loading */}
+      <section className="container mx-auto py-16 px-4">
+        <h2 className="text-3xl font-bold mb-8">Popular Destinations</h2>
+        {popularDestinationsLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, index) => (
+              <Card key={index} className="overflow-hidden">
+                <div className="relative h-48 bg-gray-200 animate-pulse" />
+                <div className="absolute inset-0 flex items-end p-4">
+                  <div className="w-full">
+                    <div className="h-6 w-3/4 bg-gray-300 animate-pulse rounded mb-2" />
+                    <div className="h-4 w-1/2 bg-gray-300 animate-pulse rounded" />
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            {popularDestinationsData?.map((destination: any) => (
+              <Link key={destination?.name} href={`/search?location=${destination?.name}`}>
+                <Card className="group cursor-pointer overflow-hidden">
+                  <div className="relative h-48">
+                    <Image
+                      src={destination?.image}
+                      alt={destination?.name}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-black/40 flex items-end p-4">
+                      <div className="text-white">
+                        <h3 className="font-bold text-xl">{destination?.name}</h3>
+                        <p className="text-sm">{destination?.hotelCount} hotels</p>
                       </div>
                     </div>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          </section>
-      }
+                  </div>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
 
-
-      {/* Why Choose Us - update icons */}
+      {/* Why Choose Us (unchanged) */}
       <section className="container mx-auto py-16 px-4">
         <h2 className="text-3xl font-bold mb-12 text-center">Why Choose Us</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
