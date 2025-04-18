@@ -86,22 +86,22 @@ model Review {
 }
 
 model Booking {
-  id        String   @id @default(cuid())
+  id        String        @id @default(cuid())
   hotelId   String
   userId    String
-  roomId    String?
   checkIn   DateTime
   checkOut  DateTime
   status    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  hotel     Hotel    @relation(fields: [hotelId], references: [id])
-  room      Room?    @relation(fields: [roomId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  hotel     Hotel         @relation(fields: [hotelId], references: [id])
+  user      User          @relation(fields: [userId], references: [id])
+  rooms     BookingRoom[] // 👈 many-to-many through join table
 }
 
 model Room {
   id        String    @id @default(cuid())
+  name      String
   hotelId   String
   available Int
   total     Int
@@ -111,8 +111,16 @@ model Room {
   price     Float
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  bookings  Booking[]
+  bookings  BookingRoom[]
   hotel     Hotel     @relation(fields: [hotelId], references: [id])
+}
+
+model BookingRoom {
+  id         String   @id @default(cuid())
+  booking    Booking  @relation(fields: [bookingId], references: [id])
+  bookingId  String
+  room       Room     @relation(fields: [roomId], references: [id])
+  roomId     String
 }
 
 model Destination {

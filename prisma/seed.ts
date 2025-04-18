@@ -37,6 +37,7 @@ function getRandomElement<T>(array: T[]): T {
 async function main() {
   // Clear existing data
   await prisma.verificationToken.deleteMany()
+  await prisma.bookingRoom.deleteMany()
   await prisma.booking.deleteMany()
   await prisma.review.deleteMany()
   await prisma.room.deleteMany()
@@ -382,6 +383,7 @@ async function main() {
 
       await prisma.room.create({
         data: {
+          name: `${roomConfig.type} Room`, // Added required name field
           hotelId: hotel.id,
           roomType: roomConfig.type,
           total,
@@ -397,38 +399,57 @@ async function main() {
   // Get all rooms for bookings
   const rooms = await prisma.room.findMany()
 
-  // Create bookings
-  const bookings = await Promise.all([
-    prisma.booking.create({
+  // Create bookings with proper room connections
+  const booking1 = await prisma.booking.create({
+    data: {
+      hotelId: hotels[0].id,
+      userId: users[0].id,
+      checkIn: new Date('2023-06-15'),
+      checkOut: new Date('2023-06-20'),
+      status: "confirmed"
+    }
+  })
+
+  const booking2 = await prisma.booking.create({
+    data: {
+      hotelId: hotels[1].id,
+      userId: users[1].id,
+      checkIn: new Date('2023-07-10'),
+      checkOut: new Date('2023-07-15'),
+      status: "confirmed"
+    }
+  })
+
+  const booking3 = await prisma.booking.create({
+    data: {
+      hotelId: hotels[3].id,
+      userId: users[2].id,
+      checkIn: new Date('2023-08-05'),
+      checkOut: new Date('2023-08-12'),
+      status: "pending"
+    }
+  })
+
+  // Connect rooms to bookings through BookingRoom
+  await Promise.all([
+    prisma.bookingRoom.create({
       data: {
-        hotelId: hotels[0].id,
-        userId: users[0].id,
-        roomId: rooms.find(r => r.hotelId === hotels[0].id && r.roomType === RoomType.DOUBLE)?.id,
-        checkIn: new Date('2023-06-15'),
-        checkOut: new Date('2023-06-20'),
-        status: "confirmed"
+        bookingId: booking1.id,
+        roomId: rooms.find(r => r.hotelId === hotels[0].id && r.roomType === RoomType.DOUBLE)!.id
       }
     }),
-    prisma.booking.create({
+    prisma.bookingRoom.create({
       data: {
-        hotelId: hotels[1].id,
-        userId: users[1].id,
-        roomId: rooms.find(r => r.hotelId === hotels[1].id && r.roomType === RoomType.SUITE)?.id,
-        checkIn: new Date('2023-07-10'),
-        checkOut: new Date('2023-07-15'),
-        status: "confirmed"
+        bookingId: booking2.id,
+        roomId: rooms.find(r => r.hotelId === hotels[1].id && r.roomType === RoomType.SUITE)!.id
       }
     }),
-    prisma.booking.create({
+    prisma.bookingRoom.create({
       data: {
-        hotelId: hotels[3].id,
-        userId: users[2].id,
-        roomId: rooms.find(r => r.hotelId === hotels[3].id && r.roomType === RoomType.FAMILY)?.id,
-        checkIn: new Date('2023-08-05'),
-        checkOut: new Date('2023-08-12'),
-        status: "pending"
+        bookingId: booking3.id,
+        roomId: rooms.find(r => r.hotelId === hotels[3].id && r.roomType === RoomType.FAMILY)!.id
       }
-    }),
+    })
   ])
 
   // Create reviews
@@ -475,7 +496,7 @@ async function main() {
     }
   })
 
-  console.log('Database seeded successfully with images for countries and cities!')
+  console.log('Database seeded successfully!')
 }
 
 main()

@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { LuLayoutDashboard } from "react-icons/lu"
-import { BsBuildings } from "react-icons/bs"
-import { IoBedOutline } from "react-icons/io5"
-import { TbWorld } from "react-icons/tb"
-import { MdLocationCity } from "react-icons/md"
-
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { LuLayoutDashboard } from "react-icons/lu";
+import { BsBuildings } from "react-icons/bs";
+import { IoBedOutline } from "react-icons/io5";
+import { TbWorld } from "react-icons/tb";
+import { MdLocationCity } from "react-icons/md";
+import { FaCalendarCheck } from "react-icons/fa";
 export const routes = [
   {
     label: "Dashboard",
@@ -33,11 +33,16 @@ export const routes = [
     label: "Cities",
     icon: MdLocationCity,
     href: "/dashboard/cities",
-  }
-]
+  },
+  {
+    label: "Bookings",
+    icon: FaCalendarCheck,
+    href: "/dashboard/bookings",
+  },
+];
 
 export function Sidebar() {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
     <div className="h-full flex flex-col bg-background p-4">
@@ -50,7 +55,7 @@ export function Sidebar() {
               flex items-center gap-x-2 text-sm font-medium p-3
               hover:bg-accent hover:text-accent-foreground rounded-lg
               transition-colors
-              ${pathname === route.href ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'}
+              ${pathname === route.href ? "bg-accent text-accent-foreground" : "text-muted-foreground"}
             `}
           >
             <route.icon className="h-5 w-5" />
@@ -59,5 +64,5 @@ export function Sidebar() {
         ))}
       </div>
     </div>
-  )
+  );
 }

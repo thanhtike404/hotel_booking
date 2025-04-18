@@ -9,6 +9,10 @@ export type Room = {
     image: string;
     price: number;
     amenities: string[];
+    name: string;
+    description?: string;
+    maxOccupancy?: number;
+    features?: string[];
 };
 
 export type RoomResponse = {

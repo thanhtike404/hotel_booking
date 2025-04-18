@@ -1,16 +1,7 @@
 // Define the possible RoomType values as a union type
 export type RoomType = 'SINGLE' | 'DOUBLE' | 'TWIN' | 'SUITE' | 'FAMILY';
 
-export type Room = {
-  id: string;
-  hotelId: string;
-  available: number;
-  total: number;
-  roomType: RoomType;
-  createdAt: string;
-  updatedAt: string;
-};
-
+import { Room } from './rooms';
 export type Review = {
   id: string;
   hotelId: string;
