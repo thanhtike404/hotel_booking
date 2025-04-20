@@ -9,9 +9,13 @@ import { Eye, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { Room } from "@/types/rooms";
+import { Booking } from "@/types/bookings";
+interface BookingColumnMeta {
+  search?: boolean;
+  calendar?: boolean;
+}
 
-export const columns: ColumnDef<Room>[] = [
+export const columns: ColumnDef<Booking, unknown>[] = [
   {
     accessorKey: "name",
     header: "username",
@@ -62,26 +66,77 @@ export const columns: ColumnDef<Room>[] = [
       );
     },
   },
-
   {
     accessorKey: "checkIn",
-    header: "Checked In",
-    cell: ({ row }) => {
-      const dateStr = row.getValue("checkIn") as string;
-      if (!dateStr) return null;
-      const date = new Date(dateStr);
-      return date.toLocaleString();
+    header: "Check In",
+    cell: ({ getValue }) => {
+      const date = new Date(getValue() as string);
+      return !isNaN(date.getTime()) ? format(date, "PPP") : "Invalid date";
     },
+    filterFn: (row, columnId, filterValue) => {
+      if (!filterValue) return true;
+
+      const rowValue = row.getValue(columnId) as string; // Explicitly type as string
+      if (!rowValue) return false;
+
+      // Parse dates without timezone conversion
+      const parseDate = (dateString: string) => {
+        const parts = dateString.split("-");
+        return new Date(
+          parseInt(parts[0]),
+          parseInt(parts[1]) - 1,
+          parseInt(parts[2]),
+        );
+      };
+
+      const rowDate = parseDate(rowValue.split("T")[0]);
+      const filterDate = parseDate(filterValue as string);
+
+      return (
+        rowDate.getFullYear() === filterDate.getFullYear() &&
+        rowDate.getMonth() === filterDate.getMonth() &&
+        rowDate.getDate() === filterDate.getDate()
+      );
+    },
+    meta: {
+      calendar: true,
+    } as BookingColumnMeta,
   },
   {
     accessorKey: "checkOut",
-    header: "Checked Out",
-    cell: ({ row }) => {
-      const dateStr = row.getValue("checkOut") as string;
-      if (!dateStr) return null;
-      const date = new Date(dateStr);
-      return date.toLocaleString();
+    header: "Check Out",
+    cell: ({ getValue }) => {
+      const date = new Date(getValue() as string);
+      return !isNaN(date.getTime()) ? format(date, "PPP") : "Invalid date";
     },
+    filterFn: (row, columnId, filterValue) => {
+      if (!filterValue) return true;
+
+      const rowValue = row.getValue(columnId) as string; // Explicitly type as string
+      if (!rowValue) return false;
+
+      // Parse dates without timezone conversion
+      const parseDate = (dateString: string) => {
+        const parts = dateString.split("-");
+        return new Date(
+          parseInt(parts[0]),
+          parseInt(parts[1]) - 1,
+          parseInt(parts[2]),
+        );
+      };
+
+      const rowDate = parseDate(rowValue.split("T")[0]);
+      const filterDate = parseDate(filterValue as string);
+
+      return (
+        rowDate.getFullYear() === filterDate.getFullYear() &&
+        rowDate.getMonth() === filterDate.getMonth() &&
+        rowDate.getDate() === filterDate.getDate()
+      );
+    },
+    meta: {
+      calendar: true,
+    } as BookingColumnMeta,
   },
   {
     id: "actions",
