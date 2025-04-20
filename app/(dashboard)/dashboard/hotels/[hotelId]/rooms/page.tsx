@@ -9,10 +9,8 @@ import { Room, RoomResponse } from "@/types/rooms"
 import { DataTable } from '@/components/dataTable/data-table'
 import { columns } from './columns'
 import { Button } from '@/components/ui/button'
-function Page() {
+export default function Page() {
     const { hotelId } = useParams<{ hotelId: string }>()
-
-
 
 
     const fetchRoomsByHotelId = async (hotelId: string): Promise<Room[]> => {
@@ -36,6 +34,7 @@ function Page() {
             <div className="flex justify-between items-center mb-8">
                 <div>
                     <h1 className="text-3xl font-bold">
+                        {/* @ts-ignore */}
                         {data?.[0]?.hotel?.name}
                     </h1>
                     <p className="text-muted-foreground">Manage your Room listings</p>
@@ -48,4 +47,4 @@ function Page() {
         </div>)
 }
 
-export default Page
+

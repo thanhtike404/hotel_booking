@@ -5,7 +5,7 @@ import { DataTable } from "@/components/dataTable/data-table";
 import { useQuery } from "@tanstack/react-query";
 
 export default function CitiesPage() {
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["cities"],
     queryFn: async () => {
       const response = await fetch("/api/dashboard/cities");
@@ -20,7 +20,7 @@ export default function CitiesPage() {
         <h2 className="text-3xl font-bold tracking-tight">Cities</h2>
         <p className="text-muted-foreground">Manage hotel locations by city</p>
       </div>
-      <DataTable columns={columns} data={data || []} />
+      <DataTable isLoading={isLoading} columns={columns} data={data || []} />
     </div>
   );
 }

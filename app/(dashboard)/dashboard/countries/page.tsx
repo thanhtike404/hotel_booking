@@ -5,7 +5,7 @@ import { DataTable } from "@/components/dataTable/data-table"
 import { useQuery } from "@tanstack/react-query"
 
 export default function CountriesPage() {
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["countries"],
     queryFn: async () => {
       const response = await fetch("/api/dashboard/countries")
@@ -20,7 +20,7 @@ export default function CountriesPage() {
         <h2 className="text-3xl font-bold tracking-tight">Countries</h2>
         <p className="text-muted-foreground">Manage hotel locations by country</p>
       </div>
-      <DataTable columns={columns} data={data || []} />
+      <DataTable isLoading={isLoading} columns={columns} data={data || []} />
     </div>
   )
 }

@@ -21,7 +21,7 @@ export default function Page() {
         <h2 className="text-3xl font-bold tracking-tight">Bookings</h2>
         <p className="text-muted-foreground">Booking List</p>
       </div>
-      <DataTable columns={columns} data={data || []} />
+      <DataTable isLoading={isLoading} columns={columns} data={data || []} />
     </div>
   );
 }

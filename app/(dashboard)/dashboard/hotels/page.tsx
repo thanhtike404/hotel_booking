@@ -15,10 +15,7 @@ export default function Page() {
       return response.data.hotels // Access the hotels array directly
     }
   })
-  console.log(data)
-  if (isLoading) {
-    return <div>It loading</div>
-  }
+
 
   return (
     <div className="container mx-auto py-10">
@@ -31,7 +28,7 @@ export default function Page() {
           <Link href="/dashboard/hotels/create">Add Hotel</Link>
         </Button>
       </div>
-      <DataTable columns={columns} data={data || []} />
+      <DataTable isLoading={isLoading} columns={columns} data={data || []} />
     </div>
   )
 }

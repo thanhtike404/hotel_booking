@@ -16,6 +16,12 @@ export default function MainNav() {
           <Link href="/hotels" className="text-muted-foreground">
             Hotels
           </Link>
+          <Link
+            href="/search"
+            className="text-muted-foregroundtext-muted-foreground"
+          >
+            Search
+          </Link>
         </div>
 
         <div className="flex items-center gap-4">
