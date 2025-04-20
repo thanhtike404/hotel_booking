@@ -18,8 +18,8 @@ export default function Page() {
   return (
     <div className="p-6">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold tracking-tight">Cities</h2>
-        <p className="text-muted-foreground">Manage hotel locations by city</p>
+        <h2 className="text-3xl font-bold tracking-tight">Bookings</h2>
+        <p className="text-muted-foreground">Booking List</p>
       </div>
       <DataTable columns={columns} data={data || []} />
     </div>

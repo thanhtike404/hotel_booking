@@ -48,20 +48,36 @@ export const columns: ColumnDef<Room>[] = [
       return <div>{count}</div>;
     },
   },
+
   {
-    accessorKey: "featured",
+    id: "featured",
     header: "Featured",
-    cell: ({ row }) => (
-      <Badge variant={row.getValue("featured") ? "default" : "secondary"}>
-        {row.getValue("featured") ? "Yes" : "No"}
-      </Badge>
-    ),
+    accessorFn: (row) => row.hotel?.featured,
+    cell: ({ getValue }) => {
+      const isFeatured = getValue();
+      return (
+        <Badge variant={isFeatured ? "default" : "secondary"}>
+          {isFeatured ? "Yes" : "No"}
+        </Badge>
+      );
+    },
+  },
+
+  {
+    accessorKey: "checkIn",
+    header: "Checked In",
+    cell: ({ row }) => {
+      const dateStr = row.getValue("checkIn") as string;
+      if (!dateStr) return null;
+      const date = new Date(dateStr);
+      return date.toLocaleString();
+    },
   },
   {
-    accessorKey: "createdAt",
-    header: "Created At",
+    accessorKey: "checkOut",
+    header: "Checked Out",
     cell: ({ row }) => {
-      const dateStr = row.getValue("createdAt") as string;
+      const dateStr = row.getValue("checkOut") as string;
       if (!dateStr) return null;
       const date = new Date(dateStr);
       return date.toLocaleString();
