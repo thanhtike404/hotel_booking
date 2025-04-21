@@ -1,79 +1,105 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authGuard } from "@/lib/authGuard";
+import { Prisma } from "@prisma/client";
+import { z } from "zod";
+
+const bookingSchema = z.object({
+  hotelId: z.string().min(1),
+  roomId: z.string().min(1),
+  checkIn: z.string().datetime(),
+  checkOut: z.string().datetime(),
+  customerName: z.string().optional(),
+  customerPhone: z.string().optional(),
+});
 
 export async function POST(request: Request) {
   try {
+    // 1. Authentication check
     const session = await authGuard();
-    if (!session) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const body = await request.json();
-    const email = session?.user?.email;
-    if (!email)
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    const { hotelId, checkIn, checkOut, guests, roomId } = body;
 
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
-    if (!hotelId || !checkIn || !checkOut || !guests) {
+    // 2. Parse and validate request body
+    const body = await request.json();
+    const validation = bookingSchema.safeParse(body);
+
+    if (!validation.success) {
       return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 },
+        { error: "Invalid data", details: validation.error.errors },
+        { status: 400 }
       );
     }
 
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    const { hotelId, roomId, checkIn, checkOut } = validation.data;
+    const userId = session.user.id; // Now properly getting userId
+
+    // 3. Verify room exists
+    const roomExists = await prisma.room.findUnique({
+      where: { id: roomId, hotelId },
+      select: { id: true },
+    });
+
+    if (!roomExists) {
+      return NextResponse.json(
+        { error: "Room not found in specified hotel" },
+        { status: 404 }
+      );
     }
 
-    if (roomId) {
-      const existingBookings = await prisma.booking.findMany({
-        where: {
-          roomId,
-          OR: [
-            {
-              AND: [
-                { checkIn: { lte: new Date(checkIn) } },
-                { checkOut: { gte: new Date(checkIn) } },
-              ],
-            },
-            {
-              AND: [
-                { checkIn: { lte: new Date(checkOut) } },
-                { checkOut: { gte: new Date(checkOut) } },
-              ],
-            },
-          ],
-        },
-      });
-
-      if (existingBookings.length > 0) {
-        return NextResponse.json(
-          { error: "Room is not available for the selected dates" },
-          { status: 400 },
-        );
-      }
-    }
-
+    // 4. Create booking (simplified without transaction for now)
     const booking = await prisma.booking.create({
       data: {
-        hotelId,
-        userId: user.id,
-        roomId,
+        hotelId, // Just the ID, not relation object
+        userId,  // Now properly included
         checkIn: new Date(checkIn),
         checkOut: new Date(checkOut),
         status: "PENDING",
       },
     });
 
-    return NextResponse.json(booking);
-  } catch (error) {
-    console.error("Error creating booking:", error);
+    // 5. Create booking-room relationship
+    await prisma.bookingRoom.create({
+      data: {
+        bookingId: booking.id,
+        roomId,
+      },
+    });
+
+    // 6. Return success response
     return NextResponse.json(
-      { error: "Failed to create booking" },
-      { status: 500 },
+      {
+        success: true,
+        bookingId: booking.id,
+        message: "Booking created successfully"
+      },
+      { status: 201 }
+    );
+
+  } catch (error) {
+    console.error("Booking creation error:", error);
+
+    // Handle Prisma errors
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        return NextResponse.json(
+          { error: "Unique constraint violation" },
+          { status: 400 }
+        );
+      }
+      if (error.code === "P2025") {
+        return NextResponse.json(
+          { error: "Referenced record not found" },
+          { status: 404 }
+        );
+      }
+    }
+
+    // Fallback error response
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
     );
   }
 }

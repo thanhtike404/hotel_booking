@@ -18,14 +18,17 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { addDays } from "date-fns";
-
 import { Room } from "@/types/rooms";
 import { useBookingForm, BookingFormValues } from "./bookingForm";
 import { DateField } from "./date-fields";
 import { BookingSummary } from "./booking-summary";
 import { HotelInfo } from "./hotel-info";
 
+import { createBooking, useCreateBooking } from "./createBooking";
+
+
 interface BookingModalProps {
+    email: string | '';
     isOpen: boolean;
     onClose: () => void;
     room: Room;
@@ -34,6 +37,7 @@ interface BookingModalProps {
 }
 
 export default function BookingModal({
+    email,
     isOpen,
     onClose,
     room,
@@ -44,6 +48,7 @@ export default function BookingModal({
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
     const form = useBookingForm(room);
+    const { mutate: createBookingMutation } = useCreateBooking();
 
     useEffect(() => {
         if (isOpen && room) {
@@ -60,48 +65,55 @@ export default function BookingModal({
         }
     }, [isOpen, room, form]);
 
+
     async function onSubmit(values: BookingFormValues) {
         try {
-            setIsLoading(true);
-            setError("");
-
-            const nights = Math.ceil(
-                (new Date(values.checkOut).getTime() - new Date(values.checkIn).getTime()) /
-                (1000 * 60 * 60 * 24)
-            );
-
-            const response = await fetch("/api/bookings", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    hotelId,
-                    roomId: room.id,
-                    roomName: room.name,
-                    hotelName,
-                    checkIn: values.checkIn.toISOString(),
-                    checkOut: values.checkOut.toISOString(),
-                    guests: values.guests,
-                    customerName: values.name,
-                    customerEmail: values.email,
-                    customerPhone: values.phone,
-                    totalPrice: room.price * nights,
-                    nights,
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error((await response.json()).error || "Failed to create booking");
+            const requestData = await setBookingData(values);
+            if (!requestData) {
+                setError("Failed to create booking");
+                return;
             }
 
-            setSuccess(true);
-            setTimeout(() => onClose(), 2000);
+            setIsLoading(true);
+
+            createBookingMutation(requestData, {
+                onSuccess: () => {
+                    setSuccess(true);
+                    setTimeout(() => onClose(), 2000);
+                },
+                onError: (error: any) => {
+                    setError(error?.message || "Failed to create booking");
+                },
+                onSettled: () => {
+                    setIsLoading(false);
+                },
+            });
         } catch (error) {
             setError(error instanceof Error ? error.message : "Failed to create booking");
-        } finally {
             setIsLoading(false);
         }
     }
 
+    const setBookingData = async (values: BookingFormValues) => {
+        const nights = Math.ceil(
+            (new Date(values.checkOut).getTime() - new Date(values.checkIn).getTime()) /
+            (1000 * 60 * 60 * 24)
+        );
+        return {
+            hotelId,
+            roomId: room.id,
+            roomName: room.name,
+            hotelName,
+            checkIn: values.checkIn.toISOString(),
+            checkOut: values.checkOut.toISOString(),
+            guests: values.guests,
+            customerName: values.name,
+            customerEmail: values.email,
+            customerPhone: values.phone,
+            totalPrice: room.price * nights,
+            nights,
+        }
+    }
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-[500px]">
@@ -151,6 +163,49 @@ export default function BookingModal({
                                 />
                             </div>
 
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name="email"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Email</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="user@gmail.com" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="name"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Name</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="snoop doggy dogg" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <FormField
+                                control={form.control}
+                                name="phone"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Phone</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="09...." {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+
                             <FormField
                                 control={form.control}
                                 name="guests"
@@ -174,11 +229,7 @@ export default function BookingModal({
                             {/* Other form fields remain similar */}
 
                             {form.watch("checkIn") && form.watch("checkOut") && (
-                                <BookingSummary
-                                    room={room}
-                                    checkIn={form.watch("checkIn")}
-                                    checkOut={form.watch("checkOut")}
-                                />
+                                <BookingSummary room={room} checkIn={form.watch("checkIn")} checkOut={form.watch("checkOut")} />
                             )}
 
                             <div className="pt-4 border-t">

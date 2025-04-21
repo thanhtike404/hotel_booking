@@ -23,13 +23,14 @@ import * as z from "zod";
 import { CalendarIcon } from "lucide-react";
 import { format, addDays } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
+import { Room } from "@/types/rooms";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { Room } from "@/types/hotel";
+
 
 const formSchema = z.object({
   checkIn: z.date({
@@ -54,15 +55,11 @@ interface BookingModalProps {
   room: Room;
   hotelId: string;
   hotelName: string;
-  user: {
-    name: string;
-    email: string;
-    image: string | null;
-  };
+  email: string;
 }
 
 export function BookingModal({
-  user,
+  email,
   isOpen,
   onClose,
   room,
@@ -72,7 +69,7 @@ export function BookingModal({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  console.log(user.email);
+  // console.log(user.email);
   // Set up the form with default values
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -94,7 +91,7 @@ export function BookingModal({
         checkOut: addDays(new Date(), 1),
         guests: room.maxOccupancy || 2,
         name: "",
-        email: user?.email,
+        email: email,
         phone: "",
       });
       setError("");
@@ -126,7 +123,7 @@ export function BookingModal({
         customerName: values.name,
         customerEmail: values.email,
         customerPhone: values.phone,
-        totalPrice: (room.pricePerNight || room.price) * nights,
+        totalPrice: room.price * nights as number,
         nights,
       };
 
@@ -179,7 +176,7 @@ export function BookingModal({
               <div className="bg-muted/50 p-4 rounded-md mb-4">
                 <h3 className="font-semibold">{hotelName}</h3>
                 <p className="text-sm">
-                  {room?.name} - ${room?.pricePerNight || room?.price} per night
+                  {room?.name} - {room?.price}
                 </p>
               </div>
 
@@ -345,7 +342,7 @@ export function BookingModal({
                     </div>
                     <div className="flex justify-between">
                       <span>Price per night:</span>
-                      <span>${room?.pricePerNight || room?.price}</span>
+                      <span>${room?.price}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Number of nights:</span>
@@ -361,7 +358,7 @@ export function BookingModal({
                       <span>Total:</span>
                       <span>
                         $
-                        {(room?.pricePerNight || room?.price) *
+                        {(room?.price) *
                           Math.ceil(
                             (new Date(form.watch("checkOut")).getTime() -
                               new Date(form.watch("checkIn")).getTime()) /

@@ -1,10 +1,10 @@
-import { NextAuthOptions } from "next-auth"
-import CredentialsProvider from "next-auth/providers/credentials"
-import { PrismaClient } from "@prisma/client"
-import bcrypt from "bcryptjs"
-import NextAuth from "next-auth"
+import { NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
+import NextAuth from "next-auth";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -16,37 +16,63 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error("Invalid credentials")
+          throw new Error("Invalid credentials");
         }
 
         const user = await prisma.user.findUnique({
           where: {
             email: credentials.email
           }
-        })
+        });
 
         if (!user || !user.password) {
-          throw new Error("User not found")
+          throw new Error("User not found");
         }
 
-        const passwordMatch = await bcrypt.compare(credentials.password, user.password)
+        const passwordMatch = await bcrypt.compare(
+          credentials.password,
+          user.password
+        );
 
         if (!passwordMatch) {
-          throw new Error("Invalid password")
+          throw new Error("Invalid password");
         }
 
-        return user
+        // Return user object with id
+        return {
+          id: user.id,  // This is crucial
+          email: user.email,
+          name: user.name,
+          // Include any other user fields you need
+        };
       }
     })
   ],
+  callbacks: {
+    async jwt({ token, user }) {
+      // Add user id to the token right after sign in
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      // Add user id to the session
+      if (session.user) {
+        // @ts-ignore
+        session.user.id = token.id as string;
+      }
+      return session;
+    },
+  },
   session: {
-    strategy: "jwt"
+    strategy: "jwt",
   },
   pages: {
     signIn: "/login",
   },
   secret: process.env.NEXTAUTH_SECRET,
-}
+};
 
-const handler = NextAuth(authOptions)
-export { handler as GET, handler as POST }
+const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST };

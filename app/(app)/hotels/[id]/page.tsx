@@ -5,7 +5,8 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, ArrowLeft, BedDouble, Users, Check } from "lucide-react";
-import { BookingModal } from "@/components/hotel/BookingModal";
+import BookingModal from "./bookingModel";
+// import { BookingModal } from "@/components/hotrel/BookingModal";
 import { notFound, useRouter } from "next/navigation";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
@@ -241,7 +242,7 @@ export default function HotelDetailPage({
 
       {selectedRoom && (
         <BookingModal
-          user={data?.user}
+          email={data?.user?.email || ""}
           isOpen={isBookingModalOpen}
           onClose={() => setIsBookingModalOpen(false)}
           room={selectedRoom}
