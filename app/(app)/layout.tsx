@@ -1,4 +1,5 @@
-import MainNav from '@/components/main-nav';
+"use client";
+import Navbar from "@/components/Navbar";
 export default function SiteLayout({
   children,
 }: {
@@ -10,8 +11,8 @@ export default function SiteLayout({
 
 
       {/* Site Content */}
+      <Navbar />
       <main className="flex-1">
-        <MainNav />
 
         {children}</main>
 
