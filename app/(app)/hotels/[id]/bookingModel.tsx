@@ -24,7 +24,7 @@ import { DateField } from "./date-fields";
 import { BookingSummary } from "./booking-summary";
 import { HotelInfo } from "./hotel-info";
 
-import { createBooking, useCreateBooking } from "./createBooking";
+import { useCreateBooking } from "./createBooking";
 
 
 interface BookingModalProps {

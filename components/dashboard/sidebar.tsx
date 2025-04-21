@@ -8,6 +8,8 @@ import { IoBedOutline } from "react-icons/io5";
 import { TbWorld } from "react-icons/tb";
 import { MdLocationCity } from "react-icons/md";
 import { FaCalendarCheck } from "react-icons/fa";
+
+// Routes config
 export const routes = [
   {
     label: "Dashboard",
@@ -41,11 +43,12 @@ export const routes = [
   },
 ];
 
+// Sidebar component
 export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="h-full flex flex-col bg-background p-4">
+    <div className="h-full w-64 flex flex-col bg-background p-4 overflow-x-hidden border-r border-border">
       <div className="flex flex-col flex-1 gap-y-4">
         {routes.map((route) => (
           <Link

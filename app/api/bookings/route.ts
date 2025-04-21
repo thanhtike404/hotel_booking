@@ -48,18 +48,18 @@ export async function POST(request: Request) {
       );
     }
 
-    // 4. Create booking (simplified without transaction for now)
+
     const booking = await prisma.booking.create({
       data: {
-        hotelId, // Just the ID, not relation object
-        userId,  // Now properly included
+        hotelId,
+        userId,
         checkIn: new Date(checkIn),
         checkOut: new Date(checkOut),
         status: "PENDING",
       },
     });
 
-    // 5. Create booking-room relationship
+
     await prisma.bookingRoom.create({
       data: {
         bookingId: booking.id,
