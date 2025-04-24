@@ -54,19 +54,6 @@ export const columns: ColumnDef<Booking, unknown>[] = [
   },
 
   {
-    id: "featured",
-    header: "Featured",
-    accessorFn: (row) => row.hotel?.featured,
-    cell: ({ getValue }) => {
-      const isFeatured = getValue();
-      return (
-        <Badge variant={isFeatured ? "default" : "secondary"}>
-          {isFeatured ? "Yes" : "No"}
-        </Badge>
-      );
-    },
-  },
-  {
     accessorKey: "checkIn",
     header: "Check In",
     cell: ({ getValue }) => {

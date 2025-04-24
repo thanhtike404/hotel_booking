@@ -12,7 +12,7 @@ export default function SiteLayout({
 
       {/* Site Content */}
       <Navbar />
-      <main className="flex-1">
+      <main className="flex-1 py-8">
 
         {children}</main>
 

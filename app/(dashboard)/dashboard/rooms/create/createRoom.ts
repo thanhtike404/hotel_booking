@@ -5,6 +5,7 @@ import { z } from "zod";
 import { redirect } from "next/navigation";
 const RoomSchema = z.object({
     hotelId: z.string().min(1),
+    name: z.string(),
     roomType: z.enum(["SINGLE", "DOUBLE", "TWIN", "SUITE", "FAMILY"]),
     price: z.string().refine((val) => !isNaN(Number(val)), {
         message: "Price must be a number",
@@ -19,6 +20,7 @@ export async function createRoom(formData: FormData) {
     const amenities = formData.getAll("amenities") as string[];
 
     const parsed = RoomSchema.safeParse({
+        name: formData.get("name"),
         hotelId: formData.get("hotelId"),
         roomType: formData.get("roomType"),
         price: formData.get("price"),
@@ -36,6 +38,7 @@ export async function createRoom(formData: FormData) {
 
     await prisma.room.create({
         data: {
+            name: formData.get("name"),
             hotelId: data.hotelId,
             roomType: data.roomType,
             price: parseFloat(data.price),
@@ -47,7 +50,6 @@ export async function createRoom(formData: FormData) {
     });
 
     redirect("/dashboard/hotels");
-
 }
 
 export async function getHotels() {

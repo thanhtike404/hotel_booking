@@ -26,10 +26,20 @@ export default async function CreateRoomPage() {
                             ))}
                         </select>
                     </div>
-
+                    <div>
+                        <label htmlFor="" className="block text-sm font-medium mb-1">
+                            Name
+                        </label>
+                        <input
+                            name="name"
+                            className="w-full bg-gray-900 border border-gray-700 rounded-md p-3"
+                        />
+                    </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium mb-1">Room Type</label>
+                            <label className="block text-sm font-medium mb-1">
+                                Room Type
+                            </label>
                             <select
                                 name="roomType"
                                 className="w-full bg-gray-900 border border-gray-700 rounded-md p-3"
@@ -44,7 +54,9 @@ export default async function CreateRoomPage() {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium mb-1">Price Per Night</label>
+                            <label className="block text-sm font-medium mb-1">
+                                Price Per Night
+                            </label>
                             <input
                                 type="number"
                                 name="price"
@@ -57,7 +69,9 @@ export default async function CreateRoomPage() {
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium mb-1">Total Rooms</label>
+                            <label className="block text-sm font-medium mb-1">
+                                Total Rooms
+                            </label>
                             <input
                                 type="number"
                                 name="totalRooms"
@@ -67,7 +81,9 @@ export default async function CreateRoomPage() {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium mb-1">Available Rooms</label>
+                            <label className="block text-sm font-medium mb-1">
+                                Available Rooms
+                            </label>
                             <input
                                 type="number"
                                 name="availableRooms"
@@ -79,7 +95,9 @@ export default async function CreateRoomPage() {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium mb-1">Room Image URL</label>
+                        <label className="block text-sm font-medium mb-1">
+                            Room Image URL
+                        </label>
                         <input
                             type="url"
                             name="roomImage"
