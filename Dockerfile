@@ -1,32 +1,29 @@
-FROM node:18-alpine AS base
-
-# Install build dependencies
-USER root
-RUN apk add --no-cache openssl python3 make g++ libc6-compat
-
-# Create app directory
-RUN mkdir -p /app && chown -R node:node /app
+# 1. Base image for installing dependencies
+FROM node:20-slim AS base
+RUN apt-get update && apt-get install -y openssl
 WORKDIR /app
-
-# Install pnpm
 RUN npm install -g pnpm
 
-# Copy package files
-COPY --chown=node:node package.json pnpm-lock.yaml* ./
+# 2. Dependencies image
+FROM base AS dependencies
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
-# Install dependencies
-USER node
-RUN pnpm install --prefer-offline
+# 3. Build image
+FROM base AS builder
+WORKDIR /app
+COPY --from=dependencies /app/node_modules ./node_modules
+COPY . .
+ARG DATABASE_URL
+RUN pnpm prisma generate
 
-# Copy source files
-COPY --chown=node:node . .
-
-# Rebuild native modules
-RUN pnpm rebuild bcrypt
-
-# Build application
-RUN pnpm prisma generate && pnpm build
+# 4. Production image
+FROM base AS runner
+WORKDIR /app
+COPY --from=builder /app .
+COPY docker-entrypoint.sh ./
+RUN chmod +x docker-entrypoint.sh
 
 EXPOSE 3000
+ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["pnpm", "start"]
-

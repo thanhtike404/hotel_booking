@@ -1,48 +1,29 @@
 version: '3.8'
-
 services:
-  web:
+  next-app:
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        DATABASE_URL: ${DATABASE_URL}
-    env_file: .env
-    container_name: hotel-booking-web
+        - DATABASE_URL=postgresql://user:password@postgres:5432/db
+        - NEXTAUTH_SECRET=5HnVheJcVO7U67Ha85oB4BMidQ4qmPAOP9UulejeYgU=%
     ports:
       - "3000:3000"
-    environment:
-      - NODE_ENV=development
-      - CHOWN_USER=node
-    command: ["pnpm", "run", "dev"]
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - pnpm_store:/root/.pnpm-store
-    user: "node"
     depends_on:
-      postgres:
-        condition: service_healthy
-    restart: always
-
+      - postgres
+    environment:
+      - DATABASE_URL=postgresql://user:password@postgres:5432/db
+      - NEXTAUTH_SECRET=5HnVheJcVO7U67Ha85oB4BMidQ4qmPAOP9UulejeYgU=%
   postgres:
-    image: postgres:15
-    container_name: hotel-booking-postgres
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=db
     ports:
       - "5432:5432"
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: secret
-      POSTGRES_DB: hotel_booking
-      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=trust"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d hotel_booking"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
+      - postgres-data:/var/lib/postgresql/data
 
 volumes:
-  postgres_data:
-  pnpm_store:
+  postgres-data:
