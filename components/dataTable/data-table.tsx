@@ -72,7 +72,7 @@ export function DataTable<TData, TValue>({
       )}
 
       {/* Sticky Filter Bar */}
-      <div className="sticky top-0 z-10 bg-white p-4 border-b flex flex-wrap justify-between items-end gap-4">
+      <div className="sticky top-0 z-10 p-4 border-b flex flex-wrap justify-between items-end gap-4">
         {/* Left - Search Filters */}
         <div className="flex flex-wrap items-end gap-4">
           {table

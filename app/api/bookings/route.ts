@@ -110,12 +110,20 @@ export const GET = async () => {
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const bookings = await prisma.booking.findMany({
+    const bookings = await prisma.bookingRoom.findMany({
+      
       include: {
-        hotel: true,
-        user: true,
-        _count: {
-          select: { rooms: true },
+        booking: {
+          include: {
+            hotel: true,
+            user: true,
+          },
+        },
+        room: true,
+      },
+      orderBy: {
+        booking: {
+          createdAt: "desc",
         },
       },
     });

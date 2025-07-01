@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { useSession } from "next-auth/react";
 import {
     Dialog,
     DialogContent,
@@ -23,7 +24,6 @@ import { useBookingForm, BookingFormValues } from "./bookingForm";
 import { DateField } from "./date-fields";
 import { BookingSummary } from "./booking-summary";
 import { HotelInfo } from "./hotel-info";
-
 import { useCreateBooking } from "./createBooking";
 
 
@@ -49,6 +49,7 @@ export default function BookingModal({
     const [success, setSuccess] = useState(false);
     const form = useBookingForm(room);
     const { mutate: createBookingMutation } = useCreateBooking();
+    const { data: session } = useSession();
 
     useEffect(() => {
         if (isOpen && room) {
@@ -57,7 +58,7 @@ export default function BookingModal({
                 checkOut: addDays(new Date(), 1),
                 guests: room.maxOccupancy || 2,
                 name: "",
-                email: "",
+                email: session?.user?.email || email || "",
                 phone: "",
             });
             setError("");

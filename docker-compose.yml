@@ -5,16 +5,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        DATABASE_URL: ${DATABASE_URL}
+    env_file: .env
     container_name: hotel-booking-web
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=postgresql://admin:secret@hotel-booking-postgres:5432/hotel_booking
       - NODE_ENV=development
-      # Add user mapping for permissions
       - CHOWN_USER=node
     command: ["pnpm", "run", "dev"]
-
     volumes:
       - .:/app
       - /app/node_modules
@@ -42,6 +42,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+
 volumes:
   postgres_data:
   pnpm_store:

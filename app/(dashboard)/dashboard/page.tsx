@@ -39,6 +39,11 @@ const recentBookings: Booking[] = [
   }
 ];
 
+interface RoomStatus {
+  type: string;
+  percentage: number;
+}
+
 const roomStatus: RoomStatus[] = [
   { type: "Occupied", percentage: 75 },
   { type: "Available", percentage: 25 },

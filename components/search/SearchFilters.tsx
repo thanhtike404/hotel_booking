@@ -12,6 +12,7 @@ import {
 import { useQuery } from "@tanstack/react-query"
 import axios from "axios"
 import type { Country } from "@/types/country"
+import { City } from "@prisma/client"
 
 type SearchFiltersProps = {
   searchQuery: string
@@ -91,7 +92,7 @@ export function SearchFilters({
               <SelectValue placeholder="Select a city" />
             </SelectTrigger>
             <SelectContent>
-              {availableCities.map((city: string) => (
+              {availableCities.map((city: City) => (
                 <SelectItem key={city.id} value={city.id}>
                   {city.name}
                 </SelectItem>
@@ -121,6 +122,7 @@ export function SearchFilters({
       {/* Reset */}
       <div className="pt-2">
         <Button
+          
           variant="outline"
           className="w-full"
           onClick={() => {

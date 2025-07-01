@@ -1,3 +1,5 @@
+import { Room } from "./rooms";
+
 interface Hotel {
     id: string;
     name: string;
@@ -37,3 +39,22 @@ export interface Booking {
         rooms: number;
     };
 }
+ export type BookingDetail= Booking & {
+      hotel: {
+          name: string;
+          image: string;
+          description: string;
+          rooms: Array<{
+              id: string;
+              name: string;
+              price: number;
+            }>;
+        };
+        user: {
+            name: string;
+        };
+        totoalPrice: string;
+        room: Room;
+        booking:Booking;
+        
+    };  

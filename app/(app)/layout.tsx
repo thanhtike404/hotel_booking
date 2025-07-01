@@ -7,16 +7,12 @@ export default function SiteLayout({
 }) {
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Site Header */}
-
-
-      {/* Site Content */}
+    
       <Navbar />
       <main className="flex-1 py-8">
 
         {children}</main>
 
-      {/* Site Footer */}
       <footer className="">
         <div className="container mx-auto px-4 py-8">
           {/* Add your footer content here */}

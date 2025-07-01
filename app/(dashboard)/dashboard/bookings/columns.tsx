@@ -9,147 +9,113 @@ import { Eye, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { Booking } from "@/types/bookings";
-interface BookingColumnMeta {
-  search?: boolean;
-  calendar?: boolean;
+
+export interface Booking {
+  id: string;
+  bookingId: string;
+  roomId: string;
+  booking: {
+    id: string;
+    hotelId: string;
+    userId: string;
+    checkIn: string;
+    checkOut: string;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+    hotel: {
+      id: string;
+      name: string;
+      rating: number;
+    };
+    user: {
+      id: string;
+      name: string;
+      email: string;
+    };
+  };
+  room: {
+    id: string;
+    name: string;
+    roomType: string;
+    image: string;
+    price: number;
+  };
 }
 
 export const columns: ColumnDef<Booking, unknown>[] = [
   {
-    accessorKey: "name",
-    header: "username",
-    meta: {
-      search: true,
-    },
+    accessorKey: "booking.user.name",
+    header: "Username",
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <h2>{row.original.user.name}</h2>
+        <h2>{row.original.booking.user.name}</h2>
       </div>
     ),
   },
   {
-    accessorKey: "hotel.name",
+    accessorKey: "booking.hotel.name",
     header: "Hotel Name",
     cell: ({ row }) => (
-      <Link href={row.original.hotel.name}>{row.original.hotel.name}</Link>
+      <Link href={`/dashboard/hotels/${row.original.booking.hotel.id}`}>
+        {row.original.booking.hotel.name}
+      </Link>
     ),
   },
   {
-    accessorKey: "hotel.rating",
+    accessorKey: "booking.hotel.rating",
     header: "Rating",
     cell: ({ row }) => (
       <span className="text-yellow-500 font-medium">
-        {row.original.hotel.rating} ★
+        {row.original.booking.hotel.rating} ★
       </span>
     ),
   },
   {
-    accessorKey: "_count.rooms",
-    header: "Rooms",
-    cell: ({ row }) => {
-      const count = row.original._count?.rooms ?? 0;
-      return <div>{count}</div>;
-    },
+    accessorKey: "room.roomType",
+    header: "Room Type",
+    cell: ({ row }) => (
+      <span>{row.original.room.roomType}</span>
+    ),
   },
-
   {
-    accessorKey: "checkIn",
+    accessorKey: "booking.checkIn",
     header: "Check In",
     cell: ({ getValue }) => {
       const date = new Date(getValue() as string);
       return !isNaN(date.getTime()) ? format(date, "PPP") : "Invalid date";
     },
-    filterFn: (row, columnId, filterValue) => {
-      if (!filterValue) return true;
-
-      const rowValue = row.getValue(columnId) as string; // Explicitly type as string
-      if (!rowValue) return false;
-
-      // Parse dates without timezone conversion
-      const parseDate = (dateString: string) => {
-        const parts = dateString.split("-");
-        return new Date(
-          parseInt(parts[0]),
-          parseInt(parts[1]) - 1,
-          parseInt(parts[2]),
-        );
-      };
-
-      const rowDate = parseDate(rowValue.split("T")[0]);
-      const filterDate = parseDate(filterValue as string);
-
-      return (
-        rowDate.getFullYear() === filterDate.getFullYear() &&
-        rowDate.getMonth() === filterDate.getMonth() &&
-        rowDate.getDate() === filterDate.getDate()
-      );
-    },
-    meta: {
-      calendar: true,
-    } as BookingColumnMeta,
   },
   {
-    accessorKey: "checkOut",
+    accessorKey: "booking.checkOut",
     header: "Check Out",
     cell: ({ getValue }) => {
       const date = new Date(getValue() as string);
       return !isNaN(date.getTime()) ? format(date, "PPP") : "Invalid date";
     },
-    filterFn: (row, columnId, filterValue) => {
-      if (!filterValue) return true;
-
-      const rowValue = row.getValue(columnId) as string; // Explicitly type as string
-      if (!rowValue) return false;
-
-      // Parse dates without timezone conversion
-      const parseDate = (dateString: string) => {
-        const parts = dateString.split("-");
-        return new Date(
-          parseInt(parts[0]),
-          parseInt(parts[1]) - 1,
-          parseInt(parts[2]),
-        );
-      };
-
-      const rowDate = parseDate(rowValue.split("T")[0]);
-      const filterDate = parseDate(filterValue as string);
-
-      return (
-        rowDate.getFullYear() === filterDate.getFullYear() &&
-        rowDate.getMonth() === filterDate.getMonth() &&
-        rowDate.getDate() === filterDate.getDate()
-      );
-    },
-    meta: {
-      calendar: true,
-    } as BookingColumnMeta,
   },
   {
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {
       const queryClient = useQueryClient();
-
       const deleteHotel = useMutation({
         mutationFn: async (id: string) => {
           await axios.delete("/api/dashboard/hotels", { data: { id } });
         },
         onSuccess: () => {
-          queryClient.invalidateQueries({
-            queryKey: ["hotels"],
-          });
+          queryClient.invalidateQueries({ queryKey: ["hotels"] });
         },
       });
 
       return (
         <div className="flex items-center gap-2">
-          <Link href={`/dashboard/hotels/${row.original.id}`}>
+          <Link href={`/dashboard/bookings/${row.original.id}`}>
             <Button variant="ghost" size="icon">
               <Eye className="h-4 w-4" />
             </Button>
           </Link>
-          <Link href={`/dashboard/hotels/edit/${row.original.id}`}>
+          <Link href={`/dashboard/hotels/edit/${row.original.booking.hotel.id}`}>
             <Button variant="ghost" size="icon">
               <Edit className="h-4 w-4" />
             </Button>
@@ -160,7 +126,7 @@ export const columns: ColumnDef<Booking, unknown>[] = [
             className="text-destructive"
             onClick={() => {
               if (confirm("Are you sure you want to delete this hotel?")) {
-                deleteHotel.mutate(row.original.id);
+                deleteHotel.mutate(row.original.booking.hotel.id);
               }
             }}
           >

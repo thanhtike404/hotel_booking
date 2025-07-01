@@ -19,9 +19,9 @@ export default function HotelsPage() {
   const [selectedCityId, setSelectedCityId] = useState("")
 
   return (
-    <div className="min-h-screen bg-black text-white p-4">
+    <div className="min-h-screen mt-4 lg:mt-0 p-4 lg:p-6 bg-zinc-800 text-white">
       {/* Mobile: Filter button and drawer */}
-      <div className="lg:hidden mb-4">
+      <div className="lg:hidden mb-4 dark:bg-zinc-900 p-4 rounded-lg">
         <Sheet>
           <SheetTrigger asChild>
             <Button className="w-full">Filter Hotels</Button>

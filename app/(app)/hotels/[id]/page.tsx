@@ -40,16 +40,15 @@ export default function HotelDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const hotelCoords = [51.505, -0.09];
+  const hotelCoords: [number, number] = [51.505, -0.09];
   const router = useRouter();
   const unwrappedParams = React.use(params);
   const { id } = unwrappedParams;
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const { data, status } = useSession();
-
   if (!id) return notFound();
-
+  
   const {
     data: hotel,
     isLoading,
@@ -61,6 +60,7 @@ export default function HotelDetailPage({
       return response.data;
     },
   });
+  console.log(hotel,'data in hotel detail page');
 
   const handleBookRoom = (room: Room) => {
     setSelectedRoom(room);
@@ -97,7 +97,7 @@ export default function HotelDetailPage({
       <div className="container mx-auto py-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="relative h-[400px]">
-            {hotel.image && (
+            {hotel?.image && (
               <Image
                 alt={hotel.id}
                 src={hotel.image}
@@ -147,7 +147,7 @@ export default function HotelDetailPage({
           <div className="lg:col-span-5 space-y-4">
             <h2 className="text-2xl font-semibold">📍 Location</h2>
             <div className="h-[400px] rounded-xl overflow-hidden border">
-              <Map center={hotelCoords} name={hotel.name} location={hotel.location} />
+              <Map center={hotelCoords} name={hotel.name} location={hotel?.location} />
             </div>
           </div>
 
@@ -160,11 +160,13 @@ export default function HotelDetailPage({
                 className="flex flex-col md:flex-row border rounded-xl p-5 gap-5 shadow-sm bg-white"
               >
                 <div className="md:min-w-[160px] w-full md:w-[30%] h-40 relative rounded-lg overflow-hidden">
-                  {room.image ? (
+                  {room?.image ? (
                     <Image
                       src={room.image}
                       alt={room.id}
+
                       fill
+                   
                       className="object-cover"
                     />
                   ) : (
