@@ -4,7 +4,7 @@ import { useState } from "react"
 import { DashboardNavbar } from "@/components/dashboard/navbar"
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { Toaster } from "@/components/ui/toaster"
-
+import { useWebSocketNotifications } from "@/hooks/dashboard/useWebsocketNotification";
 export default function DashboardLayout({
   children,
 }: {
@@ -12,8 +12,19 @@ export default function DashboardLayout({
 }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
+  try {
+    // Initialize WebSocket notifications
+    useWebSocketNotifications();
+
+    // Handle any potential errors in the WebSocket connection
+  } catch (error) {
+    console.error("Error in DashboardLayout:", error)
+    
+  }
+
   return (
     <div>
+     
       <DashboardNavbar onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
 
       <div className="pt-16 h-screen relative overflow-hidden md:flex">

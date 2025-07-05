@@ -143,6 +143,8 @@ model Notification {
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
+
 model Country {
   id     String @id @default(cuid())
   image   String
