@@ -50,7 +50,7 @@ export default function HotelDetailClient({ hotel }: { hotel: HotelWithRelations
             <div className="flex items-start justify-between">
               <div>
                 <h1 className="text-3xl font-bold">{hotel.name}</h1>
-                <p className="text-muted-foreground mt-2">{hotel.location}</p>
+      
               </div>
               <Badge variant={hotel.featured ? "default" : "secondary"}>
                 {hotel.featured ? "Featured" : "Not Featured"}

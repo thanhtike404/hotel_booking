@@ -9,7 +9,8 @@ interface HotelEditPageProps {
 }
 
 export default async function HotelEditPage({ params }: HotelEditPageProps) {
-  const hotel = await getHotelById(params.hotelId)
+  const { hotelId } =await params
+  const hotel = await getHotelById(hotelId)
 
   return (
     <Suspense fallback={<div>Loading...</div>}>

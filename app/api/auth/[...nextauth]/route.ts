@@ -43,6 +43,7 @@ export const authOptions: NextAuthOptions = {
           id: user.id,  // This is crucial
           email: user.email,
           name: user.name,
+        // Assuming you have a role field
           // Include any other user fields you need
         };
       }
@@ -53,6 +54,7 @@ export const authOptions: NextAuthOptions = {
       // Add user id to the token right after sign in
       if (user) {
         token.id = user.id;
+        token.role = user.role; // Include role if needed
       }
       return token;
     },

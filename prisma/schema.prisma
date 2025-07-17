@@ -35,16 +35,17 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String         @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String?        @unique
   password      String?
   emailVerified DateTime?
   image         String?
+  role          Role           @default(USER)
   accounts      Account[]
   bookings      Booking[]
-  sessions      Session[]
   notifications Notification[]
+  sessions      Session[]
 }
 
 model VerificationToken {
@@ -59,15 +60,15 @@ model Hotel {
   id          String    @id @default(cuid())
   name        String
   description String
-  cityId      String
   image       String
   rating      Float
   featured    Boolean   @default(false)
   amenities   String[]
-  latitude    Float
-  longitude   Float
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  cityId      String
+  latitude    Float
+  longitude   Float
   bookings    Booking[]
   city        City      @relation(fields: [cityId], references: [id])
   reviews     Review[]
@@ -97,31 +98,31 @@ model Booking {
   updatedAt DateTime      @updatedAt
   hotel     Hotel         @relation(fields: [hotelId], references: [id])
   user      User          @relation(fields: [userId], references: [id])
-  rooms     BookingRoom[] // 👈 many-to-many through join table
+  rooms     BookingRoom[]
 }
 
 model Room {
-  id        String    @id @default(cuid())
-  name      String
+  id        String        @id @default(cuid())
   hotelId   String
   available Int
   total     Int
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
   roomType  RoomType
-  image     String
   amenities String[]
+  image     String
   price     Float
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  name      String
   bookings  BookingRoom[]
-  hotel     Hotel     @relation(fields: [hotelId], references: [id])
+  hotel     Hotel         @relation(fields: [hotelId], references: [id])
 }
 
 model BookingRoom {
-  id         String   @id @default(cuid())
-  booking    Booking  @relation(fields: [bookingId], references: [id])
-  bookingId  String
-  room       Room     @relation(fields: [roomId], references: [id])
-  roomId     String
+  id        String  @id @default(cuid())
+  bookingId String
+  roomId    String
+  booking   Booking @relation(fields: [bookingId], references: [id])
+  room      Room    @relation(fields: [roomId], references: [id])
 }
 
 model Destination {
@@ -134,20 +135,19 @@ model Destination {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
 model Notification {
   id        String   @id @default(cuid())
-  userId    String   // The ID of the user who should receive this
-  message   String   // The content of the notification
+  userId    String
+  message   String
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
-
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-
 model Country {
   id     String @id @default(cuid())
-  image   String
+  image  String
   name   String @unique
   code   String @unique
   cities City[]
@@ -156,7 +156,7 @@ model Country {
 model City {
   id        String  @id @default(cuid())
   name      String
-  image   String
+  image     String
   countryId String
   country   Country @relation(fields: [countryId], references: [id])
   hotels    Hotel[]
@@ -168,4 +168,9 @@ enum RoomType {
   TWIN
   SUITE
   FAMILY
+}
+
+enum Role {
+  USER
+  ADMIN
 }

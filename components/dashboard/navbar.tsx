@@ -16,8 +16,11 @@ interface NavbarProps {
 
 export function DashboardNavbar({ onMenuClick }: NavbarProps) {
 
-  const { data: notifications = [], isLoading } = useNotifications();
   const { data: session } = useSession()
+  console.log("Session:", session);
+
+  const { data: notifications = [], isLoading } = useNotifications(session?.user?.id || "");
+  console.log("Notifications:", notifications);
   return (
     <div className="fixed w-full z-50 flex h-16 items-center px-4 border-b bg-background">
       <Button variant="ghost" size="icon" onClick={onMenuClick} className="md:hidden">
@@ -42,8 +45,23 @@ export function DashboardNavbar({ onMenuClick }: NavbarProps) {
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-80 p-4">
-            <h4 className="font-semibold mb-2">Notifications</h4>
-            <p className="text-sm text-muted-foreground">You have 3 unread notifications.</p>
+            {
+              isLoading ? (
+                <p>Loading notifications...</p>
+              ) : notifications.length === 0 ? (
+                <p>No notifications</p>
+              ) : (
+                notifications.map(notification => (
+                  <div key={notification.id} className="mb-2">
+                    <p className="text-sm">{notification.message}</p>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(notification.createdAt).toLocaleString()}
+                    </span>
+                  </div>
+                ))
+              )
+            }
+
             <Link href="/dashboard/notifications">
               <Button variant="link" className="mt-2 p-0 h-auto">View all notifications</Button>
             </Link>

@@ -5,7 +5,7 @@ import { ThemeProvider } from "@/components/providers/theme-provider"
 import QueryProvider from "@/components/providers/queryProvider"
 import AuthProvider from "@/components/providers/session-provider"
 import ThemeScript from "@/components/providers/theme-script"
-
+import { WebSocketProvider } from "@/providers/webSocketProvider"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -19,6 +19,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  
   return (
     <html lang="en" suppressHydrationWarning >
       <head>
@@ -28,8 +29,10 @@ export default function RootLayout({
         <QueryProvider>
           <AuthProvider>
             <ThemeProvider>
+            
               {children}
 
+        
             </ThemeProvider>
           </AuthProvider>
         </QueryProvider>

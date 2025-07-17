@@ -12,7 +12,7 @@ export default function Page() {
     queryKey: ['hotels'],
     queryFn: async () => {
       const response = await axios.get('/api/dashboard/hotels')
-      return response.data.hotels // Access the hotels array directly
+      return response.data.hotels 
     }
   })
 

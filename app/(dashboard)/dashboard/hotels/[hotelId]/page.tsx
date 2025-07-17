@@ -6,14 +6,15 @@ export default async function HotelDetailPage({
 }: {
   params: { hotelId?: string };
 }) {
-  // Ensure params are properly awaited
-  if (!params?.hotelId) {
-    return <p>Loading...</p>; // Or handle the missing hotelId case properly
+
+  const { hotelId} =await params;
+  if (!hotelId) {
+    return <p>Loading...</p>; 
   }
 
   const hotel = await prisma.hotel.findUnique({
     where: {
-      id: params.hotelId, // Correctly accessing hotelId
+      id: hotelId,
     },
     include: {
       rooms: true,
@@ -23,8 +24,8 @@ export default async function HotelDetailPage({
   });
 
   if (!hotel) {
-    return <p>Hotel not found</p>; // Handle case where hotel is not found
+    return <p>Hotel not found</p>; 
   }
-
+  console.log("Hotel data:", hotel); // Debugging line to check hotel data
   return <HotelDetailClient hotel={hotel} />;
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useState } from "react";
 import {
   ColumnDef,
   flexRender,
@@ -9,6 +10,8 @@ import {
   getPaginationRowModel,
   useReactTable,
   ColumnFiltersState,
+  RowSelectionState,
+  
 } from "@tanstack/react-table";
 import { format } from "date-fns";
 
@@ -29,13 +32,17 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 
-interface DataTableProps<TData, TValue> {
+interface RowWithId {
+  id: string | number;
+}
+
+interface DataTableProps<TData extends RowWithId, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   isLoading?: boolean;
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends RowWithId, TValue>({
   columns,
   data,
   isLoading,
@@ -43,6 +50,7 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
+    const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   const table = useReactTable({
     data,
@@ -50,14 +58,30 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onColumnFiltersChange: setColumnFilters,
+     onRowSelectionChange: setRowSelection,
     getFilteredRowModel: getFilteredRowModel(),
+   enableRowSelection: true,
     state: {
       columnFilters,
+          rowSelection,
     },
   });
 
   // Number of loading rows to show
   const loadingRowCount = 5;
+
+  const handleDeleteSelected =async () => {
+    // Get the array of selected row objects
+    const selectedRows = table.getSelectedRowModel().rows;
+
+    // Map over the selected row objects to get their original Product.id
+    const selectedProductIds = selectedRows.map((row) => row.original.id);
+
+    console.log("Product IDs to delete:", selectedProductIds);
+
+   
+
+  };
 
   return (
     <div className="rounded-md border relative">
@@ -88,6 +112,16 @@ export function DataTable<TData, TValue>({
                 disabled={isLoading}
               />
             ))}
+             {Object.keys(rowSelection).length > 0 && (
+            <Button
+              variant="destructive" // Use a destructive variant for delete
+              onClick={handleDeleteSelected}
+              // Disable if no items are selected
+              disabled={Object.keys(rowSelection).length === 0}
+            >
+              Delete Selected ({Object.keys(rowSelection).length})
+            </Button>
+          )}
         </div>
 
         {/* Right - Date Filters */}

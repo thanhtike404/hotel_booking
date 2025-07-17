@@ -4,23 +4,12 @@ import { useState } from "react"
 import { DashboardNavbar } from "@/components/dashboard/navbar"
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { Toaster } from "@/components/ui/toaster"
-import { useWebSocketNotifications } from "@/hooks/dashboard/useWebsocketNotification";
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-
-  try {
-    // Initialize WebSocket notifications
-    useWebSocketNotifications();
-
-    // Handle any potential errors in the WebSocket connection
-  } catch (error) {
-    console.error("Error in DashboardLayout:", error)
-    
-  }
 
   return (
     <div>

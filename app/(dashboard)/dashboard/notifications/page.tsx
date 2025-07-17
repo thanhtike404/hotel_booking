@@ -4,10 +4,15 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import {useNotifications} from "@/hooks/dashboard/useNotifications";
 import { BellRing, Check } from "lucide-react";
 
-
+import { useSession } from "next-auth/react";
 
 export default function Page() {
-    const { data: notifications = [], isLoading } = useNotifications();
+  const { data: session } = useSession();
+  const userId = session?.user?.id;
+  console.log(userId);
+    const { data: notifications = [], isLoading } = useNotifications(
+    userId || ""
+    );
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-3xl font-bold mb-6">Notifications</h1>

@@ -44,6 +44,7 @@ export default function BookingModal({
     hotelId,
     hotelName,
 }: BookingModalProps) {
+  
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
@@ -80,7 +81,15 @@ export default function BookingModal({
             createBookingMutation(requestData, {
                 onSuccess: () => {
                     setSuccess(true);
+                        try {
+                           
+                        } catch (error) {
+                            console.error("Error sending notification:", error);
+                            
+                        }
+
                     setTimeout(() => onClose(), 2000);
+
                 },
                 onError: (error: any) => {
                     setError(error?.message || "Failed to create booking");

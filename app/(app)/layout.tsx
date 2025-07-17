@@ -1,11 +1,20 @@
 "use client";
 import Navbar from "@/components/Navbar";
+import { WebSocketProvider } from "@/providers/webSocketProvider";
 export default function SiteLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  
+   
+   
+  
+      // Handle any potential errors in the WebSocket connection
+
+  
   return (
+  
     <div className="min-h-screen flex flex-col">
     
       <Navbar />
@@ -19,5 +28,6 @@ export default function SiteLayout({
         </div>
       </footer>
     </div>
+
   );
 }
