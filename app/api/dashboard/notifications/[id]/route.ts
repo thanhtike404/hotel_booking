@@ -33,11 +33,12 @@ export const PATCH = async (
   { params }: { params: { id: string } }
 ) => {
   try {
+    const { id } = await params;
     const { isRead } = await req.json();
 
     const updatedNotification = await prisma.notification.update({
       where: {
-        id: params.id,
+        id,
       },
       data: {
         isRead,
@@ -59,9 +60,11 @@ export const DELETE = async (
   { params }: { params: { id: string } }
 ) => {
   try {
+    const { id } = await params;
+    
     await prisma.notification.delete({
       where: {
-        id: params.id,
+        id,
       },
     });
 

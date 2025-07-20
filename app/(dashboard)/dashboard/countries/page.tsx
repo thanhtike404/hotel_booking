@@ -5,6 +5,8 @@ import { DataTable } from "@/components/dataTable/data-table"
 import { useQuery } from "@tanstack/react-query"
 
 export default function CountriesPage() {
+
+  
   const { data, isLoading } = useQuery({
     queryKey: ["countries"],
     queryFn: async () => {

@@ -17,3 +17,13 @@ export const getNotifications = async (userId: string) => {
     throw error;
   }
 };
+
+export const deleteNotification = async (notificationId: string) => {
+  try {
+    const response = await axios.delete(`/api/dashboard/notifications/${notificationId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting notification:", error);
+    throw error;
+  }
+};
