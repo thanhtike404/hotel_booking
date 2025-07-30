@@ -40,17 +40,21 @@ interface DataTableProps<TData extends RowWithId, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   isLoading?: boolean;
+  onSelectionChange?: (selectedIds: string[]) => void;
+  batchActions?: React.ReactNode;
 }
 
 export function DataTable<TData extends RowWithId, TValue>({
   columns,
   data,
   isLoading,
+  onSelectionChange,
+  batchActions,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
-    const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   const table = useReactTable({
     data,
@@ -58,30 +62,26 @@ export function DataTable<TData extends RowWithId, TValue>({
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onColumnFiltersChange: setColumnFilters,
-     onRowSelectionChange: setRowSelection,
+    onRowSelectionChange: setRowSelection,
     getFilteredRowModel: getFilteredRowModel(),
-   enableRowSelection: true,
+    enableRowSelection: true,
     state: {
       columnFilters,
-          rowSelection,
+      rowSelection,
     },
   });
 
   // Number of loading rows to show
   const loadingRowCount = 5;
 
-  const handleDeleteSelected =async () => {
-    // Get the array of selected row objects
-    const selectedRows = table.getSelectedRowModel().rows;
-
-    // Map over the selected row objects to get their original Product.id
-    const selectedProductIds = selectedRows.map((row) => row.original.id);
-
-    console.log("Product IDs to delete:", selectedProductIds);
-
-   
-
-  };
+  // Update parent component when selection changes
+  React.useEffect(() => {
+    if (onSelectionChange) {
+      const selectedRows = table.getSelectedRowModel().rows;
+      const selectedIds = selectedRows.map((row) => String(row.original.id));
+      onSelectionChange(selectedIds);
+    }
+  }, [rowSelection, onSelectionChange, table]);
 
   return (
     <div className="rounded-md border relative">
@@ -112,16 +112,7 @@ export function DataTable<TData extends RowWithId, TValue>({
                 disabled={isLoading}
               />
             ))}
-             {Object.keys(rowSelection).length > 0 && (
-            <Button
-              variant="destructive" // Use a destructive variant for delete
-              onClick={handleDeleteSelected}
-              // Disable if no items are selected
-              disabled={Object.keys(rowSelection).length === 0}
-            >
-              Delete Selected ({Object.keys(rowSelection).length})
-            </Button>
-          )}
+          {batchActions}
         </div>
 
         {/* Right - Date Filters */}

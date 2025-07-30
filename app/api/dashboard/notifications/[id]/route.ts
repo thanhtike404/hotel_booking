@@ -5,8 +5,8 @@ export const GET = async (
   { params }: { params: { id: string } }
 ) => {
   try {
-    const {id} =await params;
- 
+    const { id } = await params;
+
     const notifications = await prisma.notification.findMany({
       where: {
         userId: id,
@@ -61,7 +61,7 @@ export const DELETE = async (
 ) => {
   try {
     const { id } = await params;
-    
+
     await prisma.notification.delete({
       where: {
         id,

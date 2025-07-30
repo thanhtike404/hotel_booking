@@ -3,9 +3,11 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { signIn, signOut, useSession } from 'next-auth/react'
-import { Menu, X, UserCircle2 } from 'lucide-react'
+import { Menu, X, UserCircle2, Bell } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useNotifications } from '@/hooks/dashboard/useNotifications'
 
 const navLinks = [
   { name: 'Hotels', href: '/hotels' },
@@ -16,7 +18,9 @@ const navLinks = [
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
+  const [notificationOpen, setNotificationOpen] = useState(false)
   const { data: session } = useSession()
+  const { data: notifications = [], isLoading } = useNotifications(session?.user?.id || "")
 
   return (
     <nav className="fixed w-full top-0 z-50 bg-white text-black  dark:text-white dark:bg-black shadow-md">
@@ -31,6 +35,75 @@ export default function Navbar() {
               {link.name}
             </Link>
           ))}
+
+          {/* Notification button */}
+          {session && (
+            <div className="relative">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setNotificationOpen((prev) => !prev)}
+                className="relative"
+              >
+                <Bell className="w-6 h-6" />
+                {notifications.filter(notification => !notification.isRead).length > 0 && (
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                  >
+                    {notifications.filter(notification => !notification.isRead).length}
+                  </Badge>
+                )}
+              </Button>
+
+              <AnimatePresence>
+                {notificationOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 border rounded-md shadow-lg z-50 max-h-96 overflow-y-auto"
+                  >
+                    <div className="p-4 border-b">
+                      <h3 className="font-semibold text-gray-900 dark:text-white">Notifications</h3>
+                    </div>
+                    <div className="p-2">
+                      {isLoading ? (
+                        <p className="text-center py-4 text-gray-500">Loading notifications...</p>
+                      ) : notifications.length === 0 ? (
+                        <p className="text-center py-4 text-gray-500">No notifications</p>
+                      ) : (
+                        notifications.slice(0, 5).map(notification => (
+                          <div 
+                            key={notification.id} 
+                            className={`p-3 rounded-md mb-2 ${
+                              !notification.isRead 
+                                ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500' 
+                                : 'bg-gray-50 dark:bg-gray-700/50'
+                            }`}
+                          >
+                            <p className="text-sm text-gray-900 dark:text-white">{notification.message}</p>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              {new Date(notification.createdAt).toLocaleString()}
+                            </span>
+                          </div>
+                        ))
+                      )}
+                      {notifications.length > 5 && (
+                        <Link 
+                          href="/dashboard/notifications"
+                          className="block text-center py-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
+                          onClick={() => setNotificationOpen(false)}
+                        >
+                          View all notifications
+                        </Link>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
 
           {/* Profile button */}
           {session ? (

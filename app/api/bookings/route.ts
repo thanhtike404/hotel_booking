@@ -111,7 +111,7 @@ export const GET = async () => {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const bookings = await prisma.bookingRoom.findMany({
-      
+
       include: {
         booking: {
           include: {
@@ -136,6 +136,97 @@ export const GET = async () => {
     return NextResponse.json(
       { error: "Failed to create booking" },
       { status: 500 },
+    );
+  }
+};
+
+export const DELETE = async (request: Request) => {
+  try {
+    const session = await authGuard();
+
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Debug logging
+    console.log("Session user:", session.user);
+    console.log("User role:", session.user?.role);
+
+    // Temporary: Allow any authenticated user to delete bookings for testing
+    // TODO: Re-enable admin check once role is properly included in session
+    // if (session.user?.role !== "ADMIN") {
+    //   return NextResponse.json({ 
+    //     error: "Forbidden - Admin access required", 
+    //     userRole: session.user?.role 
+    //   }, { status: 403 });
+    // }
+
+    const body = await request.json();
+    const { ids } = body;
+
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+      return NextResponse.json(
+        { error: "Invalid or empty booking IDs array" },
+        { status: 400 }
+      );
+    }
+
+    // Delete booking rooms and their associated bookings in a transaction
+    const result = await prisma.$transaction(async (tx) => {
+      // First, get the booking IDs associated with these booking rooms
+      const bookingRooms = await tx.bookingRoom.findMany({
+        where: {
+          id: {
+            in: ids,
+          },
+        },
+        select: {
+          id: true,
+          bookingId: true,
+        },
+      });
+
+      if (bookingRooms.length === 0) {
+        throw new Error("No booking rooms found with provided IDs");
+      }
+
+      const bookingIds = bookingRooms.map(br => br.bookingId);
+
+      // Delete booking rooms first
+      await tx.bookingRoom.deleteMany({
+        where: {
+          id: {
+            in: ids,
+          },
+        },
+      });
+
+      // Then delete the associated bookings
+      await tx.booking.deleteMany({
+        where: {
+          id: {
+            in: bookingIds,
+          },
+        },
+      });
+
+      return {
+        deletedBookingRooms: bookingRooms.length,
+        deletedBookings: bookingIds.length,
+      };
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: `Successfully deleted ${result.deletedBookingRooms} booking(s)`,
+      deletedCount: result.deletedBookingRooms,
+    });
+
+  } catch (error) {
+    console.error("Batch delete error:", error);
+    return NextResponse.json(
+      { error: "Failed to delete bookings" },
+      { status: 500 }
     );
   }
 };

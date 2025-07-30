@@ -38,12 +38,12 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid password");
         }
 
-        // Return user object with id
+        // Return user object with id and role
         return {
           id: user.id,  // This is crucial
           email: user.email,
           name: user.name,
-        // Assuming you have a role field
+          role: user.role, // Include the user's role
           // Include any other user fields you need
         };
       }
@@ -59,10 +59,12 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      // Add user id to the session
+      // Add user id and role to the session
       if (session.user) {
         // @ts-ignore
         session.user.id = token.id as string;
+        // @ts-ignore
+        session.user.role = token.role as string;
       }
       return session;
     },
