@@ -45,9 +45,16 @@ export const sendBookingNotificationToAdmins = async (
     roomName: string;
     checkIn: string;
     checkOut: string;
-  }
+  },
+  status: 'REQUESTED' | 'ACCEPTED' | 'REJECTED' = 'REQUESTED'
 ) => {
-  const message = `New booking received! ${bookingDetails.guestName} (${bookingDetails.guestEmail}) booked ${bookingDetails.roomName} at ${bookingDetails.hotelName} from ${new Date(bookingDetails.checkIn).toLocaleDateString()} to ${new Date(bookingDetails.checkOut).toLocaleDateString()}. Booking ID: ${bookingDetails.bookingId}`;
+  const statusMessages = {
+    REQUESTED: `New booking request from ${bookingDetails.guestName} (${bookingDetails.guestEmail}) for ${bookingDetails.roomName} at ${bookingDetails.hotelName} from ${new Date(bookingDetails.checkIn).toLocaleDateString()} to ${new Date(bookingDetails.checkOut).toLocaleDateString()}. Booking ID: ${bookingDetails.bookingId}`,
+    ACCEPTED: `Booking ${bookingDetails.bookingId} has been accepted for ${bookingDetails.guestName} at ${bookingDetails.hotelName}`,
+    REJECTED: `Booking ${bookingDetails.bookingId} has been rejected for ${bookingDetails.guestName} at ${bookingDetails.hotelName}`
+  };
+
+  const message = statusMessages[status];
 
   const notifications = await Promise.all(
     adminUserIds.map(userId =>
@@ -56,10 +63,69 @@ export const sendBookingNotificationToAdmins = async (
         userId,
         message,
         type: 'booking',
-        data: bookingDetails
+        data: { 
+          ...bookingDetails,
+          status
+        }
       })
     )
   );
 
   return notifications;
 };
+export const updateBookingNotificationStatus = async (
+  bookingId: string,
+  status: 'ACCEPTED' | 'REJECTED',
+  adminUserIds: string[],
+  bookingDetails: {
+    bookingId: string;
+    guestName: string;
+    guestEmail: string;
+    hotelName: string;
+    roomName: string;
+    checkIn: string;
+    checkOut: string;
+  }
+) => {
+  // Send notification to admins about the status change
+  const notifications = await sendBookingNotificationToAdmins(
+    adminUserIds,
+    bookingDetails,
+    status
+  );
+
+  return notifications;
+};
+
+export const sendBookingStatusUpdateToGuest = async (
+  guestUserId: string,
+  bookingDetails: {
+    bookingId: string;
+    guestName: string;
+    hotelName: string;
+    roomName: string;
+    checkIn: string;
+    checkOut: string;
+  },
+  status: 'ACCEPTED' | 'REJECTED'
+) => {
+  const statusMessages = {
+    ACCEPTED: `Great news! Your booking at ${bookingDetails.hotelName} has been confirmed. Booking ID: ${bookingDetails.bookingId}`,
+    REJECTED: `We're sorry, but your booking request at ${bookingDetails.hotelName} has been declined. Booking ID: ${bookingDetails.bookingId}`
+  };
+
+  const message = statusMessages[status];
+
+  const notification = await sendWebSocketNotification({
+    action: 'sendNotification',
+    userId: guestUserId,
+    message,
+    type: 'booking_status',
+    data: { 
+      ...bookingDetails,
+      status
+    }
+  });
+
+  return notification;
+}

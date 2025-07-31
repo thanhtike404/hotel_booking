@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardTitle } from "@/components/ui/card";
 import { useNotifications, useDeleteNotification } from "@/hooks/dashboard/useNotifications";
 import { BellRing, Check, Trash2 } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -13,7 +13,7 @@ export default function Page() {
   
   const { data: notifications = [], isLoading } = useNotifications(userId || "");
   const deleteNotificationMutation = useDeleteNotification(userId || "");
-
+  console.log(notifications)
   const handleDeleteNotification = async (notificationId: string) => {
     setDeletingIds(prev => new Set(prev).add(notificationId));
     
@@ -36,7 +36,7 @@ export default function Page() {
         <h1 className="text-3xl font-bold mb-6">Notifications</h1>
         <div className="grid gap-4">
           {[...Array(3)].map((_, index) => (
-            <Card key={index} className="flex items-start p-4">
+            <Card key={`loading-skeleton-${index}`} className="flex items-start p-4">
               <div className="mt-1 mr-4 h-6 w-6 bg-gray-200 animate-pulse rounded-full" />
               <div className="flex-1">
                 <div className="h-6 w-3/4 bg-gray-200 animate-pulse rounded mb-2" />

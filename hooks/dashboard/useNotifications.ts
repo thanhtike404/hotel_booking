@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getNotifications, deleteNotification } from "@/services/notification";
+import { getNotifications, deleteNotification, updateNotificationStatus } from "@/services/notification";
 import { Notification } from "@prisma/client";
 export const notificationsQueryKey = (userId: string) => ['notifications', userId];
 
@@ -26,6 +26,25 @@ export const useDeleteNotification = (userId: string) => {
     },
     onError: (error) => {
       console.error("Error deleting notification:", error);
+    }
+  });
+};
+export const useUpdateNotificationStatus = (userId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ notificationId, status }: {
+      notificationId: string;
+      status: 'REQUESTED' | 'ACCEPTED' | 'REJECTED'
+    }) => updateNotificationStatus(notificationId, status),
+    onSuccess: () => {
+      // Invalidate and refetch notifications after successful status update
+      queryClient.invalidateQueries({
+        queryKey: notificationsQueryKey(userId)
+      });
+    },
+    onError: (error) => {
+      console.error("Error updating notification status:", error);
     }
   });
 };

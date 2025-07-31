@@ -27,3 +27,49 @@ export const deleteNotification = async (notificationId: string) => {
     throw error;
   }
 };
+export const updateNotificationStatus = async (
+  notificationId: string, 
+  status: 'REQUESTED' | 'ACCEPTED' | 'REJECTED'
+) => {
+  try {
+    const response = await axios.patch(`/api/notifications/${notificationId}/status`, {
+      status
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log("Updated notification status:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating notification status:", error);
+    throw error;
+  }
+};
+
+export const createBookingNotification = async (
+  userId: string,
+  message: string,
+  bookingId: string,
+  status: 'REQUESTED' | 'ACCEPTED' | 'REJECTED' = 'REQUESTED'
+) => {
+  try {
+    const response = await axios.post('/api/notifications', {
+      userId,
+      message,
+      bookingId,
+      status
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log("Created booking notification:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating booking notification:", error);
+    throw error;
+  }
+};

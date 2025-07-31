@@ -6,6 +6,8 @@ import { z } from "zod";
 const notificationSchema = z.object({
   userId: z.string().min(1),
   message: z.string().min(1),
+  bookingId: z.string().optional(),
+  status: z.enum(['REQUESTED', 'ACCEPTED', 'REJECTED']).optional(),
 });
 
 export async function POST(request: Request) {
@@ -27,13 +29,15 @@ export async function POST(request: Request) {
       );
     }
 
-    const { userId, message } = validation.data;
+    const { userId, message, bookingId, status } = validation.data;
 
     // Create notification
     const notification = await prisma.notification.create({
       data: {
         userId,
         message,
+        bookingId,
+        status,
         isRead: false,
       },
     });
@@ -57,7 +61,11 @@ export async function POST(request: Request) {
 }
 
 // Helper function to send notification to all admin users
-export async function sendNotificationToAdmins(message: string) {
+export async function sendNotificationToAdmins(
+  message: string, 
+  bookingId?: string, 
+  status?: 'REQUESTED' | 'ACCEPTED' | 'REJECTED'
+) {
   try {
     // Get all admin users
     const adminUsers = await prisma.user.findMany({
@@ -76,6 +84,8 @@ export async function sendNotificationToAdmins(message: string) {
           data: {
             userId: admin.id,
             message,
+            bookingId,
+            status,
             isRead: false,
           },
         })

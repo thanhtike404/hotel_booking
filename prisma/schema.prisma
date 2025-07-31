@@ -88,17 +88,18 @@ model Review {
 }
 
 model Booking {
-  id        String        @id @default(cuid())
-  hotelId   String
-  userId    String
-  checkIn   DateTime
-  checkOut  DateTime
-  status    String
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  hotel     Hotel         @relation(fields: [hotelId], references: [id])
-  user      User          @relation(fields: [userId], references: [id])
-  rooms     BookingRoom[]
+  id            String         @id @default(cuid())
+  hotelId       String
+  userId        String
+  checkIn       DateTime
+  checkOut      DateTime
+  status        BookingStatus  @default(PENDING)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  hotel         Hotel          @relation(fields: [hotelId], references: [id])
+  user          User           @relation(fields: [userId], references: [id])
+  rooms         BookingRoom[]
+  notifications Notification[]
 }
 
 model Room {
@@ -137,12 +138,15 @@ model Destination {
 }
 
 model Notification {
-  id        String   @id @default(cuid())
-  userId    String
-  message   String
-  isRead    Boolean  @default(false)
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          String              @id @default(cuid())
+  userId      String
+  message     String
+  isRead      Boolean             @default(false)
+  bookingId   String?
+  status      NotificationStatus? @default(REQUESTED)
+  createdAt   DateTime            @default(now())
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  booking     Booking?            @relation(fields: [bookingId], references: [id], onDelete: SetNull)
 }
 
 model Country {
@@ -173,4 +177,18 @@ enum RoomType {
 enum Role {
   USER
   ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
+  CANCELLED
+  COMPLETED
+}
+
+enum NotificationStatus {
+  REQUESTED
+  ACCEPTED
+  REJECTED
 }
