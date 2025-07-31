@@ -61,7 +61,7 @@ export default function Page() {
         </Card>
       ) : (
         <div className="grid gap-4">
-          {notifications.map((notification) => (
+          {notifications?.map((notification) => (
             <Card key={notification.id} className="flex items-start p-4">
               <BellRing className="mt-1 mr-4 h-6 w-6 text-blue-500" />
               <div className="flex-1">

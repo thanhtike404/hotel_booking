@@ -83,8 +83,11 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
         setConnectionState("connected");
         reconnectAttemptsRef.current = 0; // Reset reconnection attempts
       };
+   
+
 
       ws.current.onmessage = (event) => {
+        console.log(event,' web socekt connection event')
         try {
           const data = JSON.parse(event.data);
           console.log("📩 WS Message:", data);

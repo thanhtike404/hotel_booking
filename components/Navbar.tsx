@@ -20,7 +20,8 @@ export default function Navbar() {
   const [profileOpen, setProfileOpen] = useState(false)
   const [notificationOpen, setNotificationOpen] = useState(false)
   const { data: session } = useSession()
-  const { data: notifications = [], isLoading } = useNotifications(session?.user?.id || "")
+  const { data: notifications = [], isLoading } = useNotifications(false)??[];
+
 
   return (
     <nav className="fixed w-full top-0 z-50 bg-white text-black  dark:text-white dark:bg-black shadow-md">
@@ -46,14 +47,17 @@ export default function Navbar() {
                 className="relative"
               >
                 <Bell className="w-6 h-6" />
-                {notifications.filter(notification => !notification.isRead).length > 0 && (
-                  <Badge 
-                    variant="destructive" 
-                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-                  >
-                    {notifications.filter(notification => !notification.isRead).length}
-                  </Badge>
-                )}
+                {(() => {
+                  const unreadCount = notifications.filter(notification => !notification.isRead).length;
+                  return unreadCount > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                    >
+                      {unreadCount}
+                    </Badge>
+                  );
+                })()}
               </Button>
 
               <AnimatePresence>
@@ -74,13 +78,12 @@ export default function Navbar() {
                         <p className="text-center py-4 text-gray-500">No notifications</p>
                       ) : (
                         notifications.slice(0, 5).map(notification => (
-                          <div 
-                            key={notification.id} 
-                            className={`p-3 rounded-md mb-2 ${
-                              !notification.isRead 
-                                ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500' 
+                          <div
+                            key={notification.id}
+                            className={`p-3 rounded-md mb-2 ${!notification.isRead
+                                ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500'
                                 : 'bg-gray-50 dark:bg-gray-700/50'
-                            }`}
+                              }`}
                           >
                             <p className="text-sm text-gray-900 dark:text-white">{notification.message}</p>
                             <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -90,7 +93,7 @@ export default function Navbar() {
                         ))
                       )}
                       {notifications.length > 5 && (
-                        <Link 
+                        <Link
                           href="/dashboard/notifications"
                           className="block text-center py-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
                           onClick={() => setNotificationOpen(false)}
@@ -204,6 +207,7 @@ export default function Navbar() {
                 {session ? (
                   <>
                     <Link
+                      key="dashboard-link"
                       href="/dashboard"
                       onClick={() => setIsOpen(false)}
                       className="text-gray-700 hover:text-black"
@@ -211,6 +215,7 @@ export default function Navbar() {
                       Dashboard
                     </Link>
                     <Button
+                      key="sign-out-button"
                       variant="ghost"
                       className="text-left px-0 text-red-600"
                       onClick={() => {
@@ -222,7 +227,7 @@ export default function Navbar() {
                     </Button>
                   </>
                 ) : (
-                  <Button onClick={() => signIn()}>Sign In</Button>
+                  <Button key="sign-in-button" onClick={() => signIn()}>Sign In</Button>
                 )}
               </nav>
             </motion.div>

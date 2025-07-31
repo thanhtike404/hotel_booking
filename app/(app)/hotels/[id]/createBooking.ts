@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { z } from "zod";
+import { useWebSocket } from "@/providers/webSocketProvider";
 
 // Define TypeScript interface for booking data
 interface BookingData {

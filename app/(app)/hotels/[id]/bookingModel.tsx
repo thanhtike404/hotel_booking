@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
+import { useWebSocket } from "@/providers/webSocketProvider";
 import {
     Dialog,
     DialogContent,
@@ -26,7 +27,6 @@ import { BookingSummary } from "./booking-summary";
 import { HotelInfo } from "./hotel-info";
 import { useCreateBooking } from "./createBooking";
 
-
 interface BookingModalProps {
     email: string | '';
     isOpen: boolean;
@@ -44,7 +44,8 @@ export default function BookingModal({
     hotelId,
     hotelName,
 }: BookingModalProps) {
-  
+    const { sendNotification, isConnected, connectionState } = useWebSocket();
+    const notificationSentRef = useRef(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
@@ -54,6 +55,9 @@ export default function BookingModal({
 
     useEffect(() => {
         if (isOpen && room) {
+            // Reset the notification ref when modal opens
+            notificationSentRef.current = false;
+            
             form.reset({
                 checkIn: new Date(),
                 checkOut: addDays(new Date(), 1),
@@ -65,8 +69,7 @@ export default function BookingModal({
             setError("");
             setSuccess(false);
         }
-    }, [isOpen, room, form]);
-
+    }, [isOpen, room, form, session?.user?.email, email]);
 
     async function onSubmit(values: BookingFormValues) {
         try {
@@ -81,15 +84,23 @@ export default function BookingModal({
             createBookingMutation(requestData, {
                 onSuccess: () => {
                     setSuccess(true);
+                    
+                    // Send notification only once per booking
+                    if (!notificationSentRef.current) {
+                        notificationSentRef.current = true;
                         try {
-                           
+                            console.log('Sending notification...');
+                            sendNotification({
+                                action: "sendNotification",
+                                userId: session?.user?.id || '',
+                                message: "📢 Hello from client!",
+                            });
                         } catch (error) {
                             console.error("Error sending notification:", error);
-                            
                         }
+                    }
 
                     setTimeout(() => onClose(), 2000);
-
                 },
                 onError: (error: any) => {
                     setError(error?.message || "Failed to create booking");
@@ -124,6 +135,7 @@ export default function BookingModal({
             nights,
         }
     }
+
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-[500px]">
@@ -201,6 +213,7 @@ export default function BookingModal({
                                     )}
                                 />
                             </div>
+
                             <FormField
                                 control={form.control}
                                 name="phone"
@@ -214,7 +227,6 @@ export default function BookingModal({
                                     </FormItem>
                                 )}
                             />
-
 
                             <FormField
                                 control={form.control}
@@ -235,8 +247,6 @@ export default function BookingModal({
                                     </FormItem>
                                 )}
                             />
-
-                            {/* Other form fields remain similar */}
 
                             {form.watch("checkIn") && form.watch("checkOut") && (
                                 <BookingSummary room={room} checkIn={form.watch("checkIn")} checkOut={form.watch("checkOut")} />

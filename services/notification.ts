@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const getNotifications = async (userId: string) => {
   try {
-    const response = await axios.get('/api/dashboard/notifications/', {
+    const response = await axios.get('/api/dashboard/notifications', {
       headers: {
         'Content-Type': 'application/json',
       },
