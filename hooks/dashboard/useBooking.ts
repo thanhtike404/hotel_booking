@@ -1,5 +1,23 @@
-// hooks/useBooking.ts
 import { useQuery } from '@tanstack/react-query'
+import axios from 'axios'
+
+interface Hotel {
+  id: string
+  name: string
+  rating: number
+  city: {
+    name: string
+    country: {
+      name: string
+    }
+  }
+}
+
+interface User {
+  id: string
+  name: string
+  email: string
+}
 
 interface Booking {
   id: string
@@ -10,6 +28,14 @@ interface Booking {
   status: string
   createdAt: string
   updatedAt: string
+  hotel: Hotel
+  user: User
+  notifications: Array<{
+    id: string
+    message: string
+    status: string
+    createdAt: string
+  }>
 }
 
 interface Room {
@@ -27,29 +53,27 @@ interface Room {
 }
 
 interface BookingResponse {
-  id: string
-  bookingId: string
-  roomId: string
-  booking: Booking
-  room: Room
+  success: boolean
+  booking: {
+    id: string
+    bookingId: string
+    roomId: string
+    booking: Booking
+    room: Room
+  }
 }
 
 async function fetchBooking(bookingId: string): Promise<BookingResponse> {
-  const response = await fetch(`http://localhost:3000/api/bookings/${bookingId}`)
-  
-  if (!response.ok) {
-    throw new Error('Failed to fetch booking')
-  }
-  
-  return response.json()
+  const response = await axios.get(`/api/bookings/${bookingId}`)
+  return response.data
 }
 
 export function useBooking(bookingId: string) {
   return useQuery({
     queryKey: ['booking', bookingId],
     queryFn: () => fetchBooking(bookingId),
-    enabled: !!bookingId, // Only run query if bookingId exists
-    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+    enabled: !!bookingId,
+    staleTime: 5 * 60 * 1000,
     retry: 3,
   })
 }

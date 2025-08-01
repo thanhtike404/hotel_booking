@@ -9,6 +9,7 @@ import { Eye, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import { BookingStatusSelect } from "@/components/dashboard/BookingStatusSelect";
 
 export interface Booking {
   id: string;
@@ -114,6 +115,16 @@ export const columns: ColumnDef<Booking, unknown>[] = [
     },
   },
   {
+    accessorKey: "booking.status",
+    header: "Booking Status",
+    cell: ({ row }) => (
+      <BookingStatusSelect
+        bookingId={row.original.booking.id}
+        currentStatus={row.original.booking.status}
+      />
+    ),
+  },
+  {
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {
@@ -144,7 +155,7 @@ export const columns: ColumnDef<Booking, unknown>[] = [
             size="icon"
             className="text-destructive"
             onClick={() => {
-              if (confirm("Are you sure you want to delete this hotel?")) {
+              if (confirm("Are you sure you want to delete this booking?")) {
                 deleteHotel.mutate(row.original.booking.hotel.id);
               }
             }}

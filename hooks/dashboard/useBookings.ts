@@ -33,3 +33,23 @@ export const useBatchDeleteBookings = () => {
     }
   });
 };
+
+export const useUpdateBookingStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ bookingId, status }: { bookingId: string; status: string }) => {
+      const response = await axios.patch(`/api/bookings/${bookingId}`, { status });
+      return response.data;
+    },
+    onSuccess: () => {
+      // Invalidate and refetch bookings after successful update
+      queryClient.invalidateQueries({
+        queryKey: bookingsQueryKey
+      });
+    },
+    onError: (error) => {
+      console.error("Error updating booking status:", error);
+    }
+  });
+};

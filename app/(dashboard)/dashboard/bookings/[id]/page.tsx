@@ -1,58 +1,21 @@
 'use client'
-import React from "react";
-import {use} from 'react'
-import { ArrowLeft, Hotel, CalendarDays, User, Wifi, Snowflake, Bath, Tv, Wine } from "lucide-react";
+import React, { use } from "react";
+import { ArrowLeft, Hotel, CalendarDays, User } from "lucide-react";
 import { useBooking } from "@/hooks/dashboard/useBooking";
-import { BookingDetail } from "@/types/bookings";
-// Fixed calculation function with correct syntax
-function calculateTotalPrice(bookingData: BookingDetail | null): number {
-  if (!bookingData || !bookingData.room || !bookingData.booking) return 0;
-  
-  const checkIn = new Date(bookingData.booking.checkIn);
-  const checkOut = new Date(bookingData.booking.checkOut);
-  
-  if (isNaN(checkIn.getTime())) return 0;
-  if (isNaN(checkOut.getTime())) return 0;
-  
-  const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
-  return bookingData.room.price * nights;
-}
-function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-}
+import { calculateTotalPrice, formatDate, formatDateShort, amenityIcons } from "@/lib/bookingUtils";
 
-function formatDateShort(dateString: string) {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  });
-}
-
-const amenityIcons: Record<string, React.FC<any>> = {
-  "Free WiFi": Wifi,
-  "Air Conditioning": Snowflake,
-  "Private Bathroom": Bath,
-  "TV": Tv,
-  "Mini Bar": Wine
-};
-
-export default function BookingDetailUI({ params }: { params: { id: string } }) {
-  const { id } =use(params);
-  const { data: bookingData, isLoading, error } = useBooking(id);
+export default function BookingDetailUI({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const { data: response, isLoading, error } = useBooking(id);
 
   if (isLoading) return <LoadingSpinner />;
   if (error) return <ErrorDisplay error={error} />;
-  if (!bookingData) return <NotFound />;
+  if (!response?.booking) return <NotFound />;
 
+  const bookingData = response.booking;
   const totalPrice = calculateTotalPrice(bookingData);
   const nights = Math.ceil(
-    (new Date(bookingData.booking.checkOut) - new Date(bookingData.booking.checkIn)) / 
+    (new Date(bookingData.booking.checkOut).getTime() - new Date(bookingData.booking.checkIn).getTime()) /
     (1000 * 60 * 60 * 24)
   );
 
@@ -61,7 +24,7 @@ export default function BookingDetailUI({ params }: { params: { id: string } }) 
       {/* Header */}
       <div className="border-b shadow-sm">
         <div className="max-w-7xl mx-auto flex h-16 items-center px-4">
-          <button 
+          <button
             className="flex items-center gap-2  hover: transition-colors"
             onClick={() => window.history.back()}
           >
@@ -74,40 +37,42 @@ export default function BookingDetailUI({ params }: { params: { id: string } }) 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
+
           {/* Left Column - Room Details */}
           <div className="lg:col-span-2 space-y-6">
             <div>
-              <h1 className="text-3xl font-bold  mb-2">
-                {bookingData.room.name}
+              <h1 className="text-3xl font-bold mb-2">
+                {bookingData.room?.name || 'Room Details'}
               </h1>
-              <p className="text-lg ">
-                {bookingData.room.roomType} • ${bookingData.room.price} per night
+              <p className="text-lg">
+                {bookingData.room?.roomType || 'N/A'} • ${bookingData.room?.price || 0} per night
               </p>
             </div>
-            
+
             <div className="relative">
               <img
-                src={bookingData.room.image}
-                alt={bookingData.room.name}
+                src={bookingData.room?.image || '/placeholder-room.jpg'}
+                alt={bookingData.room?.name || 'Room'}
                 className="w-full h-96 object-cover rounded-xl shadow-lg"
               />
-              <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-sm font-medium ${
-                bookingData.booking.status === 'confirmed' 
-                  ? 'bg-green-100 text-green-800' 
+              <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-sm font-medium ${bookingData.booking?.status === 'CONFIRMED'
+                  ? 'bg-green-100 text-green-800'
                   : 'bg-yellow-100 text-yellow-800'
-              }`}>
-                {bookingData.booking.status.charAt(0).toUpperCase() + bookingData.booking.status.slice(1)}
+                }`}>
+                {bookingData.booking?.status ?
+                  bookingData.booking.status.charAt(0).toUpperCase() + bookingData.booking.status.slice(1).toLowerCase()
+                  : 'Pending'
+                }
               </div>
             </div>
 
             {/* Amenities Section */}
-            <div className=" p-6 rounded-xl shadow-sm border">
-              <h3 className="text-xl font-semibold  mb-4">
+            <div className="p-6 rounded-xl shadow-sm border">
+              <h3 className="text-xl font-semibold mb-4">
                 Room Amenities
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {bookingData.room.amenities.map((amenity, index) => {
+                {(bookingData.room?.amenities || []).map((amenity, index) => {
                   const Icon = amenityIcons[amenity] || Hotel;
                   return (
                     <div key={index} className="flex items-center gap-3 text-gray-700">
@@ -120,21 +85,22 @@ export default function BookingDetailUI({ params }: { params: { id: string } }) 
             </div>
 
             {/* Availability Section */}
-            <div className=" p-6 rounded-xl shadow-sm border">
-              <h3 className="text-xl font-semibold  mb-4">
+            <div className="p-6 rounded-xl shadow-sm border">
+              <h3 className="text-xl font-semibold mb-4">
                 Availability
               </h3>
               <div className="flex items-center gap-4">
-                <div className="text-sm ">
-                  <span className="font-medium ">
-                    {bookingData.room.available}
-                  </span> of {bookingData.room.total} rooms available
+                <div className="text-sm">
+                  <span className="font-medium">
+                    {bookingData.room?.available || 0}
+                  </span> of {bookingData.room?.total || 0} rooms available
                 </div>
                 <div className="flex-1 bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-blue-600 h-2 rounded-full" 
+                  <div
+                    className="bg-blue-600 h-2 rounded-full"
                     style={{
-                      width: `${(bookingData.room.available / bookingData.room.total) * 100}%`
+                      width: `${bookingData.room?.available && bookingData.room?.total ?
+                        (bookingData.room.available / bookingData.room.total) * 100 : 0}%`
                     }}
                   />
                 </div>
@@ -148,14 +114,14 @@ export default function BookingDetailUI({ params }: { params: { id: string } }) 
               <h3 className="text-xl font-semibold  mb-6">
                 Booking Summary
               </h3>
-              
+
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <CalendarDays className="h-5 w-5 text-blue-600 mt-0.5" />
                   <div>
-                    <p className="font-medium ">Check-in</p>
-                    <p className="text-sm ">
-                      {formatDateShort(bookingData.booking.checkIn)}
+                    <p className="font-medium">Check-in</p>
+                    <p className="text-sm">
+                      {bookingData.booking?.checkIn ? formatDateShort(bookingData.booking.checkIn) : 'N/A'}
                     </p>
                   </div>
                 </div>
@@ -163,9 +129,9 @@ export default function BookingDetailUI({ params }: { params: { id: string } }) 
                 <div className="flex items-start gap-3">
                   <CalendarDays className="h-5 w-5 text-blue-600 mt-0.5" />
                   <div>
-                    <p className="font-medium ">Check-out</p>
-                    <p className="text-sm ">
-                      {formatDateShort(bookingData.booking.checkOut)}
+                    <p className="font-medium">Check-out</p>
+                    <p className="text-sm">
+                      {bookingData.booking?.checkOut ? formatDateShort(bookingData.booking.checkOut) : 'N/A'}
                     </p>
                   </div>
                 </div>
@@ -173,9 +139,9 @@ export default function BookingDetailUI({ params }: { params: { id: string } }) 
                 <div className="flex items-start gap-3">
                   <Hotel className="h-5 w-5 text-blue-600 mt-0.5" />
                   <div>
-                    <p className="font-medium ">Room Type</p>
-                    <p className="text-sm ">
-                      {bookingData.room.roomType}
+                    <p className="font-medium">Room Type</p>
+                    <p className="text-sm">
+                      {bookingData.room?.roomType || 'N/A'}
                     </p>
                   </div>
                 </div>
@@ -183,9 +149,9 @@ export default function BookingDetailUI({ params }: { params: { id: string } }) 
                 <div className="flex items-start gap-3">
                   <User className="h-5 w-5 text-blue-600 mt-0.5" />
                   <div>
-                    <p className="font-medium ">Booking ID</p>
-                    <p className="text-sm  font-mono">
-                      {bookingData.booking.id.slice(-8)}
+                    <p className="font-medium">Booking ID</p>
+                    <p className="text-sm font-mono">
+                      {bookingData.booking?.id ? bookingData.booking.id.slice(-8) : 'N/A'}
                     </p>
                   </div>
                 </div>
@@ -194,13 +160,13 @@ export default function BookingDetailUI({ params }: { params: { id: string } }) 
               <div className="border-t pt-4 mt-6">
                 <div className="flex justify-between items-center mb-2">
                   <span className="">
-                    ${bookingData.room.price} × {nights} nights
+                    ${bookingData.room?.price || 0} × {nights} nights
                   </span>
                   <span className="">
-                    ${bookingData.room.price * nights}
+                    ${(bookingData.room?.price || 0) * nights}
                   </span>
                 </div>
-                <div className="flex justify-between items-center text-lg font-semibold  pt-2 border-t">
+                <div className="flex justify-between items-center text-lg font-semibold pt-2 border-t">
                   <span>Total</span>
                   <span className="text-blue-600">${totalPrice}</span>
                 </div>
@@ -215,24 +181,24 @@ export default function BookingDetailUI({ params }: { params: { id: string } }) 
               <div className="space-y-3 text-sm">
                 <div>
                   <span className="font-medium text-gray-700">Check-in Date:</span>
-                  <p className=" mt-1">
-                    {formatDate(bookingData.booking.checkIn)}
+                  <p className="mt-1">
+                    {bookingData.booking?.checkIn ? formatDate(bookingData.booking.checkIn) : 'N/A'}
                   </p>
                 </div>
                 <div>
                   <span className="font-medium text-gray-700">Check-out Date:</span>
-                  <p className=" mt-1">
-                    {formatDate(bookingData.booking.checkOut)}
+                  <p className="mt-1">
+                    {bookingData.booking?.checkOut ? formatDate(bookingData.booking.checkOut) : 'N/A'}
                   </p>
                 </div>
                 <div>
                   <span className="font-medium text-gray-700">Nights:</span>
-                  <p className=" mt-1">{nights} nights</p>
+                  <p className="mt-1">{nights} nights</p>
                 </div>
                 <div>
                   <span className="font-medium text-gray-700">Booked on:</span>
-                  <p className=" mt-1">
-                    {formatDate(bookingData.booking.createdAt)}
+                  <p className="mt-1">
+                    {bookingData.booking?.createdAt ? formatDate(bookingData.booking.createdAt) : 'N/A'}
                   </p>
                 </div>
               </div>
