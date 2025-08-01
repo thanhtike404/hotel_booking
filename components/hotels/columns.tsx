@@ -6,9 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Star } from "lucide-react"
 import Image from "next/image"
 
-interface ColumnsProps {
-  onImageClick: (image: string) => void;
-}
+import { ColumnsProps } from "@/types/dashboard";
 
 export const columns = ({ onImageClick }: ColumnsProps): ColumnDef<Hotel>[] => [
   {

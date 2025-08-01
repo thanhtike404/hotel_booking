@@ -18,17 +18,14 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-interface Room {
+import { RoomListModalProps } from "@/types/rooms";
+
+interface RoomListRoom {
   id: string
   roomType: string
   available: number
   capacity: number
   pricePerNight: number
-}
-
-interface RoomListModalProps {
-  hotelId: string
-  rooms: Room[]
 }
 
 export function RoomListModal({ hotelId, rooms }: RoomListModalProps) {

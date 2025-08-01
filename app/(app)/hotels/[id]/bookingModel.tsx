@@ -27,14 +27,7 @@ import { BookingSummary } from "./booking-summary";
 import { HotelInfo } from "./hotel-info";
 import { useCreateBooking } from "./createBooking";
 
-interface BookingModalProps {
-    email: string | '';
-    isOpen: boolean;
-    onClose: () => void;
-    room: Room;
-    hotelId: string;
-    hotelName: string;
-}
+import { BookingModalProps } from "@/types/bookings";
 
 export default function BookingModal({
     email,

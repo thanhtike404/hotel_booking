@@ -6,9 +6,7 @@ import { ReactNode } from 'react'
 
 const queryClient = new QueryClient()
 
-interface QueryProviderProps {
-  children: ReactNode
-}
+import { QueryProviderProps } from "@/types/providers";
 
 export default function QueryProvider({ children }: QueryProviderProps) {
   

@@ -14,11 +14,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Search, X, Filter } from "lucide-react";
 import { useHotelsForFilter } from "@/hooks/dashboard/useRooms";
-
-interface RoomsFilterProps {
-  onFilterChange: (filters: any) => void;
-  isLoading?: boolean;
-}
+import { RoomsFilterProps } from "@/types/ui";
 
 export function RoomsFilter({ onFilterChange, isLoading }: RoomsFilterProps) {
   const [filters, setFilters] = useState({

@@ -12,10 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { useUpdateBookingStatus } from "@/hooks/dashboard/useBookings";
 import { useToast } from "@/hooks/use-toast";
 
-interface BookingStatusSelectProps {
-    bookingId: string;
-    currentStatus: string;
-}
+import { BookingStatusSelectProps } from "@/types/bookings";
 
 const statusConfig = {
     PENDING: { label: "Pending", variant: "secondary" as const, color: "bg-yellow-100 text-yellow-800" },

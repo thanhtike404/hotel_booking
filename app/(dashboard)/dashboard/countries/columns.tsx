@@ -3,12 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { Country } from "@prisma/client"
 import { Checkbox } from "@/components/ui/checkbox"
-type CountryCol = Country & {
-  cities?: {
-    id: string
-    name: string
-  }[]
-}
+import { CountryCol } from "@/types/dashboard";
 
 export const columns: ColumnDef<CountryCol>[] = [
   {

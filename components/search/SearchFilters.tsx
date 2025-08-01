@@ -14,16 +14,7 @@ import axios from "axios"
 import type { Country } from "@/types/country"
 import { City } from "@prisma/client"
 
-type SearchFiltersProps = {
-  searchQuery: string
-  setSearchQuery: (value: string) => void
-  rating: number
-  setRating: (value: number) => void
-  selectedCountryId: string
-  setSelectedCountryId: (value: string) => void
-  selectedCityId: string
-  setSelectedCityId: (value: string) => void
-}
+import { SearchFiltersProps } from "@/types/search";
 
 export function SearchFilters({
   searchQuery,

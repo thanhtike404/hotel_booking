@@ -5,15 +5,7 @@ import axios, { AxiosError } from "axios";
 import { z } from "zod";
 import { useWebSocket } from "@/providers/webSocketProvider";
 
-// Define TypeScript interface for booking data
-interface BookingData {
-    hotelId: string;
-    roomId: string;
-    checkIn: string;
-    checkOut: string;
-    customerName?: string;
-    customerPhone?: string;
-}
+import { BookingData } from "@/types/bookings";
 
 export const createBooking = async (requestData: BookingData) => {
     try {

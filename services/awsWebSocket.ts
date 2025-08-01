@@ -1,17 +1,6 @@
 import { ApiGatewayManagementApiClient, PostToConnectionCommand } from '@aws-sdk/client-apigatewaymanagementapi';
 import axios from 'axios';
-
-interface WebSocketMessage {
-    action: string;
-    userId: string;
-    message: string;
-    type?: string;
-    data?: any;
-    timestamp?: string;
-    id?: string;
-    isRead?: boolean;
-    createdAt?: string;
-}
+import { WebSocketMessage } from '@/types/websocket';
 
 // In-memory store for connection IDs (in production, use Redis or DynamoDB)
 const userConnections = new Map<string, string>();

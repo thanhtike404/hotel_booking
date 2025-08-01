@@ -7,11 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { format } from "date-fns"
 import { Hotel, Booking, Review, Room } from "@prisma/client"
 
-type HotelWithRelations = Hotel & {
-  rooms: Room[]
-  reviews: Review[]
-  bookings: Booking[]
-}
+import { HotelWithRelations } from "@/types/hotel";
 
 export default function HotelDetailClient({ hotel }: { hotel: HotelWithRelations | null }) {
   if (!hotel) {

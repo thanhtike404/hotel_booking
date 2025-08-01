@@ -1,10 +1,5 @@
 import { Room } from "@/types/rooms";
-
-interface BookingSummaryProps {
-    room: Room;
-    checkIn: Date;
-    checkOut: Date;
-}
+import { BookingSummaryProps } from "@/types/bookings";
 
 export const BookingSummary = ({ room, checkIn, checkOut }: BookingSummaryProps) => {
     const nights = Math.ceil(

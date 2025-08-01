@@ -49,14 +49,7 @@ const formSchema = z.object({
   phone: z.string().min(5, "Phone number is required"),
 });
 
-interface BookingModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  room: Room;
-  hotelId: string;
-  hotelName: string;
-  email: string;
-}
+import { BookingModalProps } from "@/types/bookings";
 
 export function BookingModal({
   email,

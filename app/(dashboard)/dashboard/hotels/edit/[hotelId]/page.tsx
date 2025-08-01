@@ -2,11 +2,7 @@ import { Suspense } from "react"
 import { getHotelById } from "@/lib/hotel-service"
 import HotelEditClient from "./HotelEditClient"
 
-interface HotelEditPageProps {
-  params: {
-    hotelId: string
-  }
-}
+import { HotelEditPageProps } from "@/types/hotel";
 
 export default async function HotelEditPage({ params }: HotelEditPageProps) {
   const { hotelId } =await params

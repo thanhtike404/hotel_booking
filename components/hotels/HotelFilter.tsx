@@ -1,30 +1,22 @@
-// components/search/SearchFilters.tsx
 "use client"
 
 import { Input } from "@/components/ui/input"
 import { Slider } from "@/components/ui/slider"
+import { HotelFilterProps } from "@/types/search";
 
-type Props = {
-    searchQuery: string
-    setSearchQuery: (val: string) => void
-    rating: number
-    setRating: (val: number) => void
-    selectedCountry: string
-    setSelectedCountry: (val: string) => void
-    selectedCity: string
-    setSelectedCity: (val: string) => void
-}
-
-export const SearchFilters = ({
+export const HotelFilter = ({
     searchQuery,
     setSearchQuery,
+    selectedCity,
+    setSelectedCity,
+    priceRange,
+    setPriceRange,
+    selectedAmenities,
+    setSelectedAmenities,
     rating,
     setRating,
-    selectedCountry,
-    setSelectedCountry,
-    selectedCity,
-    setSelectedCity
-}: Props) => {
+    cities
+}: HotelFilterProps) => {
     return (
         <div id="filters" className="space-y-6">
             <div>
@@ -33,8 +25,14 @@ export const SearchFilters = ({
             </div>
 
             <div>
-                <label className="block mb-1 text-sm font-medium">Country</label>
-                <Input value={selectedCountry} onChange={(e) => setSelectedCountry(e.target.value)} />
+                <label className="block mb-1 text-sm font-medium">Price Range: ${priceRange[0]} - ${priceRange[1]}</label>
+                <Slider
+                    min={0}
+                    max={1000}
+                    step={10}
+                    value={priceRange}
+                    onValueChange={setPriceRange}
+                />
             </div>
 
             <div>

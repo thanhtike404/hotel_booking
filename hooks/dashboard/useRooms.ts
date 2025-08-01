@@ -3,20 +3,13 @@ import axios from "axios";
 
 export const roomsQueryKey = ['dashboard', 'rooms'];
 
-interface RoomsFilters {
-  page?: number;
-  limit?: number;
-  name?: string;
-  hotelId?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  available?: number;
-}
+import { RoomsFilters } from '@/types/ui';
+
 
 export const useRooms = (filters: RoomsFilters = {}) => {
   const fetchRooms = async () => {
     const params = new URLSearchParams();
-    
+
     if (filters.page) params.append('page', filters.page.toString());
     if (filters.limit) params.append('limit', filters.limit.toString());
     if (filters.name) params.append('name', filters.name);

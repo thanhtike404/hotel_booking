@@ -1,12 +1,5 @@
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
-
-interface NotificationMessage {
-  action: string;
-  userId: string;
-  message: string;
-  type?: string;
-  data?: any;
-}
+import { NotificationMessage } from '@/types/websocket';
 
 export class SimpleWebSocketService {
   private lambdaClient: LambdaClient;

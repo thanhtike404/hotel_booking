@@ -7,15 +7,9 @@ import {
 import React from "react";
 import { dashboardData } from "@/data/dashboard";
 
-interface Booking {
-  id: number;
-  guestName: string;
-  roomType: string;
-  date: string;
-  status: string;
-}
+import { DashboardBooking, RoomStatus, CardProps } from "@/types/dashboard";
 
-const recentBookings: Booking[] = [
+const recentBookings: DashboardBooking[] = [
   {
     id: 1,
     guestName: "John Doe",
@@ -39,27 +33,12 @@ const recentBookings: Booking[] = [
   }
 ];
 
-interface RoomStatus {
-  type: string;
-  percentage: number;
-}
-
 const roomStatus: RoomStatus[] = [
   { type: "Occupied", percentage: 75 },
   { type: "Available", percentage: 25 },
   { type: "Under Maintenance", percentage: 10 },
   { type: "Reserved", percentage: 45 }
 ];
-
-interface CardProps {
-  title: string;
-  value: string | number;
-  icon: React.ElementType;
-  trend: {
-    direction: 'up' | 'down';
-    value: string;
-  };
-}
 
 function StatsCard({ title, value, icon, trend }: CardProps) {
   const isPositive = trend.direction === 'up';

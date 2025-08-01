@@ -31,30 +31,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-
-interface RowWithId {
-  id: string | number;
-}
-
-interface PaginationProps {
-  page: number;
-  limit: number;
-  totalCount: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-  onPageChange: (page: number) => void;
-  onPageSizeChange: (limit: number) => void;
-}
-
-interface DataTableProps<TData extends RowWithId, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-  isLoading?: boolean;
-  onSelectionChange?: (selectedIds: string[]) => void;
-  batchActions?: React.ReactNode;
-  pagination?: PaginationProps;
-}
+import { DataTableProps } from "@/types/ui";
+import { RowWithId } from "@/types/common";
 
 export function DataTable<TData extends RowWithId, TValue>({
   columns,

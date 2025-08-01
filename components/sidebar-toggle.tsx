@@ -2,9 +2,7 @@
 
 import { Menu } from "lucide-react";
 
-interface SidebarToggleProps {
-  onToggle: () => void;
-}
+import { SidebarToggleProps } from "@/types/ui";
 
 export function SidebarToggle({ onToggle }: SidebarToggleProps) {
   return (

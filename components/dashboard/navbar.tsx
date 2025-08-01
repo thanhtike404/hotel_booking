@@ -11,9 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 import { useNotifications } from "@/hooks/dashboard/useNotifications"
 import { useEffect, useState } from "react"
 
-interface NavbarProps {
-  onMenuClick: () => void;
-}
+import { NavbarProps } from "@/types/ui";
 
 export function DashboardNavbar({ onMenuClick }: NavbarProps) {
   const { data: session } = useSession()

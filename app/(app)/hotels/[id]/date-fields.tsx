@@ -9,11 +9,7 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-interface DateFieldProps {
-    label: string;
-    field: ControllerRenderProps<any, any>;
-    disabledDates?: (date: Date) => boolean;
-}
+import { DateFieldProps } from "@/types/ui";
 
 export const DateField = ({ label, field, disabledDates }: DateFieldProps) => (
     <div className="flex flex-col">

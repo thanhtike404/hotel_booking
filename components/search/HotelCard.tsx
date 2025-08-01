@@ -7,9 +7,7 @@ import { Star, MapPin } from "lucide-react"
 import Image from "next/image"
 import { CustomLink as Link } from "@/components/ui/custom-link"
 
-type HotelCardProps = {
-  hotel: Hotel
-}
+import { HotelCardProps } from "@/types/hotel";
 
 export function HotelCard({ hotel }: HotelCardProps) {
   return (

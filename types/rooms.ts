@@ -1,11 +1,11 @@
-export type Room = {
-    id: string;
+import { BaseEntity } from "./common";
+import { RoomType } from "./hotel";
+
+export type Room = BaseEntity & {
     hotelId: string;
     available: number;
     total: number;
-    roomType: 'SINGLE' | 'DOUBLE' | 'TWIN' | 'SUITE' | 'FAMILY';
-    createdAt: string;
-    updatedAt: string;
+    roomType: RoomType;
     image: string;
     price: number;
     amenities: string[];
@@ -18,3 +18,17 @@ export type Room = {
 export type RoomResponse = {
     rooms: Room[];
 };
+
+// Room-related component props
+export interface RoomCardProps {
+    room: Room & {
+        image: string;
+        price: number;
+        amenities: string[];
+    };
+}
+
+export interface RoomListModalProps {
+    hotelId: string;
+    rooms: Room[];
+}

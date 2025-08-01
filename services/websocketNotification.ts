@@ -1,12 +1,5 @@
 import axios from 'axios';
-
-interface WebSocketNotificationPayload {
-  action: string;
-  userId: string;
-  message: string;
-  type?: string;
-  data?: any;
-}
+import { WebSocketNotificationPayload } from '@/types/websocket';
 
 export const sendWebSocketNotification = async (payload: WebSocketNotificationPayload) => {
   try {

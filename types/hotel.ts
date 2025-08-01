@@ -1,32 +1,18 @@
+import { Room } from './rooms';
+import { BaseEntity } from './common';
+
 // Define the possible RoomType values as a union type
 export type RoomType = 'SINGLE' | 'DOUBLE' | 'TWIN' | 'SUITE' | 'FAMILY';
 
-import { Room } from './rooms';
-export type Review = {
-  id: string;
+export type Review = BaseEntity & {
   hotelId: string;
   userId?: string;
   rating: number;
   comment: string;
   date: string;
-  createdAt: string;
-  updatedAt: string;
 };
 
-export type Booking = {
-  id: string;
-  hotelId: string;
-  userId: string;
-  roomId?: string;
-  checkIn: string;
-  checkOut: string;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type City = {
-  id: string;
+export type City = BaseEntity & {
   name: string;
   countryId: string;
   country: {
@@ -36,8 +22,7 @@ export type City = {
   };
 };
 
-export type Hotel = {
-  id: string;
+export type Hotel = BaseEntity & {
   name: string;
   description: string;
   cityId: string;
@@ -48,19 +33,39 @@ export type Hotel = {
   amenities: string[];
   latitude: number;
   longitude: number;
+  location: string;
   rooms: Room[];
   reviews: Review[];
-  bookings: Booking[];
-  createdAt: string;
-  updatedAt: string;
-  location: string;
+  bookings: any[]; // Reference to avoid circular dependency
   _count: {
-    rooms: number
+    rooms: number;
   };
-  room: Room[]
+  room: Room[];
 };
 
 export type CreateHotelResponse = {
-  id: string
+  id: string;
   // ... other hotel fields
+};
+
+// Hotel-specific component props
+export type HotelCardProps = {
+  hotel: Hotel;
+};
+
+export interface HotelInfoProps {
+  hotelName: string;
+  roomName: string;
+  price: number;
+}
+
+export type HotelWithRelations = Hotel & {
+  rooms: Room[];
+  reviews: Review[];
+};
+
+export interface HotelEditPageProps {
+  params: {
+    hotelId: string;
+  };
 }

@@ -1,8 +1,4 @@
-interface HotelInfoProps {
-    hotelName: string;
-    roomName: string;
-    price: number;
-}
+import { HotelInfoProps } from "@/types/hotel";
 
 export const HotelInfo = ({ hotelName, roomName, price }: HotelInfoProps) => (
     <div className="bg-muted/50 p-4 rounded-md mb-4">

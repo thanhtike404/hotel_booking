@@ -5,13 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
 
-interface RoomCardProps {
-  room: Room & {
-    image: string;
-    price: number;
-    amenities: string[];
-  }
-}
+import { RoomCardProps } from "@/types/rooms";
 
 export function RoomCard({ room }: RoomCardProps) {
   return (

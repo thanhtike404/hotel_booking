@@ -12,11 +12,7 @@ const icon = new Icon({
   iconAnchor: [12, 41],
 })
 
-interface MapProps {
-  center: [number, number]
-  name: string
-  location: string
-}
+import { MapProps } from "@/types/location";
 
 export default function Map({ center, name, location }: MapProps) {
   useEffect(() => {
