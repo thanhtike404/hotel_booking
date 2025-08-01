@@ -36,12 +36,24 @@ interface RowWithId {
   id: string | number;
 }
 
+interface PaginationProps {
+  page: number;
+  limit: number;
+  totalCount: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (limit: number) => void;
+}
+
 interface DataTableProps<TData extends RowWithId, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   isLoading?: boolean;
   onSelectionChange?: (selectedIds: string[]) => void;
   batchActions?: React.ReactNode;
+  pagination?: PaginationProps;
 }
 
 export function DataTable<TData extends RowWithId, TValue>({
@@ -50,6 +62,7 @@ export function DataTable<TData extends RowWithId, TValue>({
   isLoading,
   onSelectionChange,
   batchActions,
+  pagination,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -60,11 +73,12 @@ export function DataTable<TData extends RowWithId, TValue>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    getPaginationRowModel: pagination ? undefined : getPaginationRowModel(),
     onColumnFiltersChange: setColumnFilters,
     onRowSelectionChange: setRowSelection,
     getFilteredRowModel: getFilteredRowModel(),
     enableRowSelection: true,
+    manualPagination: !!pagination,
     state: {
       columnFilters,
       rowSelection,
@@ -230,24 +244,76 @@ export function DataTable<TData extends RowWithId, TValue>({
       </Table>
 
       {/* Pagination */}
-      <div className="flex items-center justify-end space-x-2 py-4 px-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage() || isLoading}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage() || isLoading}
-        >
-          Next
-        </Button>
-      </div>
+      {pagination && (
+        <div className="flex items-center justify-between space-x-2 py-4 px-4">
+          <div className="flex items-center space-x-2">
+            <p className="text-sm text-muted-foreground">
+              Showing {((pagination.page - 1) * pagination.limit) + 1} to{' '}
+              {Math.min(pagination.page * pagination.limit, pagination.totalCount)} of{' '}
+              {pagination.totalCount} results
+            </p>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2">
+              <p className="text-sm font-medium">Rows per page</p>
+              <select
+                value={pagination.limit}
+                onChange={(e) => pagination.onPageSizeChange(Number(e.target.value))}
+                className="h-8 w-[70px] rounded border border-input bg-background px-3 py-1 text-sm"
+                disabled={isLoading}
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
+            </div>
+            
+            <div className="flex items-center space-x-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => pagination.onPageChange(1)}
+                disabled={!pagination.hasPreviousPage || isLoading}
+              >
+                First
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => pagination.onPageChange(pagination.page - 1)}
+                disabled={!pagination.hasPreviousPage || isLoading}
+              >
+                Previous
+              </Button>
+              
+              <div className="flex items-center space-x-1">
+                <span className="text-sm font-medium">
+                  Page {pagination.page} of {pagination.totalPages}
+                </span>
+              </div>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => pagination.onPageChange(pagination.page + 1)}
+                disabled={!pagination.hasNextPage || isLoading}
+              >
+                Next
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => pagination.onPageChange(pagination.totalPages)}
+                disabled={!pagination.hasNextPage || isLoading}
+              >
+                Last
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
