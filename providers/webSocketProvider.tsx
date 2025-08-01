@@ -11,6 +11,7 @@ import React, {
 import { useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { notificationsQueryKey } from "@/hooks/dashboard/useNotifications";
+import { saveNotification, saveNotificationToAdmins } from "@/services/notification";
 
 interface WebSocketContextType {
   sendNotification: (payload: Record<string, any>) => void;
@@ -154,7 +155,60 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
     return cleanup;
   }, [session?.user?.id, status, connect, cleanup]);
 
-  const sendNotification = useCallback((payload: Record<string, any>) => {
+  const sendNotification = useCallback(async (payload: Record<string, any>) => {
+    // Determine if this is a booking notification that should go to admins
+    const isBookingNotification = payload.type === 'booking' || payload.bookingId;
+    
+    try {
+      console.log("💾 Saving notification to database:", payload);
+      
+      if (isBookingNotification) {
+        // Send to all admin users for booking notifications
+        console.log("📢 Sending booking notification to all admins");
+        await saveNotificationToAdmins({
+          message: payload.message || '',
+          action: payload.action,
+          bookingId: payload.bookingId,
+          status: payload.status,
+          type: payload.type,
+          data: payload.data
+        });
+        console.log("✅ Booking notification saved to all admins successfully");
+      } else {
+        // Send to specific user for regular notifications
+        await saveNotification({
+          userId: payload.userId || session?.user?.id || '',
+          message: payload.message || '',
+          action: payload.action,
+          bookingId: payload.bookingId,
+          status: payload.status,
+          type: payload.type,
+          data: payload.data
+        });
+        console.log("✅ Notification saved to database successfully");
+        
+        // Update local query cache for regular notifications
+        if (session?.user?.id) {
+          queryClientRef.current.setQueryData(notificationsQueryKey(session.user.id), (old: any[] = []) => [
+            {
+              id: `temp_${Date.now()}`,
+              userId: payload.userId || session.user.id,
+              message: payload.message,
+              bookingId: payload.bookingId,
+              status: payload.status,
+              isRead: false,
+              createdAt: new Date().toISOString(),
+              ...payload
+            },
+            ...(old ?? []),
+          ]);
+        }
+      }
+    } catch (error) {
+      console.error("❌ Failed to save notification to database:", error);
+    }
+
+    // Send via WebSocket (if connected)
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {
       console.log("📤 Sending via WebSocket:", payload);
       try {
@@ -163,10 +217,10 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
         console.warn("❌ Failed to send WebSocket message:", error);
       }
     } else {
-      console.warn("⚠️ WebSocket not connected. Message not sent. State:", ws.current?.readyState);
+      console.warn("⚠️ WebSocket not connected. Message not sent via WebSocket. State:", ws.current?.readyState);
       console.warn("⚠️ WebSocket states: CONNECTING=0, OPEN=1, CLOSING=2, CLOSED=3");
     }
-  }, []);
+  }, [session?.user?.id]);
 
   // Don't render context for unauthenticated users
   if (status === "loading" || status === "unauthenticated") {

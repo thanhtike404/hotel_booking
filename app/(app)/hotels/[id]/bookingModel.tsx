@@ -57,7 +57,7 @@ export default function BookingModal({
         if (isOpen && room) {
             // Reset the notification ref when modal opens
             notificationSentRef.current = false;
-            
+
             form.reset({
                 checkIn: new Date(),
                 checkOut: addDays(new Date(), 1),
@@ -82,19 +82,22 @@ export default function BookingModal({
             setIsLoading(true);
 
             createBookingMutation(requestData, {
-                onSuccess: () => {
+                onSuccess: (response) => {
                     setSuccess(true);
-                    
+
                     // Send notification only once per booking
-                    if (!notificationSentRef.current) {
+                    if (!notificationSentRef.current && response?.bookingId) {
                         notificationSentRef.current = true;
                         try {
-                            console.log('Sending notification...');
+                            console.log('Sending booking notification with ID:', response.bookingId);
                             sendNotification({
                                 action: "sendNotification",
-                                userId: session?.user?.id || '',
-                                message: "📢 Hello from client!",
-                            });
+                                message: `🏨 New booking request for ${room.name} at ${hotelName}`,
+                                bookingId: response.bookingId,
+                                status: "REQUESTED",
+                                type: "booking",
+                                userId: session?.user?.id,
+                            }); 
                         } catch (error) {
                             console.error("Error sending notification:", error);
                         }

@@ -24,7 +24,7 @@ export function DashboardNavbar({ onMenuClick }: NavbarProps) {
     setMounted(true)
   }, [])
 
-  console.log("Session:", session);
+ 
 
   // Only fetch notifications if user is authenticated
   const { data: notifications = [], isLoading } = useNotifications(

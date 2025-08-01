@@ -38,28 +38,27 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid password");
         }
 
-        // Return user object with id and role
+  
         return {
           id: user.id,  // This is crucial
           email: user.email,
           name: user.name,
-          role: user.role, // Include the user's role
-          // Include any other user fields you need
+          role: user.role,
         };
       }
     })
   ],
   callbacks: {
     async jwt({ token, user }) {
-      // Add user id to the token right after sign in
+     
       if (user) {
         token.id = user.id;
-        token.role = user.role; // Include role if needed
+        token.role = user.role; 
       }
       return token;
     },
     async session({ session, token }) {
-      // Add user id and role to the session
+  
       if (session.user) {
         // @ts-ignore
         session.user.id = token.id as string;

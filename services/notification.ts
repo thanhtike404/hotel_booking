@@ -73,3 +73,50 @@ export const createBookingNotification = async (
     throw error;
   }
 };
+
+export const saveNotification = async (notificationData: {
+  userId: string;
+  message: string;
+  action?: string;
+  bookingId?: string;
+  status?: 'REQUESTED' | 'ACCEPTED' | 'REJECTED';
+  type?: string;
+  data?: any;
+}) => {
+  try {
+    const response = await axios.post('/api/notifications/save', notificationData, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log("✅ Notification saved:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("❌ Error saving notification:", error);
+    throw error;
+  }
+};
+
+export const saveNotificationToAdmins = async (notificationData: {
+  message: string;
+  action?: string;
+  bookingId?: string;
+  status?: 'REQUESTED' | 'ACCEPTED' | 'REJECTED';
+  type?: string;
+  data?: any;
+}) => {
+  try {
+    const response = await axios.post('/api/notifications/save-to-admins', notificationData, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log("✅ Admin notifications saved:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("❌ Error saving admin notifications:", error);
+    throw error;
+  }
+};
