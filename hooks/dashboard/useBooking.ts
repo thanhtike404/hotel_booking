@@ -3,7 +3,7 @@ import axios from 'axios'
 import { Booking, BookingResponse } from '@/types/bookings'
 
 async function fetchBooking(bookingId: string): Promise<BookingResponse> {
-  const response = await axios.get(`/api/bookings/${bookingId}`)
+  const response = await axios.get(`/api/dashboard/bookings/${bookingId}`)
   return response.data
 }
 

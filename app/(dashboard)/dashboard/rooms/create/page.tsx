@@ -2,6 +2,9 @@ import { createRoom, getHotels } from "./createRoom";
 import { amenitiesList } from "@/data/aminities";
 import Form from "next/form";
 
+// Force dynamic rendering to prevent build-time database calls
+export const dynamic = 'force-dynamic';
+
 export default async function CreateRoomPage() {
     const hotels = await getHotels();
 

@@ -3,9 +3,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { 
-  updateBookingNotificationStatus, 
-  sendBookingStatusUpdateToGuest 
+import {
+  updateBookingNotificationStatus,
+  sendBookingStatusUpdateToGuest
 } from "@/services/websocketNotification";
 
 const statusUpdateSchema = z.object({
@@ -57,7 +57,7 @@ export async function PATCH(
       }
     });
 
-    // Create notification for status change if notificationStatus is provided
+ 
     if (notificationStatus) {
       await prisma.notification.create({
         data: {
@@ -68,10 +68,11 @@ export async function PATCH(
         }
       });
 
-      // Send WebSocket notification to guest
+      
       const bookingDetails = {
         bookingId: updatedBooking.id,
         guestName: updatedBooking.user.name || 'Guest',
+        guestEmail: updatedBooking.user.email || '',
         hotelName: updatedBooking.hotel.name,
         roomName: updatedBooking.rooms[0]?.room.name || 'Room',
         checkIn: updatedBooking.checkIn.toISOString(),
@@ -86,7 +87,7 @@ export async function PATCH(
         );
       }
 
-      // Get all admin users for notification
+   
       const adminUsers = await prisma.user.findMany({
         where: { role: 'ADMIN' },
         select: { id: true }
@@ -94,7 +95,7 @@ export async function PATCH(
 
       const adminUserIds = adminUsers.map(admin => admin.id);
 
-      // Send notification to admins about the status change
+
       if (adminUserIds.length > 0) {
         await updateBookingNotificationStatus(
           updatedBooking.id,

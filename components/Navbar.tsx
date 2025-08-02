@@ -13,6 +13,7 @@ const navLinks = [
   { name: 'Hotels', href: '/hotels' },
   { name: 'Search Hotels', href: '/search' },
   { name: 'Contact', href: '/contact' },
+  { name: 'Bookings', href: '/bookings' }
 ]
 
 export default function Navbar() {
@@ -20,7 +21,7 @@ export default function Navbar() {
   const [profileOpen, setProfileOpen] = useState(false)
   const [notificationOpen, setNotificationOpen] = useState(false)
   const { data: session } = useSession()
-  const { data: notifications = [], isLoading } = useNotifications(false)??[];
+  const { data: notifications = [], isLoading } = useNotifications(false) ?? [];
 
 
   return (
@@ -81,8 +82,8 @@ export default function Navbar() {
                           <div
                             key={notification.id}
                             className={`p-3 rounded-md mb-2 ${!notification.isRead
-                                ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500'
-                                : 'bg-gray-50 dark:bg-gray-700/50'
+                              ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500'
+                              : 'bg-gray-50 dark:bg-gray-700/50'
                               }`}
                           >
                             <p className="text-sm text-gray-900 dark:text-white">{notification.message}</p>

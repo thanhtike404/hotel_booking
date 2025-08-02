@@ -5,7 +5,6 @@ import 'leaflet/dist/leaflet.css'
 import { Icon } from 'leaflet'
 import { useEffect } from 'react'
 
-// Fix for default marker icon
 const icon = new Icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon.png",
   iconSize: [25, 41],
@@ -16,7 +15,7 @@ import { MapProps } from "@/types/location";
 
 export default function Map({ center, name, location }: MapProps) {
   useEffect(() => {
-    // Fix for map container not rendering properly
+    
     const container = document.getElementById('map-container')
     if (container) {
       container.style.height = '300px'

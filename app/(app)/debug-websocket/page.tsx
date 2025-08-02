@@ -9,10 +9,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function DebugWebSocketPage() {
   const { data: session } = useSession();
-  const { isConnected, connectionState, sendNotification } = useWebSocket();
-  const { data: notifications = [], isLoading, refetch } = useNotifications(session?.user?.id || "");
+  const [mounted, setMounted] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
   const [testMessage, setTestMessage] = useState("Test notification from debug page");
+
+  // Only use WebSocket hooks after component mounts (client-side only)
+  const webSocketData = mounted ? useWebSocket() : { isConnected: false, connectionState: 'disconnected', sendNotification: () => {} };
+  const { isConnected, connectionState, sendNotification } = webSocketData;
+  
+  const notificationsData = mounted ? useNotifications(session?.user?.id || "") : { data: [], isLoading: false, refetch: () => {} };
+  const { data: notifications = [], isLoading, refetch } = notificationsData;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const addLog = (message: string) => {
     const timestamp = new Date().toLocaleTimeString();

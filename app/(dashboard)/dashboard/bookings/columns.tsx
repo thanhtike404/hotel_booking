@@ -13,39 +13,33 @@ import { BookingStatusSelect } from "@/components/dashboard/BookingStatusSelect"
 
 export interface Booking {
   id: string;
-  bookingId: string;
-  roomId: string;
-  booking: {
-    id: string;
-    hotelId: string;
-    userId: string;
-    checkIn: string;
-    checkOut: string;
-    status: string;
-    createdAt: string;
-    updatedAt: string;
-    hotel: {
-      id: string;
-      name: string;
-      rating: number;
-    };
-    user: {
-      id: string;
-      name: string;
-      email: string;
-    };
-  };
-  room: {
+  hotelId: string;
+  userId: string;
+  checkIn: string;
+  checkOut: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  hotel: {
     id: string;
     name: string;
-    roomType: string;
     image: string;
-    price: number;
+    city: {
+      name: string;
+      country: {
+        name: string;
+      };
+    };
+  };
+  user: {
+    id: string;
+    name: string;
+    email: string;
   };
 }
 
 export const columns: ColumnDef<Booking, unknown>[] = [
-    {
+  {
     id: "select",
     header: ({ table }) => (
       <Checkbox
@@ -65,41 +59,42 @@ export const columns: ColumnDef<Booking, unknown>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "booking.user.name",
+    accessorKey: "user.name",
     header: "Username",
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <h2>{row.original.booking.user.name}</h2>
+        <h2>{row.original.user?.name || 'N/A'}</h2>
       </div>
     ),
   },
   {
-    accessorKey: "booking.hotel.name",
+    accessorKey: "hotel.name",
     header: "Hotel Name",
     cell: ({ row }) => (
-      <Link href={`/dashboard/hotels/${row.original.booking.hotel.id}`}>
-        {row.original.booking.hotel.name}
+      <Link href={`/dashboard/hotels/${row.original.hotel?.id || '#'}`}>
+        {row.original.hotel?.name || 'N/A'}
       </Link>
     ),
   },
   {
-    accessorKey: "booking.hotel.rating",
-    header: "Rating",
+    accessorKey: "hotel.city.name",
+    header: "Location",
     cell: ({ row }) => (
-      <span className="text-yellow-500 font-medium">
-        {row.original.booking.hotel.rating} ★
+      <span>
+        {row.original.hotel?.city?.name || 'N/A'}, {row.original.hotel?.city?.country?.name || 'N/A'}
       </span>
     ),
   },
   {
-    accessorKey: "room.roomType",
-    header: "Room Type",
-    cell: ({ row }) => (
-      <span>{row.original.room.roomType}</span>
-    ),
+    accessorKey: "createdAt",
+    header: "Booking Date",
+    cell: ({ getValue }) => {
+      const date = new Date(getValue() as string);
+      return !isNaN(date.getTime()) ? format(date, "PPP") : "Invalid date";
+    },
   },
   {
-    accessorKey: "booking.checkIn",
+    accessorKey: "checkIn",
     header: "Check In",
     cell: ({ getValue }) => {
       const date = new Date(getValue() as string);
@@ -107,7 +102,7 @@ export const columns: ColumnDef<Booking, unknown>[] = [
     },
   },
   {
-    accessorKey: "booking.checkOut",
+    accessorKey: "checkOut",
     header: "Check Out",
     cell: ({ getValue }) => {
       const date = new Date(getValue() as string);
@@ -115,12 +110,12 @@ export const columns: ColumnDef<Booking, unknown>[] = [
     },
   },
   {
-    accessorKey: "booking.status",
+    accessorKey: "status",
     header: "Booking Status",
     cell: ({ row }) => (
       <BookingStatusSelect
-        bookingId={row.original.booking.id}
-        currentStatus={row.original.booking.status}
+        bookingId={row.original.id}
+        currentStatus={row.original.status}
       />
     ),
   },
@@ -129,12 +124,12 @@ export const columns: ColumnDef<Booking, unknown>[] = [
     header: "Actions",
     cell: ({ row }) => {
       const queryClient = useQueryClient();
-      const deleteHotel = useMutation({
+      const deleteBooking = useMutation({
         mutationFn: async (id: string) => {
-          await axios.delete("/api/dashboard/hotels", { data: { id } });
+          await axios.delete(`/api/dashboard/bookings/${id}`);
         },
         onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ["hotels"] });
+          queryClient.invalidateQueries({ queryKey: ["bookings"] });
         },
       });
 
@@ -145,7 +140,7 @@ export const columns: ColumnDef<Booking, unknown>[] = [
               <Eye className="h-4 w-4" />
             </Button>
           </Link>
-          <Link href={`/dashboard/hotels/edit/${row.original.booking.hotel.id}`}>
+          <Link href={`/dashboard/hotels/edit/${row.original.hotel?.id || '#'}`}>
             <Button variant="ghost" size="icon">
               <Edit className="h-4 w-4" />
             </Button>
@@ -156,7 +151,7 @@ export const columns: ColumnDef<Booking, unknown>[] = [
             className="text-destructive"
             onClick={() => {
               if (confirm("Are you sure you want to delete this booking?")) {
-                deleteHotel.mutate(row.original.booking.hotel.id);
+                deleteBooking.mutate(row.original.id);
               }
             }}
           >

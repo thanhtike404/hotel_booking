@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse ,NextRequest} from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authGuard } from "@/lib/authGuard";
 import { Prisma } from "@prisma/client";
@@ -17,9 +17,10 @@ export async function POST(request: Request) {
   try {
     // 1. Authentication check
     const session = await authGuard();
-    if (!session?.user?.id) {
+    if (!session?.user?.id || session?.user?.role !== "USER") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+ 
 
     // 2. Parse and validate request body
     const body = await request.json();
@@ -103,43 +104,39 @@ export async function POST(request: Request) {
     );
   }
 }
-export const GET = async () => {
+
+export const GET = async (req: NextRequest) => {
   try {
     const session = await authGuard();
-
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user?.id) {
+      return new Response("Unauthorized", { status: 401 });
     }
-    const bookings = await prisma.bookingRoom.findMany({
 
+    const userId = session.user.id;
+
+    const bookings = await prisma.booking.findMany({
+      where: {
+        userId: userId,
+      },
       include: {
-        booking: {
+        hotel: true,
+        rooms: {
           include: {
-            hotel: true,
-            user: true,
-          },
-        },
-        room: true,
-      },
-      orderBy: {
-        booking: {
-          createdAt: "desc",
-        },
-      },
+            room: true
+          }
+        }
+      }
     });
-    if (!bookings) {
-      return NextResponse.json(bookings);
-    }
-    return NextResponse.json({ bookings });
+
+    return NextResponse.json(bookings);
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching user bookings:", error);
     return NextResponse.json(
-      { error: "Failed to create booking" },
-      { status: 500 },
+      { error: "Failed to fetch bookings" },
+      { status: 500 }
     );
   }
 };
-
 export const DELETE = async (request: Request) => {
   try {
     const session = await authGuard();
@@ -152,14 +149,7 @@ export const DELETE = async (request: Request) => {
     console.log("Session user:", session.user);
     console.log("User role:", session.user?.role);
 
-    // Temporary: Allow any authenticated user to delete bookings for testing
-    // TODO: Re-enable admin check once role is properly included in session
-    // if (session.user?.role !== "ADMIN") {
-    //   return NextResponse.json({ 
-    //     error: "Forbidden - Admin access required", 
-    //     userRole: session.user?.role 
-    //   }, { status: 403 });
-    // }
+ 
 
     const body = await request.json();
     const { ids } = body;

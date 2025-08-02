@@ -4,7 +4,7 @@ export const batchDeleteBookings = async (bookingIds: string[]) => {
   try {
     console.log("Attempting to delete booking IDs:", bookingIds);
     
-    const response = await axios.delete('/api/bookings', {
+    const response = await axios.delete('/api/dashboard/bookings', {
       data: { ids: bookingIds },
       headers: {
         'Content-Type': 'application/json',

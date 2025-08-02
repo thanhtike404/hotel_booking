@@ -6,7 +6,7 @@ export const bookingsQueryKey = ['bookings'];
 
 export const useBookings = () => {
   const fetchBookings = async () => {
-    const response = await axios.get("/api/bookings");
+    const response = await axios.get("/api/dashboard/bookings");
     return response.data.bookings;
   };
 
@@ -39,7 +39,7 @@ export const useUpdateBookingStatus = () => {
 
   return useMutation({
     mutationFn: async ({ bookingId, status }: { bookingId: string; status: string }) => {
-      const response = await axios.patch(`/api/bookings/${bookingId}`, { status });
+      const response = await axios.patch(`/api/dashboard/bookings/${bookingId}`, { status });
       return response.data;
     },
     onSuccess: () => {
