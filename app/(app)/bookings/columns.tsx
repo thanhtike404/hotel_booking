@@ -158,12 +158,43 @@ export const customerBookingColumns: ColumnDef<CustomerBooking, unknown>[] = [
     },
   },
   {
+    accessorKey: "rooms",
+    header: "Room(s)",
+    cell: ({ row }) => {
+      const rooms = row.original.rooms || [];
+      if (rooms.length === 0) return <span className="text-gray-500">No rooms</span>;
+      
+      return (
+        <div className="space-y-1">
+          {rooms.slice(0, 2).map((bookingRoom) => (
+            <div key={bookingRoom.id} className="text-sm">
+              <Link 
+                href={`/bookings/room/${bookingRoom.room.id}`}
+                className="text-primary hover:underline font-medium"
+              >
+                {bookingRoom.room.name}
+              </Link>
+              <div className="text-xs text-gray-500">
+                {bookingRoom.room.roomType} • ${bookingRoom.room.price}/night
+              </div>
+            </div>
+          ))}
+          {rooms.length > 2 && (
+            <div className="text-xs text-gray-500">
+              +{rooms.length - 2} more room(s)
+            </div>
+          )}
+        </div>
+      );
+    },
+  },
+  {
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {
       return (
         <div className="flex items-center gap-2">
-          <Link href={`/my-bookings/${row.original.id}`}>
+          <Link href={`/bookings/room/${row.original.id}`}>
             <Button variant="ghost" size="sm" className="h-8">
               <Eye className="h-4 w-4 mr-1" />
               View Details
