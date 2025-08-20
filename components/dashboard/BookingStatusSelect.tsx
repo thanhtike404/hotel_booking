@@ -11,7 +11,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useUpdateBookingStatus } from "@/hooks/dashboard/useBookings";
 import { useToast } from "@/hooks/use-toast";
-
+import { useQueryClient } from "@tanstack/react-query";
 import { BookingStatusSelectProps } from "@/types/bookings";
 
 const statusConfig = {
@@ -24,6 +24,7 @@ const statusConfig = {
 
 export function BookingStatusSelect({ bookingId, currentStatus }: BookingStatusSelectProps) {
     const [isUpdating, setIsUpdating] = useState(false);
+    const queryClient = useQueryClient()
     const updateStatusMutation = useUpdateBookingStatus();
     const { toast } = useToast();
 
@@ -42,6 +43,11 @@ export function BookingStatusSelect({ bookingId, currentStatus }: BookingStatusS
                 description: `Booking status updated to ${statusConfig[newStatus as keyof typeof statusConfig].label}`,
                 variant: "default",
             });
+
+            queryClient.invalidateQueries({
+                queryKey: ['bookings']
+            })
+
         } catch (error: any) {
             console.error("Failed to update booking status:", error);
             toast({

@@ -25,7 +25,7 @@ export const useRooms = (filters: RoomsFilters = {}) => {
   return useQuery({
     queryKey: [...roomsQueryKey, filters],
     queryFn: fetchRooms,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
   });
 };
 
@@ -40,7 +40,7 @@ export const useBatchDeleteRooms = () => {
       return response.data;
     },
     onSuccess: () => {
-      // Invalidate and refetch rooms after successful deletion
+
       queryClient.invalidateQueries({
         queryKey: roomsQueryKey
       });
@@ -51,7 +51,7 @@ export const useBatchDeleteRooms = () => {
   });
 };
 
-// Hook to get hotels for filter dropdown
+
 export const useHotelsForFilter = () => {
   const fetchHotels = async () => {
     const response = await axios.get('/api/hotels');

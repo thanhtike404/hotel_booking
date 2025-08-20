@@ -11,19 +11,19 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url);
 
-    // Pagination parameters
+
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");
     const skip = (page - 1) * limit;
 
-    // Filter parameters
+
     const name = searchParams.get("name") || "";
     const hotelId = searchParams.get("hotelId") || "";
     const minPrice = searchParams.get("minPrice");
     const maxPrice = searchParams.get("maxPrice");
     const available = searchParams.get("available");
 
-    // Build where clause
+
     const where: any = {};
 
     if (name) {

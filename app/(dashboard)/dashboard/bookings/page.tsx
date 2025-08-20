@@ -2,46 +2,54 @@
 import { columns } from "./columns";
 import { DataTable } from "@/components/dataTable/data-table";
 import { useBookings, useBatchDeleteBookings } from "@/hooks/dashboard/useBookings";
+import { useBatchDelete } from "@/hooks/dashboard/useBatchDelete";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-
+import { BookingFilter } from "@/components/dashboard/bookings/BookingFilter";
 export default function Page() {
-  const { data, isLoading } = useBookings();
-  const batchDeleteMutation = useBatchDeleteBookings();
-  const [selectedBookingIds, setSelectedBookingIds] = useState<string[]>([]);
-  const { toast } = useToast();
+  const [filters, setFilters] = useState({
+    page: 1,
+    limit: 10,
+  });
+  const { data, isLoading } = useBookings(
+    filters
+  );
 
-  const handleBatchDelete = async () => {
-    if (selectedBookingIds.length === 0) return;
+  const bookingDeleteMutation = useBatchDeleteBookings();
 
-    const confirmed = confirm(
-      `Are you sure you want to delete ${selectedBookingIds.length} booking(s)? This action cannot be undone.`
-    );
+  const { selectedIds, setSelectedIds, handleBatchDelete, isPending } =
+    useBatchDelete({
+      mutationFn: bookingDeleteMutation.mutateAsync,
+      getSuccessMessage: (result: any) =>
+        `Successfully deleted ${result.deletedCount} booking(s)`,
+    });
 
-    if (confirmed) {
-      try {
-        const result = await batchDeleteMutation.mutateAsync(selectedBookingIds);
-        setSelectedBookingIds([]);
-        
-        // Show success toast
-        toast({
-          title: "Success",
-          description: `Successfully deleted ${result.deletedCount} booking(s)`,
-          variant: "default",
-        });
-      } catch (error: any) {
-        console.error("Failed to delete bookings:", error);
-        
-        // Show error toast
-        toast({
-          title: "Error",
-          description: error.message || "Failed to delete bookings. Please try again.",
-          variant: "destructive",
-        });
-      }
-    }
+
+
+
+  const handleFilterChange = (newFilters: any) => {
+    setFilters({
+      ...newFilters,
+      page: 1, // Reset to first page when filters change
+      limit: filters.limit,
+    });
+  };
+
+
+  const handlePageChange = (page: number) => {
+    setFilters({
+      ...filters,
+      page,
+    });
+  };
+
+  const handlePageSizeChange = (limit: number) => {
+    setFilters({
+      ...filters,
+      limit,
+      page: 1,
+    });
   };
 
   return (
@@ -50,26 +58,36 @@ export default function Page() {
         <h2 className="text-3xl font-bold tracking-tight">Bookings</h2>
         <p className="text-muted-foreground">Booking List</p>
       </div>
-      
-      <DataTable 
-        isLoading={isLoading} 
-        columns={columns} 
-        data={data || []}
-        onSelectionChange={setSelectedBookingIds}
+      <BookingFilter onFilterChange={handleFilterChange} />
+      <DataTable
+        isLoading={isLoading}
+        columns={columns}
+        data={data?.bookings || []}
+        onSelectionChange={setSelectedIds}
+        pagination={{
+          page: filters.page,
+          limit: filters.limit,
+          totalCount: data?.pagination.totalCount || 0,
+          totalPages: data?.pagination.totalPages || 0,
+          hasNextPage: data?.pagination.hasNextPage || false,
+          hasPreviousPage: data?.pagination.hasPreviousPage || false,
+          onPageChange: handlePageChange,
+          onPageSizeChange: handlePageSizeChange,
+        }}
         batchActions={
-          selectedBookingIds.length > 0 ? (
+          selectedIds.length > 0 ? (
             <Button
               variant="destructive"
               onClick={handleBatchDelete}
-              disabled={batchDeleteMutation.isPending}
+              disabled={isPending}
               className="flex items-center gap-2"
             >
-              {batchDeleteMutation.isPending ? (
+              {isPending ? (
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
               ) : (
                 <Trash2 className="h-4 w-4" />
               )}
-              Delete Selected ({selectedBookingIds.length})
+              Delete Selected ({selectedIds.length})
             </Button>
           ) : null
         }

@@ -27,11 +27,12 @@ export function RoomsFilter({ onFilterChange, isLoading }: RoomsFilterProps) {
 
   const { data: hotels = [] } = useHotelsForFilter();
 
+  console.log(hotels)
+
   const handleFilterChange = (key: string, value: string) => {
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
-    
-    // Convert string values to appropriate types for API
+
     const apiFilters = {
       ...newFilters,
       minPrice: newFilters.minPrice ? parseFloat(newFilters.minPrice) : undefined,
@@ -91,7 +92,6 @@ export function RoomsFilter({ onFilterChange, isLoading }: RoomsFilterProps) {
             </div>
           </div>
 
-          {/* Hotel Filter */}
           <div className="space-y-2">
             <Label htmlFor="hotel">Hotel</Label>
             <Select
@@ -113,7 +113,7 @@ export function RoomsFilter({ onFilterChange, isLoading }: RoomsFilterProps) {
             </Select>
           </div>
 
-          {/* Min Price Filter */}
+
           <div className="space-y-2">
             <Label htmlFor="minPrice">Min Price</Label>
             <Input

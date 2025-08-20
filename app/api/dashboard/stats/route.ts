@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    const roomTrend = 5.2; // Mock trend for available rooms
+    const roomTrend = 5.2; 
 
     // Revenue calculation (mock calculation based on bookings)
     const confirmedBookings = await prisma.booking.findMany({
@@ -111,8 +111,7 @@ export async function GET(request: NextRequest) {
       return sum + bookingRevenue;
     }, 0);
 
-    const revenueTrend = 12.5; // Mock trend for revenue
-
+    const revenueTrend = 12.5; 
     const stats = {
       bookings: {
         total: totalBookings,

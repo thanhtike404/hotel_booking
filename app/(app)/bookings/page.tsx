@@ -1,7 +1,8 @@
 "use client";
 import { customerBookingColumns } from "./columns";
 import { DataTable } from "@/components/dataTable/data-table";
-import { useBookings, useBatchDeleteBookings } from "@/hooks/dashboard/useBookings";
+import { useBatchDeleteBookings } from "@/hooks/dashboard/useBookings";
+import { useBookings } from "@/hooks/useBooking";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
@@ -24,7 +25,7 @@ export default function Page() {
       try {
         const result = await batchDeleteMutation.mutateAsync(selectedBookingIds);
         setSelectedBookingIds([]);
-        
+
         // Show success toast
         toast({
           title: "Success",
@@ -33,7 +34,7 @@ export default function Page() {
         });
       } catch (error: any) {
         console.error("Failed to delete bookings:", error);
-        
+
         // Show error toast
         toast({
           title: "Error",
@@ -50,10 +51,10 @@ export default function Page() {
         <h2 className="text-3xl font-bold tracking-tight">Bookings</h2>
         <p className="text-muted-foreground">Booking List</p>
       </div>
-      
-      <DataTable 
-        isLoading={isLoading} 
-        columns={customerBookingColumns} 
+
+      <DataTable
+        isLoading={isLoading}
+        columns={customerBookingColumns}
         data={data || []}
         onSelectionChange={setSelectedBookingIds}
         batchActions={

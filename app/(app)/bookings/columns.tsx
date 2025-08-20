@@ -192,6 +192,7 @@ export const customerBookingColumns: ColumnDef<CustomerBooking, unknown>[] = [
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {
+      console.log(row.original)
       return (
         <div className="flex items-center gap-2">
           <Link href={`/bookings/room/${row.original.id}`}>

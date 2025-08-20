@@ -8,23 +8,30 @@ import { useRooms, useBatchDeleteRooms } from "@/hooks/dashboard/useRooms";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useBatchDelete } from "@/hooks/dashboard/useBatchDelete";
 import Link from "next/link";
 
 export default function RoomsPage() {
-  const [selectedRoomIds, setSelectedRoomIds] = useState<string[]>([]);
+
   const [filters, setFilters] = useState({
     page: 1,
     limit: 10,
   });
 
   const { data, isLoading, error } = useRooms(filters);
-  const batchDeleteMutation = useBatchDeleteRooms();
-  const { toast } = useToast();
+  const roomDeleteMutation = useBatchDeleteRooms();
+  const { selectedIds, setSelectedIds, handleBatchDelete, isPending } =
+    useBatchDelete({
+      mutationFn: roomDeleteMutation.mutateAsync,
+      getSuccessMessage: (result: any) =>
+        `Successfully deleted ${result.deletedCount} booking(s)`,
+    });
+
 
   const handleFilterChange = (newFilters: any) => {
     setFilters({
       ...newFilters,
-      page: 1, // Reset to first page when filters change
+      page: 1,
       limit: filters.limit,
     });
   };
@@ -40,38 +47,12 @@ export default function RoomsPage() {
     setFilters({
       ...filters,
       limit,
-      page: 1, // Reset to first page when page size changes
+      page: 1,
     });
   };
 
-  const handleBatchDelete = async () => {
-    if (selectedRoomIds.length === 0) return;
 
-    const confirmed = confirm(
-      `Are you sure you want to delete ${selectedRoomIds.length} room(s)? This action cannot be undone.`
-    );
 
-    if (confirmed) {
-      try {
-        const result = await batchDeleteMutation.mutateAsync(selectedRoomIds);
-        setSelectedRoomIds([]);
-        
-        toast({
-          title: "Success",
-          description: `Successfully deleted ${result.deletedCount} room(s)`,
-          variant: "default",
-        });
-      } catch (error: any) {
-        console.error("Failed to delete rooms:", error);
-        
-        toast({
-          title: "Error",
-          description: error.response?.data?.error || "Failed to delete rooms. Please try again.",
-          variant: "destructive",
-        });
-      }
-    }
-  };
 
   if (error) {
     return (
@@ -110,7 +91,7 @@ export default function RoomsPage() {
       </div>
 
       {/* Filters */}
-      <RoomsFilter 
+      <RoomsFilter
         onFilterChange={handleFilterChange}
         isLoading={isLoading}
       />
@@ -143,12 +124,12 @@ export default function RoomsPage() {
         </div>
       )}
 
-      {/* Data Table */}
-      <DataTable 
-        isLoading={isLoading} 
-        columns={columns} 
+
+      <DataTable
+        isLoading={isLoading}
+        columns={columns}
         data={data?.rooms || []}
-        onSelectionChange={setSelectedRoomIds}
+        onSelectionChange={setSelectedIds}
         pagination={{
           page: filters.page,
           limit: filters.limit,
@@ -160,19 +141,19 @@ export default function RoomsPage() {
           onPageSizeChange: handlePageSizeChange,
         }}
         batchActions={
-          selectedRoomIds.length > 0 ? (
+          selectedIds.length > 0 ? (
             <Button
               variant="destructive"
               onClick={handleBatchDelete}
-              disabled={batchDeleteMutation.isPending}
+              disabled={isPending}
               className="flex items-center gap-2"
             >
-              {batchDeleteMutation.isPending ? (
+              {isPending ? (
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
               ) : (
                 <Trash2 className="h-4 w-4" />
               )}
-              Delete Selected ({selectedRoomIds.length})
+              Delete Selected ({selectedIds.length})
             </Button>
           ) : null
         }
